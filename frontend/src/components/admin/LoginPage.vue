@@ -165,12 +165,17 @@
                     </form>
 
                     <!-- Debug info - visible on mobile -->
-                    <div class="mt-4 p-3 bg-slate-950/50 rounded-lg border border-slate-700/50 text-xs">
+                    <div
+                        class="mt-4 p-3 bg-slate-950/50 rounded-lg border border-slate-700/50 text-xs"
+                    >
                         <p class="text-slate-400 mb-1">Debug Info:</p>
                         <p class="text-slate-300 font-mono break-all">
                             Hostname: {{ window.location.hostname }}
                         </p>
-                        <p class="text-slate-300 font-mono break-all mt-1" id="apiUrl">
+                        <p
+                            class="text-slate-300 font-mono break-all mt-1"
+                            id="apiUrl"
+                        >
                             API: Loading...
                         </p>
                     </div>
@@ -470,7 +475,11 @@ const onSubmit = async () => {
         // Show detailed error for debugging on mobile
         const hostname = window.location.hostname;
         const apiUrl = `${API_BASE_URL}/api/login`;
-        error.value = `❌ ${e.message}\n\n🌐 Your hostname: ${hostname}\n📡 API URL: ${apiUrl}\n\n${e.name}: ${e.stack || 'No stack trace'}`;
+        error.value = `❌ ${
+            e.message
+        }\n\n🌐 Your hostname: ${hostname}\n📡 API URL: ${apiUrl}\n\n${
+            e.name
+        }: ${e.stack || "No stack trace"}`;
         console.error("Login error:", e);
         console.error("API_BASE_URL:", API_BASE_URL);
     } finally {
