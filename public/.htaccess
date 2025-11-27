@@ -5,6 +5,9 @@
 
     RewriteEngine On
 
+    # Redirect /admin to login page
+    RewriteRule ^admin/?$ /pages/admin/login.html [L]
+
     # Serve existing files directly (FIRST - highest priority)
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
