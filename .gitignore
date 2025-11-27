@@ -1,0 +1,14 @@
+/vendor
+/node_modules
+/.idea
+Homestead.json
+Homestead.yaml
+.env
+.phpunit.result.cache
+/storage/*.key
+/storage/logs/*
+!/storage/logs/.gitignore
+/frontend/node_modules
+/frontend/dist
+npm-debug.log
+yarn-error.log

@@ -1,0 +1,6 @@
+staff_id,name,phone_number,email,position,department,superior,group,area,work_location,hire_date,rank,device,team_leader_id,warning_letter,ojk_case,notes
+IDNA102706,Sisrina Ristiani,628123456789,sisrina.ristiani@company.com,Collection Executive,Rangga Rahmanda Putra,Asep Irpan,P-1,Jakarta,WFH,2025-02-04,S1,PC,IDNA200008,,,Recommended by Yogi
+IDNA102707,Budi Santoso,628234567890,budi.santoso@company.com,Collection Supervisor,Collection Department,Rangga Rahmanda,P-1,Jakarta,Onsite,2024-11-15,C1,Laptop,IDNA200008,,,
+IDNA102708,Siti Aminah,628345678901,siti.aminah@company.com,Data Analyst,IT Department,Ahmad Hidayat,P-2,Bandung,WFH,2024-08-20,S2,PC,,,
+IDNA102709,Andi Wijaya,628456789012,andi.wijaya@company.com,Marketing Executive,Marketing Department,Dian Purnama,P-1,Surabaya,Onsite,2025-01-10,S1,Laptop,IDNA200009,,,New hire
+IDNA200008,Asep Irpan,628567890123,asep.irpan@company.com,Team Leader,Collection Department,Rangga Rahmanda,P-1,Jakarta,Onsite,2023-12-15,C2,PC,,,,DC TL
