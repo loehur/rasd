@@ -51,6 +51,11 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('staff/import', 'StaffController@import');
     $router->get('staff/template', 'StaffController@downloadTemplate');
 
+    // Team Leader routes
+    $router->get('team-leaders', 'TeamLeaderController@index');
+    $router->post('team-leaders/import', 'TeamLeaderController@import');
+    $router->get('team-leaders/template', 'TeamLeaderController@downloadTemplate');
+
     // Account routes
     $router->put('account/name', 'AccountController@updateName');
     $router->put('account/password', 'AccountController@updatePassword');
