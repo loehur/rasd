@@ -164,22 +164,6 @@
                         </button>
                     </form>
 
-                    <!-- Debug info - visible on mobile -->
-                    <div
-                        class="mt-4 p-3 bg-slate-950/50 rounded-lg border border-slate-700/50 text-xs"
-                    >
-                        <p class="text-slate-400 mb-1">Debug Info:</p>
-                        <p class="text-slate-300 font-mono break-all">
-                            Hostname: {{ hostname }}
-                        </p>
-                        <p
-                            class="text-slate-300 font-mono break-all mt-1"
-                            id="apiUrl"
-                        >
-                            API: Loading...
-                        </p>
-                    </div>
-
                     <!-- Info kecil -->
                     <p
                         class="mt-4 text-[0.7rem] text-slate-500 text-center leading-relaxed"
