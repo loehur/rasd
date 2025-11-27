@@ -193,29 +193,6 @@
                     </p>
                 </div>
             </div>
-
-            <!-- Admin Link -->
-            <div class="mt-6 text-center">
-                <a
-                    href="/admin"
-                    class="text-sm text-slate-400 hover:text-slate-200 transition inline-flex items-center gap-1"
-                >
-                    <svg
-                        class="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                        ></path>
-                    </svg>
-                    Admin Login
-                </a>
-            </div>
         </div>
     </div>
 </template>
@@ -254,8 +231,16 @@ const handleLogin = async () => {
             localStorage.setItem("tl_auth_token", data.token);
             localStorage.setItem("tl_user", JSON.stringify(data.user));
 
-            // Redirect to Team Leader dashboard
-            window.location.href = "/team-leader/dashboard";
+            // Store default password flag
+            if (data.is_default_password) {
+                localStorage.setItem("tl_must_change_password", "true");
+                // Redirect to change password page
+                window.location.href = "/team-leader/change-password";
+            } else {
+                localStorage.removeItem("tl_must_change_password");
+                // Redirect to Team Leader dashboard
+                window.location.href = "/team-leader/dashboard";
+            }
         } else {
             errorMessage.value =
                 data.message || "Invalid employee ID or password";

@@ -46,6 +46,9 @@ class TeamLeaderController extends Controller
                 ], 401);
             }
 
+            // Check if using default password
+            $isDefaultPassword = password_verify('tl1230', $teamLeader->password);
+
             // Generate token (simple token for now)
             $token = base64_encode($teamLeader->employee_id . ':' . time());
 
@@ -53,6 +56,7 @@ class TeamLeaderController extends Controller
                 'success' => true,
                 'message' => 'Login successful',
                 'token' => $token,
+                'is_default_password' => $isDefaultPassword,
                 'user' => [
                     'employee_id' => $teamLeader->employee_id,
                     'name' => $teamLeader->name,
@@ -113,7 +117,7 @@ class TeamLeaderController extends Controller
             // Assuming staff.team_leader_id references team_leader.employee_id
             $staff = Staff::where('team_leader_id', $teamLeader->employee_id)
                 ->orderBy('name')
-                ->get(['staff_id as employee_id', 'name', 'position', 'team_leader_id']);
+                ->get();
 
             return response()->json([
                 'success' => true,
@@ -365,5 +369,152 @@ class TeamLeaderController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Update team leader name
+     */
+    public function updateName(Request $request)
+    {
+        try {
+            // Get token from Authorization header
+            $token = $request->header('Authorization');
+            if (!$token) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+            // Remove 'Bearer ' prefix if present
+            $token = str_replace('Bearer ', '', $token);
+
+            // Decode token to get employee_id
+            $decoded = base64_decode($token);
+            $parts = explode(':', $decoded);
+            $employeeId = $parts[0] ?? null;
+
+            if (!$employeeId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid token'
+                ], 401);
+            }
+
+            // Validate request
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Find and update team leader
+            $teamLeader = TeamLeader::where('employee_id', $employeeId)->first();
+
+            if (!$teamLeader) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Team leader not found'
+                ], 404);
+            }
+
+            $teamLeader->name = $request->name;
+            $teamLeader->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Name updated successfully',
+                'data' => $teamLeader
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update name: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update team leader password
+     */
+    public function updatePassword(Request $request)
+    {
+        try {
+            // Get token from Authorization header
+            $token = $request->header('Authorization');
+            if (!$token) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+            // Remove 'Bearer ' prefix if present
+            $token = str_replace('Bearer ', '', $token);
+
+            // Decode token to get employee_id
+            $decoded = base64_decode($token);
+            $parts = explode(':', $decoded);
+            $employeeId = $parts[0] ?? null;
+
+            if (!$employeeId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid token'
+                ], 401);
+            }
+
+            // Validate request
+            $validator = Validator::make($request->all(), [
+                'current_password' => 'required|string',
+                'new_password' => 'required|string|min:6',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Find team leader
+            $teamLeader = TeamLeader::where('employee_id', $employeeId)->first();
+
+            if (!$teamLeader) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Team leader not found'
+                ], 404);
+            }
+
+            // Verify current password
+            if (!password_verify($request->current_password, $teamLeader->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Current password is incorrect'
+                ], 401);
+            }
+
+            // Update password
+            $teamLeader->password = password_hash($request->new_password, PASSWORD_DEFAULT);
+            $teamLeader->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update password: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

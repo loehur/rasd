@@ -65,4 +65,20 @@ class TeamLeader extends Model
     {
         $this->attributes['password'] = Hash::make($value);
     }
+
+    /**
+     * Get the staff members under this team leader.
+     */
+    public function staffMembers()
+    {
+        return $this->hasMany(Staff::class, 'team_leader_id', 'employee_id');
+    }
+
+    /**
+     * Get the attendances created by this team leader.
+     */
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'team_leader_id', 'employee_id');
+    }
 }

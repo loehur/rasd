@@ -65,7 +65,23 @@ class Staff extends Model
      * @var array
      */
     protected $casts = [
-        'hire_date' => 'date',
+        'hire_date' => 'date:Y-m-d',
         'ojk_case' => 'integer',
     ];
+
+    /**
+     * Get the team leader that supervises this staff.
+     */
+    public function teamLeader()
+    {
+        return $this->belongsTo(TeamLeader::class, 'team_leader_id', 'employee_id');
+    }
+
+    /**
+     * Get the attendances for this staff.
+     */
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'staff_id', 'staff_id');
+    }
 }

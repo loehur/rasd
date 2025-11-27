@@ -59,6 +59,18 @@ $router->get('/team-leader/dashboard', function () {
     return file_get_contents(base_path('public/pages/team-leader/dashboard.html'));
 });
 
+$router->get('/team-leader/attendance', function () {
+    return file_get_contents(base_path('public/pages/team-leader/attendance.html'));
+});
+
+$router->get('/team-leader/account', function () {
+    return file_get_contents(base_path('public/pages/team-leader/account.html'));
+});
+
+$router->get('/team-leader/change-password', function () {
+    return file_get_contents(base_path('public/pages/team-leader/change-password.html'));
+});
+
 // API Routes
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('login', 'AuthController@login');
@@ -71,6 +83,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // Team Leader routes
     $router->post('team-leader/login', 'TeamLeaderController@login');
     $router->get('team-leader/staff', 'TeamLeaderController@getStaff');
+    $router->put('team-leader/account/name', 'TeamLeaderController@updateName');
+    $router->put('team-leader/account/password', 'TeamLeaderController@updatePassword');
     $router->get('team-leaders', 'TeamLeaderController@index');
     $router->post('team-leaders/import', 'TeamLeaderController@import');
     $router->get('team-leaders/template', 'TeamLeaderController@downloadTemplate');
@@ -78,4 +92,13 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // Account routes
     $router->put('account/name', 'AccountController@updateName');
     $router->put('account/password', 'AccountController@updatePassword');
+
+    // Attendance routes
+    $router->get('attendances', 'AttendanceController@index');
+    $router->get('attendances/staff/team-leader', 'AttendanceController@getStaffByTeamLeader');
+    $router->get('attendances/staff/{staffId}', 'AttendanceController@getStaffDetail');
+    $router->post('attendances', 'AttendanceController@store');
+    $router->get('attendances/{id}', 'AttendanceController@show');
+    $router->put('attendances/{id}', 'AttendanceController@update');
+    $router->delete('attendances/{id}', 'AttendanceController@destroy');
 });
