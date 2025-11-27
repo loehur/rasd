@@ -50,6 +50,15 @@ $router->get('/admin', function () {
     return file_get_contents(base_path('public/pages/admin/login.html'));
 });
 
+// Team Leader public routes
+$router->get('/team-leader/login', function () {
+    return file_get_contents(base_path('public/pages/public/team-leader-login.html'));
+});
+
+$router->get('/team-leader/dashboard', function () {
+    return file_get_contents(base_path('public/pages/team-leader/dashboard.html'));
+});
+
 // API Routes
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('login', 'AuthController@login');
@@ -60,6 +69,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('staff/template', 'StaffController@downloadTemplate');
 
     // Team Leader routes
+    $router->post('team-leader/login', 'TeamLeaderController@login');
     $router->get('team-leaders', 'TeamLeaderController@index');
     $router->post('team-leaders/import', 'TeamLeaderController@import');
     $router->get('team-leaders/template', 'TeamLeaderController@downloadTemplate');

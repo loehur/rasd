@@ -9,6 +9,66 @@ use Illuminate\Support\Facades\Validator;
 class TeamLeaderController extends Controller
 {
     /**
+     * Team Leader login
+     */
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'employee_id' => 'required|string',
+            'password' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee ID and password are required',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Find team leader by employee_id
+            $teamLeader = TeamLeader::where('employee_id', $request->employee_id)->first();
+
+            if (!$teamLeader) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid employee ID or password'
+                ], 401);
+            }
+
+            // Verify password
+            if (!password_verify($request->password, $teamLeader->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid employee ID or password'
+                ], 401);
+            }
+
+            // Generate token (simple token for now)
+            $token = base64_encode($teamLeader->employee_id . ':' . time());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Login successful',
+                'token' => $token,
+                'user' => [
+                    'employee_id' => $teamLeader->employee_id,
+                    'name' => $teamLeader->name,
+                    'position' => $teamLeader->position,
+                    'team' => $teamLeader->team,
+                    'department' => $teamLeader->department,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Login failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Get all team leaders
      */
     public function index()

@@ -52,6 +52,10 @@ export default defineConfig(({ command }) => {
                 input: {
                     // Public pages
                     index: resolve(__dirname, "pages/public/index.html"),
+                    teamLeaderLogin: resolve(
+                        __dirname,
+                        "pages/public/team-leader-login.html"
+                    ),
                     // Admin pages
                     adminLogin: resolve(__dirname, "pages/admin/login.html"),
                     dashboard: resolve(__dirname, "pages/admin/dashboard.html"),
