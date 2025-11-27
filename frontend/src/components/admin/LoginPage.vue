@@ -170,7 +170,7 @@
                     >
                         <p class="text-slate-400 mb-1">Debug Info:</p>
                         <p class="text-slate-300 font-mono break-all">
-                            Hostname: {{ window.location.hostname }}
+                            Hostname: {{ hostname }}
                         </p>
                         <p
                             class="text-slate-300 font-mono break-all mt-1"
@@ -424,8 +424,12 @@ const form = reactive({
 const loading = ref(false);
 const error = ref("");
 const showPassword = ref(false);
+const hostname = ref("");
 
 onMounted(() => {
+    // Set hostname
+    hostname.value = window.location.hostname;
+
     // Display API URL on page load
     const apiElement = document.getElementById("apiUrl");
     if (apiElement) {
