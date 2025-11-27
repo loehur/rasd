@@ -164,6 +164,17 @@
                         </button>
                     </form>
 
+                    <!-- Debug info - visible on mobile -->
+                    <div class="mt-4 p-3 bg-slate-950/50 rounded-lg border border-slate-700/50 text-xs">
+                        <p class="text-slate-400 mb-1">Debug Info:</p>
+                        <p class="text-slate-300 font-mono break-all">
+                            Hostname: {{ window.location.hostname }}
+                        </p>
+                        <p class="text-slate-300 font-mono break-all mt-1" id="apiUrl">
+                            API: Loading...
+                        </p>
+                    </div>
+
                     <!-- Info kecil -->
                     <p
                         class="mt-4 text-[0.7rem] text-slate-500 text-center leading-relaxed"
@@ -397,7 +408,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import { API_BASE_URL } from "@/config/api";
 
 const form = reactive({
@@ -408,6 +419,14 @@ const form = reactive({
 const loading = ref(false);
 const error = ref("");
 const showPassword = ref(false);
+
+onMounted(() => {
+    // Display API URL on page load
+    const apiElement = document.getElementById("apiUrl");
+    if (apiElement) {
+        apiElement.textContent = `API: ${API_BASE_URL}/api/login`;
+    }
+});
 
 const onSubmit = async () => {
     error.value = "";
@@ -448,8 +467,10 @@ const onSubmit = async () => {
             error.value = data.message || "Login failed. Please try again.";
         }
     } catch (e) {
-        error.value =
-            `Connection error: ${e.message}. API: ${API_BASE_URL}`;
+        // Show detailed error for debugging on mobile
+        const hostname = window.location.hostname;
+        const apiUrl = `${API_BASE_URL}/api/login`;
+        error.value = `❌ ${e.message}\n\n🌐 Your hostname: ${hostname}\n📡 API URL: ${apiUrl}\n\n${e.name}: ${e.stack || 'No stack trace'}`;
         console.error("Login error:", e);
         console.error("API_BASE_URL:", API_BASE_URL);
     } finally {
