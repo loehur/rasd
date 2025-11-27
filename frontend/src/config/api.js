@@ -6,7 +6,7 @@ const API_CONFIG = {
     development: "http://localhost:8000",
 
     // Production - update this with your actual domain
-    production: "https://yourdomain.com",
+    production: "https://rasd.naiju.com",
 };
 
 // Automatically detect environment
