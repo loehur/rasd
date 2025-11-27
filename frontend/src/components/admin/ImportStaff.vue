@@ -444,6 +444,7 @@ const importData = async () => {
     importErrors.value = [];
 
     try {
+        const token = localStorage.getItem("auth_token");
         const formData = new FormData();
         formData.append("file", selectedFile.value);
 
@@ -451,11 +452,22 @@ const importData = async () => {
             method: "POST",
             headers: {
                 Accept: "application/json",
+                Authorization: token ? `Bearer ${token}` : undefined,
             },
             body: formData,
         });
 
-        const data = await response.json();
+        const text = await response.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            resultSuccess.value = false;
+            resultMessage.value =
+                "Server error: unexpected response (not JSON). Check console for details.";
+            console.error("Import response (non-JSON):", text);
+            return;
+        }
 
         if (data.success) {
             resultSuccess.value = true;
@@ -466,7 +478,6 @@ const importData = async () => {
                 updated: data.data?.updated || 0,
                 skipped: data.data?.skipped || 0,
             };
-            // Message will stay visible until user manually closes it
         } else {
             resultSuccess.value = false;
             resultMessage.value = data.message || "Import failed";
