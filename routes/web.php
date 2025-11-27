@@ -38,6 +38,10 @@ $router->get('/admin/account', function () {
     return file_get_contents(base_path('public/pages/admin/account.html'));
 });
 
+$router->get('/admin/team-leader-list', function () {
+    return file_get_contents(base_path('public/pages/admin/team-leader-list.html'));
+});
+
 $router->get('/admin/change-password', function () {
     return file_get_contents(base_path('public/pages/admin/change-password.html'));
 });

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\TeamLeader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use League\Csv\Reader;
 
 class TeamLeaderController extends Controller
 {
@@ -41,38 +40,70 @@ class TeamLeaderController extends Controller
 
         try {
             $file = $request->file('file');
-            $csv = Reader::createFromPath($file->getRealPath(), 'r');
-            $csv->setHeaderOffset(0);
+            $handle = fopen($file->getRealPath(), 'r');
+            if ($handle === false) {
+                throw new \Exception('Unable to open uploaded file');
+            }
 
-            $records = $csv->getRecords();
+            // Read headers
+            $headers = fgetcsv($handle);
+            if ($headers === false) {
+                throw new \Exception('CSV file is empty');
+            }
+
+            // Normalize headers (trim)
+            $headers = array_map(function ($h) {
+                return trim((string)$h);
+            }, $headers);
+
             $imported = 0;
             $updated = 0;
             $errors = [];
 
-            foreach ($records as $index => $record) {
+            $rowIndex = 1; // header row
+            while (($values = fgetcsv($handle)) !== false) {
+                $rowIndex++;
                 try {
-                    // Skip if employee_id is empty
-                    if (empty($record['ID TL'])) {
+                    // Build record associative array safely (handle uneven columns)
+                    $record = [];
+                    $max = min(count($headers), count($values));
+                    for ($i = 0; $i < $max; $i++) {
+                        $record[$headers[$i]] = isset($values[$i]) ? trim($values[$i]) : '';
+                    }
+
+                    // Helper to get value by possible header names
+                    $get = function ($names) use ($record) {
+                        foreach ((array)$names as $n) {
+                            if (isset($record[$n]) && $record[$n] !== '') {
+                                return $record[$n];
+                            }
+                        }
+                        return null;
+                    };
+
+                    $employeeId = $get(['ID TL', 'ID', 'Employee ID']);
+                    if (empty($employeeId)) {
+                        // skip rows without employee id
                         continue;
                     }
 
                     $data = [
-                        'employee_id' => trim($record['ID TL']),
-                        'name' => trim($record['Name TL']),
-                        'work_location' => trim($record['WFH/Oniste']), // Note: CSV has typo "Oniste"
-                        'position' => trim($record['Position']),
-                        'team' => trim($record['Team']),
-                        'team_quantity' => !empty($record['Team
-Quantity']) ? (int)$record['Team
-Quantity'] : null,
-                        'department' => trim($record['Department']),
-                        'hire_date' => $this->parseDate($record['Hiredate']),
-                        'rank' => trim($record['Rank']),
-                        'first_day_tl' => $this->parseDate($record['1st day to be TL']),
-                        'warning_letter' => trim($record['Warning letter']),
-                        'ojk_case' => !empty($record['OJK case']) ? (int)$record['OJK case'] : 0,
-                        'former_tl' => trim($record['Former TL']),
-                        'area' => trim($record['Area']),
+                        'employee_id' => $employeeId,
+                        'name' => $get(['Name TL', 'Name']) ?? '',
+                        'work_location' => $get(['WFH/Onsite', 'WFH/Oniste', 'Work Location']) ?? '',
+                        'position' => $get(['Position']) ?? '',
+                        'team' => $get(['Team']) ?? '',
+                        'team_quantity' => ($get(['Team Quantity', 'Team
+Quantity']) !== null) ? (int)$get(['Team Quantity', 'Team
+Quantity']) : null,
+                        'department' => $get(['Department']) ?? '',
+                        'hire_date' => $this->parseDate($get(['Hiredate', 'Hire Date'])),
+                        'rank' => $get(['Rank']) ?? '',
+                        'first_day_tl' => $this->parseDate($get(['1st day to be TL', '1st day to be TL'])),
+                        'warning_letter' => $get(['Warning letter']) ?? '',
+                        'ojk_case' => ($get(['OJK case']) !== null) ? (int)$get(['OJK case']) : 0,
+                        'former_tl' => $get(['Former TL']) ?? '',
+                        'area' => $get(['Area']) ?? '',
                     ];
 
                     // Check if team leader already exists
@@ -80,7 +111,6 @@ Quantity'] : null,
 
                     if ($teamLeader) {
                         // Update existing team leader (don't change password)
-                        unset($data['password']);
                         $teamLeader->update($data);
                         $updated++;
                     } else {
@@ -90,9 +120,11 @@ Quantity'] : null,
                         $imported++;
                     }
                 } catch (\Exception $e) {
-                    $errors[] = "Row " . ($index + 2) . ": " . $e->getMessage();
+                    $errors[] = "Row {$rowIndex}: " . $e->getMessage();
                 }
             }
+
+            fclose($handle);
 
             return response()->json([
                 'success' => true,

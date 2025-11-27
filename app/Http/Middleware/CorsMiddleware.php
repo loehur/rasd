@@ -29,7 +29,11 @@ class CorsMiddleware
 
         $response = $next($request);
         foreach ($headers as $key => $value) {
-            $response->header($key, $value);
+            if (method_exists($response, 'header')) {
+                $response->header($key, $value);
+            } elseif (property_exists($response, 'headers')) {
+                $response->headers->set($key, $value);
+            }
         }
 
         return $response;
