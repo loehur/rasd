@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('team_leaders', function (Blueprint $table) {
-            $table->id();
-            $table->string('employee_id')->unique(); // ID TL
+            $table->string('employee_id')->primary(); // ID TL as primary key
             $table->string('name');
             $table->string('password');
             $table->enum('work_location', ['WFH', 'Onsite'])->default('Onsite');

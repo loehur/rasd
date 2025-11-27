@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TeamLeader;
+use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -64,6 +65,64 @@ class TeamLeaderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Login failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get staff under the logged-in team leader's supervision
+     */
+    public function getStaff(Request $request)
+    {
+        try {
+            // Get token from Authorization header
+            $token = $request->header('Authorization');
+            if (!$token) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+            // Remove 'Bearer ' prefix if present
+            $token = str_replace('Bearer ', '', $token);
+
+            // Decode token to get employee_id
+            $decoded = base64_decode($token);
+            $parts = explode(':', $decoded);
+            $employeeId = $parts[0] ?? null;
+
+            if (!$employeeId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid token'
+                ], 401);
+            }
+
+            // Find team leader
+            $teamLeader = TeamLeader::where('employee_id', $employeeId)->first();
+
+            if (!$teamLeader) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Team leader not found'
+                ], 404);
+            }
+
+            // Get staff under this team leader
+            // Assuming staff.team_leader_id references team_leader.employee_id
+            $staff = Staff::where('team_leader_id', $teamLeader->employee_id)
+                ->orderBy('name')
+                ->get(['staff_id as employee_id', 'name', 'position', 'team_leader_id']);
+
+            return response()->json([
+                'success' => true,
+                'data' => $staff
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch staff: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -243,7 +302,6 @@ Quantity']) : null,
         ];
 
         $columns = [
-            'SN',
             'WFH/Oniste',
             'ID TL',
             'Name TL',
@@ -266,7 +324,6 @@ Quantity']) : null,
 
             // Add example row
             fputcsv($file, [
-                '1',
                 'Onsite',
                 'IDNA200001',
                 'John Doe',

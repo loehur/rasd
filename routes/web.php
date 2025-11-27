@@ -70,6 +70,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     // Team Leader routes
     $router->post('team-leader/login', 'TeamLeaderController@login');
+    $router->get('team-leader/staff', 'TeamLeaderController@getStaff');
     $router->get('team-leaders', 'TeamLeaderController@index');
     $router->post('team-leaders/import', 'TeamLeaderController@import');
     $router->get('team-leaders/template', 'TeamLeaderController@downloadTemplate');
