@@ -46,8 +46,8 @@ export default defineConfig(({ command }) => {
         plugins: [vue()],
         resolve: { alias: { "@": resolve(__dirname, "src") } },
         build: {
-            outDir: "dist",
-            emptyOutDir: true,
+            outDir: "../public",
+            emptyOutDir: false,
             rollupOptions: {
                 input: {
                     // Public pages
