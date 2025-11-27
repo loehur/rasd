@@ -420,6 +420,7 @@ const onSubmit = async () => {
     loading.value = true;
     try {
         // Call login API
+        console.log("API URL:", `${API_BASE_URL}/api/login`);
         const response = await fetch(`${API_BASE_URL}/api/login`, {
             method: "POST",
             headers: {
@@ -432,7 +433,9 @@ const onSubmit = async () => {
             }),
         });
 
+        console.log("Response status:", response.status);
         const data = await response.json();
+        console.log("Response data:", data);
 
         if (data.success) {
             // Store token and user data
@@ -446,8 +449,9 @@ const onSubmit = async () => {
         }
     } catch (e) {
         error.value =
-            "Connection error. Please make sure the server is running.";
+            `Connection error: ${e.message}. API: ${API_BASE_URL}`;
         console.error("Login error:", e);
+        console.error("API_BASE_URL:", API_BASE_URL);
     } finally {
         loading.value = false;
     }
