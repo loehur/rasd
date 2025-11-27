@@ -5,8 +5,8 @@ const API_CONFIG = {
     // Development
     development: "http://localhost:8000",
 
-    // Production - update this with your actual domain
-    production: "https://rasd.naiju.com",
+    // Production - use HTTP temporarily due to SSL certificate issue
+    production: "http://rasd.naiju.com",
 };
 
 // Automatically detect environment
