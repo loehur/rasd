@@ -200,12 +200,7 @@
                                             >
                                                 View
                                             </button>
-                                            <button
-                                                @click="deleteAttendance(attendance.id)"
-                                                class="text-red-600 hover:text-red-900"
-                                            >
-                                                Delete
-                                            </button>
+                                            
                                         </td>
                                     </tr>
                                 </tbody>
@@ -543,7 +538,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { getTeamLeaderStaff, getAttendances, getStaffDetail, createAttendance, deleteAttendance as deleteAttendanceApi } from '../../utils/api';
+import { getTeamLeaderStaff, getAttendances, getStaffDetail, createAttendance } from '../../utils/api';
 
 const userName = ref('');
 const staffList = ref([]);
@@ -793,24 +788,7 @@ const closeViewModal = () => {
     viewData.value = null;
 };
 
-const deleteAttendance = async (id) => {
-    if (!confirm('Are you sure you want to delete this attendance record?')) {
-        return;
-    }
 
-    try {
-        const result = await deleteAttendanceApi(id);
-        if (result.success) {
-            showToast('Attendance deleted successfully', 'success');
-            fetchAttendances(pagination.value.current_page);
-        } else {
-            showToast(result.message || 'Delete failed', 'error');
-        }
-    } catch (err) {
-        showToast('An error occurred', 'error');
-        console.error('Error:', err);
-    }
-};
 
 const goToPage = (page) => {
     if (page === '...' || page < 1 || page > pagination.value.last_page) return;
