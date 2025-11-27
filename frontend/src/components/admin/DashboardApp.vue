@@ -306,6 +306,7 @@
                         </button>
 
                         <button
+                            @click="goToTeamLeaderList"
                             class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-xl p-4 hover:border-emerald-500/50 hover:bg-slate-800/50 transition-all text-center group"
                         >
                             <div
@@ -321,12 +322,12 @@
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
                                         stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                        d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                                     ></path>
                                 </svg>
                             </div>
                             <p class="text-sm font-medium text-slate-200">
-                                Mark Attendance
+                                View Team Leader
                             </p>
                         </button>
 
@@ -555,5 +556,8 @@ const goToStaffList = () => {
 
 const refreshPage = () => {
     window.location.reload();
+};
+const goToTeamLeaderList = () => {
+    window.location.href = "/admin/team-leader-list";
 };
 </script>

@@ -205,20 +205,147 @@
             <div
                 v-if="resultMessage"
                 :class="[
-                    'mt-6 p-4 rounded-xl border',
+                    'mt-6 p-6 rounded-xl border',
                     resultSuccess
-                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                        : 'bg-red-500/10 border-red-500/30 text-red-300',
+                        ? 'bg-emerald-500/10 border-emerald-500/30'
+                        : 'bg-red-500/10 border-red-500/30',
                 ]"
             >
-                <p class="font-semibold mb-2">{{ resultMessage }}</p>
-                <div v-if="importErrors.length > 0" class="mt-2">
-                    <p class="text-sm font-semibold mb-1">Errors:</p>
-                    <ul class="text-xs space-y-1 max-h-40 overflow-y-auto">
-                        <li v-for="(error, index) in importErrors" :key="index">
-                            • {{ error }}
-                        </li>
-                    </ul>
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <svg
+                            v-if="resultSuccess"
+                            class="w-6 h-6 text-emerald-400 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
+                        </svg>
+                        <svg
+                            v-else
+                            class="w-6 h-6 text-red-400 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
+                        </svg>
+                        <p
+                            :class="[
+                                'font-bold text-lg',
+                                resultSuccess
+                                    ? 'text-emerald-300'
+                                    : 'text-red-300',
+                            ]"
+                        >
+                            {{ resultSuccess ? "Import Successful!" : "Import Failed" }}
+                        </p>
+                    </div>
+                    <button
+                        @click="clearResult"
+                        class="text-slate-400 hover:text-slate-200 transition"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"
+                            ></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <p
+                    :class="[
+                        'mb-3',
+                        resultSuccess ? 'text-emerald-200' : 'text-red-200',
+                    ]"
+                >
+                    {{ resultMessage }}
+                </p>
+
+                <!-- Import Statistics -->
+                <div
+                    v-if="resultSuccess && importStats"
+                    class="grid grid-cols-2 gap-3 mb-3"
+                >
+                    <div
+                        class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3"
+                    >
+                        <p class="text-xs text-blue-300/70 mb-1">New Records</p>
+                        <p class="text-2xl font-bold text-blue-300">
+                            {{ importStats.imported }}
+                        </p>
+                    </div>
+                    <div
+                        class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3"
+                    >
+                        <p class="text-xs text-purple-300/70 mb-1">
+                            Updated Records
+                        </p>
+                        <p class="text-2xl font-bold text-purple-300">
+                            {{ importStats.updated }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Error List -->
+                <div v-if="importErrors.length > 0" class="mt-3">
+                    <p
+                        :class="[
+                            'text-sm font-semibold mb-2',
+                            resultSuccess ? 'text-orange-300' : 'text-red-300',
+                        ]"
+                    >
+                        <svg
+                            class="w-4 h-4 inline mr-1"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            ></path>
+                        </svg>
+                        Errors ({{ importErrors.length }}):
+                    </p>
+                    <div
+                        class="bg-slate-950/50 rounded-lg p-3 max-h-40 overflow-y-auto"
+                    >
+                        <ul class="text-xs space-y-1">
+                            <li
+                                v-for="(error, index) in importErrors"
+                                :key="index"
+                                :class="[
+                                    resultSuccess
+                                        ? 'text-orange-200'
+                                        : 'text-red-200',
+                                ]"
+                            >
+                                • {{ error }}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -237,6 +364,7 @@ const uploading = ref(false);
 const resultMessage = ref("");
 const resultSuccess = ref(false);
 const importErrors = ref([]);
+const importStats = ref(null);
 
 const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -283,6 +411,14 @@ const clearFile = () => {
     csvHeaders.value = [];
     csvData.value = [];
     resultMessage.value = "";
+    importStats.value = null;
+};
+
+const clearResult = () => {
+    resultMessage.value = "";
+    resultSuccess.value = false;
+    importErrors.value = [];
+    importStats.value = null;
 };
 
 const formatFileSize = (bytes) => {
@@ -314,21 +450,35 @@ const importData = async () => {
             }
         );
 
-        const data = await response.json();
+        // Some server errors return HTML (error page) which causes response.json() to throw.
+        // Read text first and try to parse JSON; if parsing fails show server response in console.
+        const text = await response.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            resultSuccess.value = false;
+            resultMessage.value =
+                "Server error: unexpected response (not JSON). Check console for details.";
+            console.error("Import response (non-JSON):", text);
+            return;
+        }
 
         if (data.success) {
             resultSuccess.value = true;
             resultMessage.value = data.message;
             importErrors.value = data.data?.errors || [];
+            importStats.value = {
+                imported: data.data?.imported || 0,
+                updated: data.data?.updated || 0,
+            };
 
-            // Clear file after successful import
-            setTimeout(() => {
-                clearFile();
-            }, 3000);
+            // Don't auto-clear - let user manually close the result
         } else {
             resultSuccess.value = false;
             resultMessage.value =
                 data.message || "Import failed. Please check your CSV format.";
+            importStats.value = null;
         }
     } catch (error) {
         resultSuccess.value = false;
