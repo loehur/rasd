@@ -9,12 +9,31 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 export default defineConfig(({ command }) => {
     if (command === "serve") {
         return {
-            root: ".", // gunakan root proyek agar /src/... ter-resolve
+            root: ".",
             publicDir: "public",
-            plugins: [vue()],
+            plugins: [
+                vue(),
+                {
+                    name: "rewrite-middleware",
+                    configureServer(server) {
+                        server.middlewares.use((req, res, next) => {
+                            // Rewrite /admin -> /pages/admin/login.html
+                            if (req.url === "/admin" || req.url === "/admin/") {
+                                req.url = "/pages/admin/login.html";
+                            }
+                            // Rewrite /admin/dashboard -> /pages/admin/dashboard.html
+                            else if (req.url.startsWith("/admin/")) {
+                                const page = req.url.replace("/admin/", "");
+                                req.url = `/pages/admin/${page}.html`;
+                            }
+                            next();
+                        });
+                    },
+                },
+            ],
             resolve: { alias: { "@": resolve(__dirname, "src") } },
             server: {
-                open: true, // buka browser otomatis ke root (/)
+                open: "/admin",
                 port: 5173,
                 fs: { allow: [resolve(__dirname)] },
             },
