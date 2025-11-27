@@ -14,7 +14,7 @@
 */
 
 $router->get('/', function () use ($router) {
-    return $router->app->version();
+    return file_get_contents(base_path('public/pages/public/team-leader-login.html'));
 });
 
 // Admin frontend routes - serve appropriate HTML based on path
