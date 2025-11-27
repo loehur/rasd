@@ -31,13 +31,24 @@ export default defineConfig(({ command }) => {
             emptyOutDir: true,
             rollupOptions: {
                 input: {
-                    main: resolve(__dirname, "index.html"),
-                    admin: resolve(__dirname, "admin.html"),
-                    dashboard: resolve(__dirname, "dashboard.html"),
-                    importStaff: resolve(__dirname, "import-staff.html"),
-                    staffList: resolve(__dirname, "staff-list.html"),
-                    account: resolve(__dirname, "account.html"),
-                    changePassword: resolve(__dirname, "change-password.html"),
+                    // Public pages
+                    index: resolve(__dirname, "pages/public/index.html"),
+                    // Admin pages
+                    adminLogin: resolve(__dirname, "pages/admin/login.html"),
+                    dashboard: resolve(__dirname, "pages/admin/dashboard.html"),
+                    importStaff: resolve(
+                        __dirname,
+                        "pages/admin/import-staff.html"
+                    ),
+                    staffList: resolve(
+                        __dirname,
+                        "pages/admin/staff-list.html"
+                    ),
+                    account: resolve(__dirname, "pages/admin/account.html"),
+                    changePassword: resolve(
+                        __dirname,
+                        "pages/admin/change-password.html"
+                    ),
                 },
             },
         },
