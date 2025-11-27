@@ -17,8 +17,28 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-// Admin frontend routes
-$router->get('/admin[/{path:.*}]', function () {
+// Admin frontend routes - serve appropriate HTML based on path
+$router->get('/admin/dashboard', function () {
+    return file_get_contents(base_path('public/pages/admin/dashboard.html'));
+});
+
+$router->get('/admin/staff-list', function () {
+    return file_get_contents(base_path('public/pages/admin/staff-list.html'));
+});
+
+$router->get('/admin/import-staff', function () {
+    return file_get_contents(base_path('public/pages/admin/import-staff.html'));
+});
+
+$router->get('/admin/account', function () {
+    return file_get_contents(base_path('public/pages/admin/account.html'));
+});
+
+$router->get('/admin/change-password', function () {
+    return file_get_contents(base_path('public/pages/admin/change-password.html'));
+});
+
+$router->get('/admin', function () {
     return file_get_contents(base_path('public/pages/admin/login.html'));
 });
 
