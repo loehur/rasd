@@ -59,6 +59,10 @@ export default defineConfig(({ command }) => {
                         __dirname,
                         "pages/admin/import-staff.html"
                     ),
+                    importTeamLeader: resolve(
+                        __dirname,
+                        "pages/admin/import-team-leader.html"
+                    ),
                     staffList: resolve(
                         __dirname,
                         "pages/admin/staff-list.html"

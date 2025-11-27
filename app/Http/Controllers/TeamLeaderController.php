@@ -15,7 +15,7 @@ class TeamLeaderController extends Controller
     public function index()
     {
         $teamLeaders = TeamLeader::orderBy('name')->get();
-        
+
         return response()->json([
             'success' => true,
             'data' => $teamLeaders
@@ -43,7 +43,7 @@ class TeamLeaderController extends Controller
             $file = $request->file('file');
             $csv = Reader::createFromPath($file->getRealPath(), 'r');
             $csv->setHeaderOffset(0);
-            
+
             $records = $csv->getRecords();
             $imported = 0;
             $updated = 0;
@@ -89,7 +89,6 @@ Quantity'] : null,
                         TeamLeader::create($data);
                         $imported++;
                     }
-
                 } catch (\Exception $e) {
                     $errors[] = "Row " . ($index + 2) . ": " . $e->getMessage();
                 }
@@ -104,7 +103,6 @@ Quantity'] : null,
                     'errors' => $errors
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -128,7 +126,7 @@ Quantity'] : null,
             if ($date) {
                 return $date->format('Y-m-d');
             }
-            
+
             // Fallback to strtotime
             $timestamp = strtotime(trim($dateString));
             if ($timestamp) {
@@ -170,10 +168,10 @@ Quantity'] : null,
             'Area'
         ];
 
-        $callback = function() use ($columns) {
+        $callback = function () use ($columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
-            
+
             // Add example row
             fputcsv($file, [
                 '1',
@@ -192,7 +190,7 @@ Quantity'] : null,
                 'Recommended by HR',
                 'Jakarta'
             ]);
-            
+
             fclose($file);
         };
 

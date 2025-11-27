@@ -30,6 +30,10 @@ $router->get('/admin/import-staff', function () {
     return file_get_contents(base_path('public/pages/admin/import-staff.html'));
 });
 
+$router->get('/admin/import-team-leader', function () {
+    return file_get_contents(base_path('public/pages/admin/import-team-leader.html'));
+});
+
 $router->get('/admin/account', function () {
     return file_get_contents(base_path('public/pages/admin/account.html'));
 });
