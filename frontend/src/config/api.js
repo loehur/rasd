@@ -5,8 +5,9 @@ const API_CONFIG = {
     // Development - Laragon path
     development: "http://localhost/sd_pro/public",
 
-    // Production - use HTTPS with valid SSL certificate
-    production: `https://${window.location.hostname}`,
+    // Production - follow current origin (protocol + host + optional port)
+    // This avoids mixed-content and SSL issues on deployments without HTTPS
+    production: `${window.location.origin}`,
 };
 
 // Automatically detect environment

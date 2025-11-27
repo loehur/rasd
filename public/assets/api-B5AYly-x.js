@@ -1,1 +1,0 @@
-const o={development:"http://localhost/sd_pro/public",production:`https://${window.location.hostname}`},t=window.location.hostname==="localhost"||window.location.hostname==="127.0.0.1",n=t?o.development:o.production;export{n as A};
