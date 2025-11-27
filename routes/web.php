@@ -17,6 +17,11 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
+// Admin frontend routes
+$router->get('/admin[/{path:.*}]', function () {
+    return file_get_contents(base_path('public/pages/admin/login.html'));
+});
+
 // API Routes
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('login', 'AuthController@login');
