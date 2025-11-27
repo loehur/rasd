@@ -170,9 +170,9 @@ class TeamLeaderController extends Controller
                 throw new \Exception('CSV file is empty');
             }
 
-            // Normalize headers (trim)
+            // Normalize headers: convert to UTF-8 and trim
             $headers = array_map(function ($h) {
-                return trim((string)$h);
+                return trim($this->normalizeUtf8((string)$h));
             }, $headers);
 
             $imported = 0;
@@ -187,7 +187,7 @@ class TeamLeaderController extends Controller
                     $record = [];
                     $max = min(count($headers), count($values));
                     for ($i = 0; $i < $max; $i++) {
-                        $record[$headers[$i]] = isset($values[$i]) ? trim($values[$i]) : '';
+                        $record[$headers[$i]] = isset($values[$i]) ? trim($this->normalizeUtf8($values[$i])) : '';
                     }
 
                     // Helper to get value by possible header names
@@ -212,9 +212,7 @@ class TeamLeaderController extends Controller
                         'work_location' => $get(['WFH/Onsite', 'WFH/Oniste', 'Work Location']) ?? '',
                         'position' => $get(['Position']) ?? '',
                         'team' => $get(['Team']) ?? '',
-                        'team_quantity' => ($get(['Team Quantity', 'Team
-Quantity']) !== null) ? (int)$get(['Team Quantity', 'Team
-Quantity']) : null,
+                        'team_quantity' => ($get(['Team Quantity']) !== null) ? (int)$get(['Team Quantity']) : null,
                         'department' => $get(['Department']) ?? '',
                         'hire_date' => $this->parseDate($get(['Hiredate', 'Hire Date'])),
                         'rank' => $get(['Rank']) ?? '',
@@ -260,6 +258,29 @@ Quantity']) : null,
                 'message' => 'Import failed: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Normalize string to valid UTF-8 and sanitize placeholder values
+     */
+    private function normalizeUtf8($value)
+    {
+        if ($value === null) {
+            return '';
+        }
+        $str = (string) $value;
+        $str = preg_replace('/^\xEF\xBB\xBF/', '', $str);
+        $enc = mb_detect_encoding($str, ['UTF-8', 'ISO-8859-1', 'Windows-1252'], true);
+        if ($enc && $enc !== 'UTF-8') {
+            $str = iconv($enc, 'UTF-8//IGNORE', $str);
+        } else {
+            $str = mb_convert_encoding($str, 'UTF-8', 'UTF-8');
+        }
+        $str = trim($str);
+        if ($str === '-') {
+            return '';
+        }
+        return $str;
     }
 
     /**

@@ -54,15 +54,31 @@ class StaffController extends Controller
 
         try {
             $file = $request->file('file');
-            $csvData = array_map('str_getcsv', file($file->getRealPath()));
+            $lines = file($file->getRealPath());
+            if ($lines === false) {
+                throw new \Exception('Unable to read uploaded file');
+            }
+
+            // Convert each line to UTF-8 and parse CSV
+            $csvData = [];
+            foreach ($lines as $idx => $line) {
+                $normalizedLine = $this->normalizeUtf8($line);
+                // Remove BOM on very first line if present
+                if ($idx === 0) {
+                    $normalizedLine = preg_replace('/^\xEF\xBB\xBF/', '', $normalizedLine);
+                }
+                $csvData[] = str_getcsv($normalizedLine);
+            }
 
             // Get header row and clean it
             $header = array_shift($csvData);
-            $header = array_map('trim', $header);
+            $header = array_map(function ($h) {
+                return trim($this->normalizeUtf8($h));
+            }, $header);
             $headerCount = count($header);
 
             // Validate CSV structure
-            $requiredColumns = ['staff_id', 'name', 'phone_number', 'position', 'department', 'hire_date'];
+            $requiredColumns = ['staff_id', 'name', 'position', 'department', 'hire_date'];
             $missingColumns = array_diff($requiredColumns, $header);
 
             if (!empty($missingColumns)) {
@@ -84,7 +100,9 @@ class StaffController extends Controller
                 }
 
                 // Trim all values
-                $row = array_map('trim', $row);
+                $row = array_map(function ($v) {
+                    return $this->normalizeUtf8($v);
+                }, $row);
 
                 // Ensure row has same number of elements as header
                 $rowCount = count($row);
@@ -99,32 +117,38 @@ class StaffController extends Controller
                 // Map CSV columns to array
                 $data = array_combine($header, $row);
 
-                // Validate required fields
-                if (empty($data['staff_id']) || empty($data['name']) || empty($data['phone_number'])) {
+                // Validate required fields (phone number optional; will fallback to staff_id)
+                if (empty($data['staff_id']) || empty($data['name'])) {
                     $skipped++;
                     $errors[] = "Row " . ($index + 2) . ": Missing required data";
                     continue;
                 }
 
                 // Prepare staff data
+                // Fallback phone number when missing: use staff_id (keeps uniqueness, non-null)
+                $phone = $this->normalizeUtf8($data['phone_number'] ?? '');
+                if ($phone === '') {
+                    $phone = $data['staff_id'];
+                }
+
                 $staffData = [
                     'staff_id' => $data['staff_id'],
-                    'name' => $data['name'],
-                    'phone_number' => $data['phone_number'],
-                    'email' => !empty($data['email']) ? $data['email'] : null,
-                    'position' => $data['position'] ?? '',
-                    'department' => $data['department'] ?? '',
-                    'superior' => !empty($data['superior']) ? $data['superior'] : null,
-                    'group' => !empty($data['group']) ? $data['group'] : null,
-                    'area' => !empty($data['area']) ? $data['area'] : null,
-                    'work_location' => !empty($data['work_location']) ? $data['work_location'] : null,
-                    'hire_date' => !empty($data['hire_date']) ? $data['hire_date'] : date('Y-m-d'),
-                    'rank' => !empty($data['rank']) ? $data['rank'] : null,
-                    'device' => !empty($data['device']) ? $data['device'] : null,
-                    'team_leader_id' => !empty($data['team_leader_id']) ? $data['team_leader_id'] : null,
-                    'warning_letter' => !empty($data['warning_letter']) ? $data['warning_letter'] : null,
+                    'name' => $this->normalizeUtf8($data['name']),
+                    'phone_number' => $phone,
+                    'email' => !empty($data['email']) ? $this->normalizeUtf8($data['email']) : null,
+                    'position' => $this->normalizeUtf8($data['position'] ?? ''),
+                    'department' => $this->normalizeUtf8($data['department'] ?? ''),
+                    'superior' => !empty($data['superior']) ? $this->normalizeUtf8($data['superior']) : null,
+                    'group' => !empty($data['group']) ? $this->normalizeUtf8($data['group']) : null,
+                    'area' => !empty($data['area']) ? $this->normalizeUtf8($data['area']) : null,
+                    'work_location' => !empty($data['work_location']) ? $this->normalizeUtf8($data['work_location']) : null,
+                    'hire_date' => !empty($data['hire_date']) ? ($this->parseDate($data['hire_date']) ?? date('Y-m-d')) : date('Y-m-d'),
+                    'rank' => !empty($data['rank']) ? $this->normalizeUtf8($data['rank']) : null,
+                    'device' => !empty($data['device']) ? $this->normalizeUtf8($data['device']) : null,
+                    'team_leader_id' => !empty($data['team_leader_id']) ? $this->normalizeUtf8($data['team_leader_id']) : null,
+                    'warning_letter' => !empty($data['warning_letter']) ? $this->normalizeUtf8($data['warning_letter']) : null,
                     'ojk_case' => !empty($data['ojk_case']) && is_numeric($data['ojk_case']) ? (int)$data['ojk_case'] : 0,
-                    'notes' => !empty($data['notes']) ? $data['notes'] : null,
+                    'notes' => !empty($data['notes']) ? $this->normalizeUtf8($data['notes']) : null,
                 ];
 
                 try {
@@ -162,6 +186,58 @@ class StaffController extends Controller
                 'message' => 'Import failed: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Normalize string to valid UTF-8 and sanitize placeholder values
+     */
+    private function normalizeUtf8($value)
+    {
+        if ($value === null) {
+            return '';
+        }
+        $str = (string) $value;
+        // Strip UTF-8 BOM if present
+        $str = preg_replace('/^\xEF\xBB\xBF/', '', $str);
+        // Detect and convert encoding to UTF-8
+        $enc = mb_detect_encoding($str, ['UTF-8', 'ISO-8859-1', 'Windows-1252'], true);
+        if ($enc && $enc !== 'UTF-8') {
+            $str = iconv($enc, 'UTF-8//IGNORE', $str);
+        } else {
+            // Ensure valid UTF-8
+            $str = mb_convert_encoding($str, 'UTF-8', 'UTF-8');
+        }
+        $str = trim($str);
+        // Treat dash placeholders as empty
+        if ($str === '-') {
+            return '';
+        }
+        return $str;
+    }
+
+    /**
+     * Parse date from various formats to Y-m-d
+     */
+    private function parseDate($dateString)
+    {
+        if (empty($dateString) || $dateString === '-') {
+            return null;
+        }
+        try {
+            $dateString = trim((string) $dateString);
+            // Try MM/DD/YYYY
+            $date = \DateTime::createFromFormat('n/j/Y', $dateString);
+            if ($date) {
+                return $date->format('Y-m-d');
+            }
+            // Fallback
+            $timestamp = strtotime($dateString);
+            if ($timestamp) {
+                return date('Y-m-d', $timestamp);
+            }
+        } catch (\Exception $e) {
+        }
+        return null;
     }
 
     /**
