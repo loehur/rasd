@@ -398,6 +398,7 @@
 
 <script setup>
 import { reactive, ref } from "vue";
+import { API_BASE_URL } from "@/config/api";
 
 const form = reactive({
     phone_number: "",
@@ -419,20 +420,17 @@ const onSubmit = async () => {
     loading.value = true;
     try {
         // Call login API
-        const response = await fetch(
-            "http://localhost/sd_pro/public/api/login",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-                body: JSON.stringify({
-                    phone_number: form.phone_number,
-                    password: form.password,
-                }),
-            }
-        );
+        const response = await fetch(`${API_BASE_URL}/api/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify({
+                phone_number: form.phone_number,
+                password: form.password,
+            }),
+        });
 
         const data = await response.json();
 
@@ -442,7 +440,7 @@ const onSubmit = async () => {
             localStorage.setItem("user", JSON.stringify(data.data.user));
 
             // Redirect to dashboard immediately
-            window.location.href = "/dashboard.html";
+            window.location.href = "/admin/dashboard";
         } else {
             error.value = data.message || "Login failed. Please try again.";
         }

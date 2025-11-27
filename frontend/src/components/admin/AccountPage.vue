@@ -264,7 +264,7 @@ onMounted(() => {
     const userData = localStorage.getItem("user");
 
     if (!authToken || !userData) {
-        window.location.href = "/admin.html";
+        window.location.href = "/admin";
         return;
     }
 
@@ -287,7 +287,7 @@ const updateName = async () => {
     loadingName.value = true;
 
     try {
-        const response = await fetch("http://localhost:8000/api/account/name", {
+        const response = await fetch(`${API_BASE_URL}/api/account/name`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -322,20 +322,20 @@ const updateName = async () => {
 };
 
 const goBack = () => {
-    window.location.href = "/dashboard.html";
+    window.location.href = "/admin/dashboard";
 };
 
 const goToDashboard = () => {
-    window.location.href = "/dashboard.html";
+    window.location.href = "/admin/dashboard";
 };
 
 const goToChangePassword = () => {
-    window.location.href = "/change-password.html";
+    window.location.href = "/admin/change-password";
 };
 
 const logout = () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("user");
-    window.location.href = "/admin.html";
+    window.location.href = "/admin";
 };
 </script>

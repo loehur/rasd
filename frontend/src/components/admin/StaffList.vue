@@ -606,6 +606,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import { API_BASE_URL } from "@/config/api";
 
 const staffList = ref([]);
 const loading = ref(false);
@@ -622,15 +623,12 @@ const loadStaff = async () => {
     error.value = "";
 
     try {
-        const response = await fetch(
-            "http://localhost/sd_pro/public/api/staff",
-            {
-                method: "GET",
-                headers: {
-                    Accept: "application/json",
-                },
-            }
-        );
+        const response = await fetch(`${API_BASE_URL}/api/staff`, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+            },
+        });
 
         const data = await response.json();
 
@@ -737,11 +735,11 @@ const viewStaff = (staff) => {
 };
 
 const goBack = () => {
-    window.location.href = "/dashboard.html";
+    window.location.href = "/admin/dashboard";
 };
 
 const goToImport = () => {
-    window.location.href = "/import-staff.html";
+    window.location.href = "/admin/import-staff";
 };
 
 const resetFilters = () => {

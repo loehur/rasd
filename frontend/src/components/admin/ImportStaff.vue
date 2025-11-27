@@ -124,7 +124,7 @@
                 <div class="mt-4 flex items-center justify-between">
                     <p class="text-sm text-slate-400">Don't have a CSV file?</p>
                     <a
-                        href="http://localhost:8000/api/staff/template"
+                        :href="`${API_BASE_URL}/api/staff/template`"
                         download
                         class="text-sm font-medium text-blue-400 hover:text-blue-300 underline"
                     >
@@ -226,6 +226,7 @@
 
 <script setup>
 import { ref } from "vue";
+import { API_BASE_URL } from "@/config/api";
 
 const selectedFile = ref(null);
 const csvHeaders = ref([]);
@@ -300,16 +301,13 @@ const importData = async () => {
         const formData = new FormData();
         formData.append("file", selectedFile.value);
 
-        const response = await fetch(
-            "http://localhost/sd_pro/public/api/staff/import",
-            {
-                method: "POST",
-                headers: {
-                    Accept: "application/json",
-                },
-                body: formData,
-            }
-        );
+        const response = await fetch(`${API_BASE_URL}/api/staff/import`, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+            },
+            body: formData,
+        });
 
         const data = await response.json();
 
@@ -335,6 +333,6 @@ const importData = async () => {
 };
 
 const goBack = () => {
-    window.location.href = "/dashboard.html";
+    window.location.href = "/admin/dashboard";
 };
 </script>

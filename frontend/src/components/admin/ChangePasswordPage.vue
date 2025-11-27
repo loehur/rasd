@@ -282,7 +282,7 @@ onMounted(() => {
     const userData = localStorage.getItem("user");
 
     if (!authToken || !userData) {
-        window.location.href = "/admin.html";
+        window.location.href = "/admin";
         return;
     }
 
@@ -312,20 +312,17 @@ const updatePassword = async () => {
     loadingPassword.value = true;
 
     try {
-        const response = await fetch(
-            "http://localhost:8000/api/account/password",
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    current_password: passwordForm.value.current_password,
-                    new_password: passwordForm.value.new_password,
-                    phone_number: user.value.phone_number,
-                }),
-            }
-        );
+        const response = await fetch(`${API_BASE_URL}/api/account/password`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                current_password: passwordForm.value.current_password,
+                new_password: passwordForm.value.new_password,
+                phone_number: user.value.phone_number,
+            }),
+        });
 
         const data = await response.json();
 
@@ -354,20 +351,20 @@ const updatePassword = async () => {
 };
 
 const goBack = () => {
-    window.location.href = "/dashboard.html";
+    window.location.href = "/admin/dashboard";
 };
 
 const goToDashboard = () => {
-    window.location.href = "/dashboard.html";
+    window.location.href = "/admin/dashboard";
 };
 
 const goToAccount = () => {
-    window.location.href = "/account.html";
+    window.location.href = "/admin/account";
 };
 
 const logout = () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("user");
-    window.location.href = "/admin.html";
+    window.location.href = "/admin";
 };
 </script>

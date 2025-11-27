@@ -513,7 +513,7 @@ onMounted(() => {
 
     if (!authToken || !userData) {
         // Not logged in, redirect to login
-        window.location.href = "/admin.html";
+        window.location.href = "/admin";
         return;
     }
 
@@ -534,23 +534,23 @@ const logout = () => {
     localStorage.removeItem("user");
 
     // Redirect to login
-    window.location.href = "/admin.html";
+    window.location.href = "/admin";
 };
 
 const goToAccount = () => {
-    window.location.href = "/account.html";
+    window.location.href = "/admin/account";
 };
 
 const goToChangePassword = () => {
-    window.location.href = "/change-password.html";
+    window.location.href = "/admin/change-password";
 };
 
 const goToImportStaff = () => {
-    window.location.href = "/import-staff.html";
+    window.location.href = "/admin/import-staff";
 };
 
 const goToStaffList = () => {
-    window.location.href = "/staff-list.html";
+    window.location.href = "/admin/staff-list";
 };
 
 const refreshPage = () => {
