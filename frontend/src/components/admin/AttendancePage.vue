@@ -1,18 +1,14 @@
 <template>
     <div class="min-h-screen bg-slate-950 text-slate-100">
-        <nav
-            class="bg-slate-900/80 backdrop-blur border-b border-slate-800/80 sticky top-0 z-50"
-        >
-            <div
-                class="px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
-            >
-                <div class="flex items-center gap-3">
+        <main class="px-3 sm:px-6 lg:px-8 py-4">
+            <div class="max-w-6xl mx-auto space-y-6">
+                <div class="mb-4">
                     <button
                         @click="goBack"
-                        class="text-slate-300 hover:text-slate-100 text-sm flex items-center gap-2"
+                        class="text-slate-400 hover:text-slate-200 flex items-center gap-2 transition"
                     >
                         <svg
-                            class="w-4 h-4"
+                            class="w-5 h-5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -21,21 +17,12 @@
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 stroke-width="2"
-                                d="M15 19l-7-7 7-7"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"
                             />
                         </svg>
                         Back to Dashboard
                     </button>
-                    <span
-                        class="hidden sm:inline text-sm font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400"
-                        >Attendance</span
-                    >
                 </div>
-            </div>
-        </nav>
-
-        <main class="px-3 sm:px-6 lg:px-8 py-4">
-            <div class="max-w-6xl mx-auto space-y-6">
                 <div
                     class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl p-6"
                 >

@@ -1,148 +1,12 @@
 <template>
     <div class="min-h-screen bg-slate-950 text-slate-100">
-        <!-- Top Navigation Bar -->
-        <nav
-            class="bg-slate-900/80 backdrop-blur border-b border-slate-800/80 sticky top-0 z-50"
-        >
-            <div class="px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <!-- Logo -->
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-emerald-400 flex items-center justify-center shadow-lg"
-                        >
-                            <svg
-                                class="w-6 h-6 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                ></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <p
-                                class="text-sm font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400"
-                            >
-                                STAFF DETAILS
-                            </p>
-                            <p class="text-[0.65rem] text-slate-500">
-                                Performance System
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- User Dropdown -->
-                    <div class="relative">
-                        <button
-                            @click="toggleDropdown"
-                            class="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition cursor-pointer"
-                        >
-                            <div class="text-right">
-                                <p class="text-sm font-semibold">
-                                    {{ user.name }}
-                                </p>
-                                <p class="text-xs text-emerald-300/70">
-                                    {{ user.role }}
-                                </p>
-                            </div>
-                            <svg
-                                class="w-4 h-4 transition-transform"
-                                :class="{ 'rotate-180': dropdownOpen }"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M19 9l-7 7-7-7"
-                                ></path>
-                            </svg>
-                        </button>
-
-                        <!-- Dropdown Menu -->
-                        <div
-                            v-if="dropdownOpen"
-                            class="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-lg shadow-lg overflow-hidden z-50"
-                        >
-                            <button
-                                @click="goToDashboard"
-                                class="w-full px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800 transition flex items-center gap-2"
-                            >
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                                    ></path>
-                                </svg>
-                                Dashboard
-                            </button>
-                            <button
-                                @click="goToChangePassword"
-                                class="w-full px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-800 transition flex items-center gap-2"
-                            >
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                                    ></path>
-                                </svg>
-                                Change Password
-                            </button>
-                            <button
-                                @click="logout"
-                                class="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-slate-800 transition flex items-center gap-2"
-                            >
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                                    ></path>
-                                </svg>
-                                Logout
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
         <!-- Main Content -->
         <main class="p-4 sm:p-6 lg:p-8">
             <div class="max-w-2xl mx-auto">
-                <!-- Header -->
-                <div class="mb-8">
+                <div class="mb-6">
                     <button
                         @click="goBack"
-                        class="mb-4 text-slate-400 hover:text-slate-200 flex items-center gap-2 transition"
+                        class="text-slate-400 hover:text-slate-200 flex items-center gap-2 transition"
                     >
                         <svg
                             class="w-5 h-5"
@@ -159,16 +23,7 @@
                         </svg>
                         Back to Dashboard
                     </button>
-                    <h1
-                        class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-300"
-                    >
-                        Account Settings
-                    </h1>
-                    <p class="text-slate-400 mt-2">
-                        Update your account information and password
-                    </p>
                 </div>
-
                 <!-- Success Message -->
                 <div
                     v-if="successMessage"

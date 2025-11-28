@@ -899,4 +899,3 @@ const logout = () => {
     window.location.href = "/";
 };
 </script>
-const goBack = () => { window.location.href = "/team-leader/dashboard"; };

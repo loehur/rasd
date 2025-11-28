@@ -844,7 +844,8 @@ onMounted(() => {
     }
 
     const user = JSON.parse(localStorage.getItem("tl_user") || "{}");
-    userName.value = user.name || "Team Leader";
+    const full = (user && user.name ? user.name : "Team Leader").trim();
+    userName.value = full.split(/\s+/)[0];
 
     fetchStaffList();
     fetchAttendances();

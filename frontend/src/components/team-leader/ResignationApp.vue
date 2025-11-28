@@ -70,17 +70,60 @@
                 </div>
 
                 <div class="p-6">
-                    <!-- Filter Date -->
-                    <div class="mb-4 flex items-center gap-3">
-                        <label class="text-sm font-medium text-gray-700"
-                            >Filter tanggal (Report Day):</label
-                        >
-                        <input
-                            type="date"
-                            v-model="filterDate"
-                            @change="fetchResignations(1)"
-                            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
-                        />
+                    <!-- Filter by Year -->
+                    <div
+                        class="bg-white shadow-sm border border-gray-200 rounded-xl p-4 mb-4"
+                    >
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg
+                                class="w-5 h-5 text-gray-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                            </svg>
+                            <span class="text-sm font-medium text-gray-700"
+                                >Filter by Year:</span
+                            >
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                @click="filterYear = ''"
+                                :class="[
+                                    'px-4 py-2 text-sm font-medium rounded-lg transition',
+                                    filterYear === ''
+                                        ? 'bg-gray-600 text-white'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                                ]"
+                            >
+                                All Years
+                                <span class="ml-1 text-xs opacity-70"
+                                    >({{ resignations.length }})</span
+                                >
+                            </button>
+                            <button
+                                v-for="year in availableYears"
+                                :key="year"
+                                @click="filterYear = year"
+                                :class="[
+                                    'px-4 py-2 text-sm font-medium rounded-lg transition',
+                                    filterYear === year
+                                        ? 'bg-red-600 text-white'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                                ]"
+                            >
+                                {{ year }}
+                                <span class="ml-1 text-xs opacity-70"
+                                    >({{ getYearCount(year) }})</span
+                                >
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Loading State -->
@@ -113,104 +156,106 @@
 
                     <!-- Table -->
                     <div
-                        v-else-if="resignations.length > 0"
+                        v-else-if="displayResignations.length > 0"
                         class="overflow-x-auto"
                     >
-                        <table class="w-full text-sm">
-                            <thead
-                                class="bg-gradient-to-r from-red-50 to-orange-50"
-                            >
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
                                 <tr>
                                     <th
-                                        class="px-4 py-3 text-left font-semibold text-gray-700"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
                                     >
-                                        Staff ID
+                                        Employee
                                     </th>
                                     <th
-                                        class="px-4 py-3 text-left font-semibold text-gray-700"
-                                    >
-                                        Staff Name
-                                    </th>
-                                    <th
-                                        class="px-4 py-3 text-left font-semibold text-gray-700"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
                                     >
                                         Last Working Day
                                     </th>
                                     <th
-                                        class="px-4 py-3 text-left font-semibold text-gray-700"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
                                     >
                                         Type
                                     </th>
                                     <th
-                                        class="px-4 py-3 text-left font-semibold text-gray-700"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
                                     >
                                         Subtype
                                     </th>
                                     <th
-                                        class="px-4 py-3 text-left font-semibold text-gray-700"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
                                     >
                                         Report Day
                                     </th>
                                     <th
-                                        class="px-4 py-3 text-left font-semibold text-gray-700"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
                                     >
                                         Reason
                                     </th>
                                     <th
-                                        class="px-4 py-3 text-left font-semibold text-gray-700"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
                                     >
                                         Status
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="bg-white divide-y divide-gray-200">
                                 <tr
-                                    v-for="resignation in resignations"
+                                    v-for="resignation in displayResignations"
                                     :key="resignation.id"
-                                    class="border-t border-gray-200 hover:bg-red-50/50 transition"
+                                    class="hover:bg-gray-50"
                                 >
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div
+                                            class="text-sm font-medium text-gray-900"
+                                        >
+                                            {{ resignation.staff_name }}
+                                        </div>
+                                        <div class="text-xs text-gray-500">
+                                            {{ resignation.staff_id }}
+                                        </div>
+                                    </td>
                                     <td
-                                        class="px-4 py-3 text-red-600 font-mono"
+                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
                                     >
-                                        {{ resignation.staff_id }}
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        {{ resignation.staff_name }}
-                                    </td>
-                                    <td class="px-4 py-3">
                                         {{
                                             formatDate(
                                                 resignation.last_working_day
                                             )
                                         }}
                                     </td>
-                                    <td class="px-4 py-3">
+                                    <td class="px-6 py-4 whitespace-nowrap">
                                         <span
-                                            :class="
+                                            :class="[
+                                                'px-2 py-1 text-xs font-semibold rounded-full',
                                                 resignation.resignation_type ===
                                                 'voluntary'
-                                                    ? 'text-blue-600'
-                                                    : 'text-orange-600'
-                                            "
+                                                    ? 'bg-blue-100 text-blue-800'
+                                                    : 'bg-orange-100 text-orange-800',
+                                            ]"
                                         >
                                             {{ resignation.resignation_type }}
                                         </span>
                                     </td>
-                                    <td class="px-4 py-3">
+                                    <td
+                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                    >
                                         {{ resignation.resignation_subtype }}
                                     </td>
-                                    <td class="px-4 py-3">
+                                    <td
+                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                    >
                                         {{ formatDate(resignation.report_day) }}
                                     </td>
                                     <td
-                                        class="px-4 py-3 max-w-xs truncate"
+                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 max-w-xs truncate"
                                         :title="resignation.reason"
                                     >
                                         {{ resignation.reason || "-" }}
                                     </td>
-                                    <td class="px-4 py-3">
+                                    <td class="px-6 py-4 whitespace-nowrap">
                                         <span
-                                            class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700"
+                                            class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800"
                                         >
                                             Inactive
                                         </span>
@@ -219,40 +264,11 @@
                             </tbody>
                         </table>
 
-                        <!-- Pagination -->
+                        <!-- Summary -->
                         <div class="mt-6 flex items-center justify-between">
                             <p class="text-sm text-gray-600">
-                                Showing {{ pagination.from }} to
-                                {{ pagination.to }} of
-                                {{ pagination.total }} results
+                                Showing {{ displayResignations.length }} results
                             </p>
-                            <div class="flex gap-2">
-                                <button
-                                    @click="
-                                        fetchResignations(
-                                            pagination.current_page - 1
-                                        )
-                                    "
-                                    :disabled="pagination.current_page === 1"
-                                    class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Previous
-                                </button>
-                                <button
-                                    @click="
-                                        fetchResignations(
-                                            pagination.current_page + 1
-                                        )
-                                    "
-                                    :disabled="
-                                        pagination.current_page ===
-                                        pagination.last_page
-                                    "
-                                    class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Next
-                                </button>
-                            </div>
                         </div>
                     </div>
 
@@ -556,7 +572,7 @@ const error = ref("");
 const showModal = ref(false);
 const submitting = ref(false);
 const toast = ref({ show: false, message: "", type: "success" });
-const filterDate = ref(new Date().toISOString().split("T")[0]);
+const filterYear = ref(new Date().getFullYear());
 
 const pagination = ref({
     total: 0,
@@ -597,7 +613,7 @@ const fetchResignations = async (page = 1) => {
         const token = localStorage.getItem("tl_auth_token");
         const params = new URLSearchParams();
         params.set("page", String(page));
-        if (filterDate.value) params.set("report_day", filterDate.value);
+        // Fetch all, filter by year client-side
 
         const response = await fetch(
             `${API_BASE_URL}/api/resignations?${params.toString()}`,
@@ -846,6 +862,39 @@ const formatDate = (dateString) => {
         day: "numeric",
     });
 };
+
+// Years available from resignation records
+const availableYears = computed(() => {
+    const years = new Set();
+    resignations.value.forEach((r) => {
+        const d = r.report_day || r.last_working_day;
+        if (!d) return;
+        const y = new Date(d).getFullYear();
+        if (!isNaN(y)) years.add(y);
+    });
+    return Array.from(years).sort((a, b) => b - a);
+});
+
+const getYearCount = (year) => {
+    return resignations.value.filter((r) => {
+        const d = r.report_day || r.last_working_day;
+        return d && new Date(d).getFullYear() === year;
+    }).length;
+};
+
+// Limit to TL-supervised staff and selected year
+const tlStaffIds = computed(
+    () => new Set(staffList.value.map((s) => s.staff_id))
+);
+const displayResignations = computed(() => {
+    return resignations.value.filter((r) => {
+        if (!tlStaffIds.value.has(r.staff_id)) return false;
+        if (!filterYear.value || filterYear.value === "") return true;
+        const d = r.report_day || r.last_working_day;
+        if (!d) return false;
+        return new Date(d).getFullYear() === filterYear.value;
+    });
+});
 
 const goBack = () => {
     window.location.href = "/team-leader/dashboard";
