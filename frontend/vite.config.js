@@ -14,6 +14,24 @@ export default defineConfig(({ command }) => {
             plugins: [
                 vue(),
                 {
+                    name: "global-favicon",
+                    transformIndexHtml(html) {
+                        return {
+                            html,
+                            tags: [
+                                {
+                                    tag: "link",
+                                    attrs: {
+                                        rel: "icon",
+                                        href: "http://localhost/sd_pro/public/assets/staff.png",
+                                    },
+                                    injectTo: "head",
+                                },
+                            ],
+                        };
+                    },
+                },
+                {
                     name: "rewrite-middleware",
                     configureServer(server) {
                         server.middlewares.use((req, res, next) => {
@@ -43,7 +61,27 @@ export default defineConfig(({ command }) => {
     return {
         root: ".",
         publicDir: "public",
-        plugins: [vue()],
+        plugins: [
+            vue(),
+            {
+                name: "global-favicon",
+                transformIndexHtml(html) {
+                    return {
+                        html,
+                        tags: [
+                            {
+                                tag: "link",
+                                attrs: {
+                                    rel: "icon",
+                                    href: "/assets/staff.png",
+                                },
+                                injectTo: "head",
+                            },
+                        ],
+                    };
+                },
+            },
+        ],
         resolve: { alias: { "@": resolve(__dirname, "src") } },
         build: {
             outDir: "../public",
@@ -106,6 +144,10 @@ export default defineConfig(({ command }) => {
                     staffList: resolve(
                         __dirname,
                         "pages/admin/staff-list.html"
+                    ),
+                    inactiveStaff: resolve(
+                        __dirname,
+                        "pages/admin/inactive-staff.html"
                     ),
                     account: resolve(__dirname, "pages/admin/account.html"),
                     changePassword: resolve(

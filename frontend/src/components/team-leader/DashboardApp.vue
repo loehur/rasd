@@ -119,75 +119,45 @@
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Quick Stats -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div
-                    class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition group"
+                <a
+                    href="/team-leader/staff-list"
+                    class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-emerald-300 transition-all cursor-pointer group"
                 >
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <div
-                                class="p-3 rounded-lg bg-gradient-to-br from-green-100 to-emerald-100 group-hover:from-green-200 group-hover:to-emerald-200 transition"
-                            >
-                                <svg
-                                    class="w-8 h-8 text-green-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                                    />
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-600">
-                                    Staff Lists
-                                </p>
-                                <p class="text-lg font-semibold text-green-600">
-                                    View
-                                </p>
-                            </div>
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-emerald-100 group-hover:bg-emerald-200 transition-colors">
+                            <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7M15 7a3 3 0 11-6 0 3 3 0 016 0" />
+                            </svg>
                         </div>
-                        <div class="relative staff-menu">
-                            <button
-                                @click="openStaffMenu = !openStaffMenu"
-                                class="px-3 py-2 text-sm bg-gray-100 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 transition flex items-center gap-2"
-                            >
-                                <span>Choose</span>
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M19 9l-7 7-7-7"
-                                    />
-                                </svg>
-                            </button>
-                            <div
-                                v-if="openStaffMenu"
-                                class="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-10"
-                            >
-                                <a
-                                    href="/team-leader/staff-list"
-                                    class="block px-3 py-2 text-sm text-gray-700 hover:bg-green-50"
-                                    >Active Staff</a
-                                >
-                                <a
-                                    href="/team-leader/inactive-staff"
-                                    class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                    >Inactive Staff</a
-                                >
-                            </div>
+                        <div class="ml-4 flex-1">
+                            <p class="text-sm font-medium text-gray-600 group-hover:text-emerald-600">Staff Lists</p>
+                            <p class="text-lg font-bold text-gray-900 group-hover:text-emerald-700">Active</p>
                         </div>
+                        <svg class="w-6 h-6 text-gray-400 group-hover:text-emerald-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
                     </div>
-                </div>
+                </a>
+
+                <a
+                    href="/team-leader/inactive-staff"
+                    class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer group"
+                >
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13" />
+                            </svg>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <p class="text-sm font-medium text-gray-600 group-hover:text-blue-600">Staff Lists</p>
+                            <p class="text-lg font-bold text-gray-900 group-hover:text-blue-700">Inactive</p>
+                        </div>
+                        <svg class="w-6 h-6 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
 
                 <a
                     href="/team-leader/attendance"
@@ -765,7 +735,7 @@ const viewData = ref(null);
 const proofFile = ref(null);
 const toast = ref({ show: false, message: "", type: "success" });
 const showDropdown = ref(false);
-const openStaffMenu = ref(false);
+// removed dropdown in favor of direct cards
 
 const pagination = ref({
     total: 0,
@@ -850,12 +820,7 @@ onMounted(() => {
     fetchStaffList();
     fetchAttendances();
 
-    document.addEventListener("click", (e) => {
-        const target = e.target;
-        if (!(target && target.closest && target.closest(".staff-menu"))) {
-            openStaffMenu.value = false;
-        }
-    });
+    
 });
 
 const fetchStaffList = async () => {
