@@ -333,6 +333,10 @@
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                             ></path>
                         </svg>
+                        <div class="mb-3 flex items-center gap-3 justify-center">
+                            <label class="text-sm text-gray-600">Filter tanggal (Report Day):</label>
+                            <input type="date" v-model="filterDate" @change="fetchAttendances(1)" class="px-3 py-2 border border-gray-300 rounded" />
+                        </div>
                         <h3 class="text-lg font-medium text-gray-900 mb-2">
                             No Attendance Records
                         </h3>
@@ -343,6 +347,17 @@
 
                     <!-- Attendance Table -->
                     <div v-else>
+                        <div class="mb-3 flex items-center gap-3">
+                            <label class="text-sm text-gray-600"
+                                >Filter tanggal (Report Day):</label
+                            >
+                            <input
+                                type="date"
+                                v-model="filterDate"
+                                @change="fetchAttendances(1)"
+                                class="px-3 py-2 border border-gray-300 rounded"
+                            />
+                        </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
@@ -1090,12 +1105,14 @@ const fetchStaffList = async () => {
     }
 };
 
+const filterDate = ref(new Date().toISOString().split("T")[0]);
+
 const fetchAttendances = async (page = 1) => {
     loading.value = true;
     error.value = "";
 
     try {
-        const data = await getAttendances(page);
+        const data = await getAttendances(page, filterDate.value, 1000);
         if (data.success) {
             attendances.value = data.data || [];
             pagination.value = data.pagination;

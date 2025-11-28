@@ -104,9 +104,10 @@ export default defineConfig(({ command }) => {
                         __dirname,
                         "pages/admin/change-password.html"
                     ),
-                    users: resolve(
+                    users: resolve(__dirname, "pages/admin/users.html"),
+                    attendance: resolve(
                         __dirname,
-                        "pages/admin/users.html"
+                        "pages/admin/attendance.html"
                     ),
                 },
             },

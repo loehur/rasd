@@ -85,5 +85,27 @@ class UserController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Password reset to default']);
     }
-}
 
+    /**
+     * Delete user (super-admin only)
+     */
+    public function destroy($id, Request $request)
+    {
+        $role = $request->header('X-Role') ?? ($request->input('role') ?? null);
+        if ($role !== 'super-admin') {
+            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+        }
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'User not found'], 404);
+        }
+
+        if ($user->role === 'super-admin') {
+            return response()->json(['success' => false, 'message' => 'Cannot delete super-admin'], 403);
+        }
+
+        $user->delete();
+        return response()->json(['success' => true, 'message' => 'User deleted']);
+    }
+}

@@ -49,6 +49,9 @@ $router->get('/admin/team-leader/edit/{employeeId}', function () {
 $router->get('/admin/change-password', function () {
     return file_get_contents(base_path('public/pages/admin/change-password.html'));
 });
+$router->get('/admin/attendance', function () {
+    return file_get_contents(base_path('public/pages/admin/attendance.html'));
+});
 
 $router->get('/admin/users', function () {
     return file_get_contents(base_path('public/pages/admin/users.html'));
@@ -120,4 +123,5 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('users', 'UserController@index');
     $router->post('users', 'UserController@store');
     $router->post('users/{id}/reset-password', 'UserController@resetPassword');
+    $router->delete('users/{id}', 'UserController@destroy');
 });

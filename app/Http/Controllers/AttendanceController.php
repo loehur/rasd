@@ -16,10 +16,16 @@ class AttendanceController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 15);
+        $reportDay = $request->get('report_day');
 
-        $attendances = Attendance::with(['staff', 'teamLeader'])
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+        $query = Attendance::with(['staff', 'teamLeader'])
+            ->orderBy('created_at', 'desc');
+
+        if (!empty($reportDay)) {
+            $query->whereDate('report_day', $reportDay);
+        }
+
+        $attendances = $query->paginate($perPage);
 
         return response()->json([
             'success' => true,
@@ -282,12 +288,38 @@ class AttendanceController extends Controller
     /**
      * Remove the specified attendance
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
+        $role = $request->header('X-Role');
+        if (!in_array($role, ['admin', 'super-admin'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Forbidden',
+            ], 403);
+        }
+
+        $attendance = Attendance::find($id);
+        if (!$attendance) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Attendance not found',
+            ], 404);
+        }
+
+        // Delete proof file if exists
+        if ($attendance->proof) {
+            $oldFullPath = base_path('public') . DIRECTORY_SEPARATOR . ltrim($attendance->proof, DIRECTORY_SEPARATOR);
+            if (file_exists($oldFullPath)) {
+                @unlink($oldFullPath);
+            }
+        }
+
+        $attendance->delete();
+
         return response()->json([
-            'success' => false,
-            'message' => 'Attendance cannot be deleted once submitted',
-        ], 403);
+            'success' => true,
+            'message' => 'Attendance deleted',
+        ]);
     }
 
     /**

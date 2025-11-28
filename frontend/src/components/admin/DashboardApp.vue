@@ -359,6 +359,7 @@
                         </button>
 
                         <button
+                            @click="goToAttendance"
                             class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-xl p-4 hover:border-orange-500/50 hover:bg-slate-800/50 transition-all text-center group"
                         >
                             <div
@@ -379,7 +380,7 @@
                                 </svg>
                             </div>
                             <p class="text-sm font-medium text-slate-200">
-                                Reports
+                                Attendance
                             </p>
                         </button>
                     </div>
@@ -565,5 +566,9 @@ const goToTeamLeaderList = () => {
 
 const goToUsers = () => {
     window.location.href = "/admin/users";
+};
+
+const goToAttendance = () => {
+    window.location.href = "/admin/attendance";
 };
 </script>
