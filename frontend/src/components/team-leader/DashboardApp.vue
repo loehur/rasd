@@ -8,11 +8,8 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900">
-                            TL-Dashboard
+                            Team Leader
                         </h1>
-                        <p class="text-sm text-gray-600 mt-1">
-                            Welcome, {{ userName }}
-                        </p>
                     </div>
                     <div class="relative">
                         <button
@@ -123,46 +120,15 @@
             <!-- Quick Stats -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div
-                    class="bg-white rounded-xl shadow-sm p-6 border border-gray-200"
-                >
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-lg bg-blue-100">
-                            <svg
-                                class="w-8 h-8 text-blue-600"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                                ></path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">
-                                Total Staff
-                            </p>
-                            <p class="text-2xl font-bold text-gray-900">
-                                {{ totalStaff }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <a
-                    href="/team-leader/staff-list"
-                    class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition cursor-pointer group"
+                    class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition group"
                 >
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <div
-                                class="p-3 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 group-hover:from-indigo-200 group-hover:to-purple-200 transition"
+                                class="p-3 rounded-lg bg-gradient-to-br from-green-100 to-emerald-100 group-hover:from-green-200 group-hover:to-emerald-200 transition"
                             >
                                 <svg
-                                    class="w-8 h-8 text-indigo-600"
+                                    class="w-8 h-8 text-green-600"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -172,22 +138,93 @@
                                         stroke-linejoin="round"
                                         stroke-width="2"
                                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                                    ></path>
+                                    />
                                 </svg>
                             </div>
                             <div class="ml-4">
                                 <p class="text-sm font-medium text-gray-600">
-                                    View Staff
+                                    Staff Lists
                                 </p>
-                                <p
-                                    class="text-lg font-semibold text-indigo-600"
-                                >
-                                    All Data
+                                <p class="text-lg font-semibold text-green-600">
+                                    View
                                 </p>
                             </div>
                         </div>
+                        <div class="relative staff-menu">
+                            <button
+                                @click="openStaffMenu = !openStaffMenu"
+                                class="px-3 py-2 text-sm bg-gray-100 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 transition flex items-center gap-2"
+                            >
+                                <span>Choose</span>
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M19 9l-7 7-7-7"
+                                    />
+                                </svg>
+                            </button>
+                            <div
+                                v-if="openStaffMenu"
+                                class="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-10"
+                            >
+                                <a
+                                    href="/team-leader/staff-list"
+                                    class="block px-3 py-2 text-sm text-gray-700 hover:bg-green-50"
+                                    >Active Staff</a
+                                >
+                                <a
+                                    href="/team-leader/inactive-staff"
+                                    class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                    >Inactive Staff</a
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <a
+                    href="/team-leader/attendance"
+                    class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-indigo-300 transition-all cursor-pointer group"
+                >
+                    <div class="flex items-center">
+                        <div
+                            class="p-3 rounded-lg bg-indigo-100 group-hover:bg-indigo-200 transition-colors"
+                        >
+                            <svg
+                                class="w-8 h-8 text-indigo-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                                ></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <p
+                                class="text-sm font-medium text-gray-600 group-hover:text-indigo-600 transition-colors"
+                            >
+                                Staff Attendance
+                            </p>
+                            <p
+                                class="text-lg font-bold text-gray-900 group-hover:text-indigo-700 transition-colors"
+                            >
+                                Record & Manage
+                            </p>
+                        </div>
                         <svg
-                            class="w-5 h-5 text-gray-400 group-hover:text-indigo-600 transition"
+                            class="w-6 h-6 text-gray-400 group-hover:text-indigo-600 transition-colors"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -202,13 +239,17 @@
                     </div>
                 </a>
 
-                <div
-                    class="bg-white rounded-xl shadow-sm p-6 border border-gray-200"
+                <!-- Resignation Card -->
+                <a
+                    href="/team-leader/resignation"
+                    class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-red-300 transition-all cursor-pointer group"
                 >
                     <div class="flex items-center">
-                        <div class="p-3 rounded-lg bg-purple-100">
+                        <div
+                            class="p-3 rounded-lg bg-red-100 group-hover:bg-red-200 transition-colors"
+                        >
                             <svg
-                                class="w-8 h-8 text-purple-600"
+                                class="w-8 h-8 text-red-600"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -217,90 +258,24 @@
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                     stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"
                                 ></path>
                             </svg>
                         </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">
-                                Today's Date
+                        <div class="ml-4 flex-1">
+                            <p
+                                class="text-sm font-medium text-gray-600 group-hover:text-red-600 transition-colors"
+                            >
+                                Staff Resignation
                             </p>
-                            <p class="text-lg font-bold text-gray-900">
-                                {{ todayDate }}
+                            <p
+                                class="text-lg font-bold text-gray-900 group-hover:text-red-700 transition-colors"
+                            >
+                                Manage Resignations
                             </p>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Attendance Card -->
-            <div
-                class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
-            >
-                <div
-                    class="p-6 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-purple-50"
-                >
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h2
-                                class="text-xl font-bold text-gray-900 flex items-center"
-                            >
-                                <svg
-                                    class="w-6 h-6 mr-2 text-indigo-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                                    ></path>
-                                </svg>
-                                Staff Attendance
-                            </h2>
-                            <p class="text-sm text-gray-600 mt-1">
-                                Record attendance for your team members
-                            </p>
-                        </div>
-                        <button
-                            @click="openAttendanceModal"
-                            class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700"
-                        >
-                            <svg
-                                class="w-5 h-5 inline-block mr-2 -mt-1"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 4v16m8-8H4"
-                                ></path>
-                            </svg>
-                            Record Attendance
-                        </button>
-                    </div>
-                </div>
-
-                <div class="p-6">
-                    <!-- Loading State -->
-                    <div v-if="loading" class="text-center py-12">
-                        <div
-                            class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"
-                        ></div>
-                        <p class="mt-4 text-gray-600">
-                            Loading attendance records...
-                        </p>
-                    </div>
-
-                    <!-- Error State -->
-                    <div v-else-if="error" class="text-center py-12">
                         <svg
-                            class="w-16 h-16 text-red-400 mx-auto mb-4"
+                            class="w-6 h-6 text-gray-400 group-hover:text-red-600 transition-colors"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -309,228 +284,14 @@
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 stroke-width="2"
-                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                d="M9 5l7 7-7 7"
                             ></path>
                         </svg>
-                        <p class="text-gray-600">{{ error }}</p>
                     </div>
-
-                    <!-- Empty State -->
-                    <div
-                        v-else-if="attendances.length === 0"
-                        class="text-center py-12"
-                    >
-                        <svg
-                            class="w-16 h-16 text-gray-400 mx-auto mb-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                            ></path>
-                        </svg>
-                        <div class="mb-3 flex items-center gap-3 justify-center">
-                            <label class="text-sm text-gray-600">Filter tanggal (Report Day):</label>
-                            <input type="date" v-model="filterDate" @change="fetchAttendances(1)" class="px-3 py-2 border border-gray-300 rounded" />
-                        </div>
-                        <h3 class="text-lg font-medium text-gray-900 mb-2">
-                            No Attendance Records
-                        </h3>
-                        <p class="text-gray-600">
-                            Start by creating a new attendance record.
-                        </p>
-                    </div>
-
-                    <!-- Attendance Table -->
-                    <div v-else>
-                        <div class="mb-3 flex items-center gap-3">
-                            <label class="text-sm text-gray-600"
-                                >Filter tanggal (Report Day):</label
-                            >
-                            <input
-                                type="date"
-                                v-model="filterDate"
-                                @change="fetchAttendances(1)"
-                                class="px-3 py-2 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Employee
-                                        </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Position
-                                        </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Department
-                                        </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            WFH/Onsite
-                                        </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Device
-                                        </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Report Day
-                                        </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Status
-                                        </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody
-                                    class="bg-white divide-y divide-gray-200"
-                                >
-                                    <tr
-                                        v-for="attendance in attendances"
-                                        :key="attendance.id"
-                                        class="hover:bg-gray-50"
-                                    >
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div
-                                                class="text-sm font-medium text-gray-900"
-                                            >
-                                                {{ attendance.name }}
-                                            </div>
-                                            <div class="text-xs text-gray-500">
-                                                {{ attendance.staff_id }}
-                                            </div>
-                                        </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                                        >
-                                            {{ attendance.position }}
-                                        </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                                        >
-                                            {{ attendance.department }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span
-                                                :class="[
-                                                    'px-2 py-1 text-xs font-semibold rounded-full',
-                                                    attendance.work_status ===
-                                                    'WFH'
-                                                        ? 'bg-blue-100 text-blue-800'
-                                                        : 'bg-green-100 text-green-800',
-                                                ]"
-                                            >
-                                                {{ attendance.work_status }}
-                                            </span>
-                                        </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                                        >
-                                            {{ attendance.device }}
-                                        </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                                        >
-                                            {{
-                                                formatDate(
-                                                    attendance.report_day
-                                                )
-                                            }}
-                                        </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                                        >
-                                            {{ attendance.status_code }}
-                                        </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2"
-                                        >
-                                            <button
-                                                @click="
-                                                    viewAttendance(attendance)
-                                                "
-                                                class="text-indigo-600 hover:text-indigo-900"
-                                            >
-                                                View
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Pagination -->
-                        <div
-                            v-if="pagination.last_page > 1"
-                            class="mt-4 flex items-center justify-between border-t border-gray-200 pt-4"
-                        >
-                            <div class="text-sm text-gray-700">
-                                Showing {{ pagination.from }} to
-                                {{ pagination.to }} of
-                                {{ pagination.total }} results
-                            </div>
-                            <div class="flex space-x-2">
-                                <button
-                                    @click="
-                                        goToPage(pagination.current_page - 1)
-                                    "
-                                    :disabled="pagination.current_page === 1"
-                                    class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                                >
-                                    Previous
-                                </button>
-                                <button
-                                    v-for="page in visiblePages"
-                                    :key="page"
-                                    @click="goToPage(page)"
-                                    :class="[
-                                        'px-3 py-1 border rounded-md text-sm font-medium',
-                                        page === pagination.current_page
-                                            ? 'bg-indigo-600 text-white border-indigo-600'
-                                            : 'border-gray-300 text-gray-700 hover:bg-gray-50',
-                                    ]"
-                                >
-                                    {{ page }}
-                                </button>
-                                <button
-                                    @click="
-                                        goToPage(pagination.current_page + 1)
-                                    "
-                                    :disabled="
-                                        pagination.current_page ===
-                                        pagination.last_page
-                                    "
-                                    class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                                >
-                                    Next
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </a>
             </div>
+
+            <!-- Attendance section moved to dedicated page /team-leader/attendance -->
         </main>
 
         <!-- Record Attendance Modal -->
@@ -1004,6 +765,7 @@ const viewData = ref(null);
 const proofFile = ref(null);
 const toast = ref({ show: false, message: "", type: "success" });
 const showDropdown = ref(false);
+const openStaffMenu = ref(false);
 
 const pagination = ref({
     total: 0,
@@ -1086,6 +848,13 @@ onMounted(() => {
 
     fetchStaffList();
     fetchAttendances();
+
+    document.addEventListener("click", (e) => {
+        const target = e.target;
+        if (!(target && target.closest && target.closest(".staff-menu"))) {
+            openStaffMenu.value = false;
+        }
+    });
 });
 
 const fetchStaffList = async () => {

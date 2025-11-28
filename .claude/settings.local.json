@@ -13,7 +13,12 @@
       "Bash(curl:*)",
       "Bash(php check_tl.php:*)",
       "Bash(php reset_tl_password.php:*)",
-      "Bash(php:*)"
+      "Bash(php:*)",
+      "Bash(git checkout:*)",
+      "Bash(python edit_dashboard.py:*)",
+      "Bash(node edit_dashboard.js:*)",
+      "Bash(npm run build:teamLeaderResignation:*)",
+      "Bash(npm run:*)"
     ],
     "deny": [],
     "ask": []

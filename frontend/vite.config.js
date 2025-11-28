@@ -76,6 +76,14 @@ export default defineConfig(({ command }) => {
                         __dirname,
                         "pages/team-leader/staff-list.html"
                     ),
+                    teamLeaderInactiveStaff: resolve(
+                        __dirname,
+                        "pages/team-leader/inactive-staff.html"
+                    ),
+                    teamLeaderResignation: resolve(
+                        __dirname,
+                        "pages/team-leader/resignation.html"
+                    ),
                     // Admin pages
                     adminLogin: resolve(__dirname, "pages/admin/login.html"),
                     dashboard: resolve(__dirname, "pages/admin/dashboard.html"),

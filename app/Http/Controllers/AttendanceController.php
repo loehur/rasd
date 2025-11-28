@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 // Intervention Image is optional; we'll fallback to GD if not installed
 
 class AttendanceController extends Controller
@@ -46,38 +47,58 @@ class AttendanceController extends Controller
      */
     public function getStaffByTeamLeader(Request $request)
     {
-        // Get token from Authorization header
-        $token = $request->header('Authorization');
-        if (!$token) {
+        try {
+            // Get token from Authorization header
+            $token = $request->header('Authorization');
+            if (!$token) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+            // Remove 'Bearer ' prefix if present
+            $token = str_replace('Bearer ', '', $token);
+
+            // Decode token to get employee_id
+            $decoded = base64_decode($token);
+            $parts = explode(':', $decoded);
+            $employeeId = $parts[0] ?? null;
+
+            if (!$employeeId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid token'
+                ], 401);
+            }
+
+            // Get team leader info
+            $teamLeader = DB::table('team_leaders')
+                ->where('employee_id', $employeeId)
+                ->first();
+
+            if (!$teamLeader) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Team leader not found'
+                ], 401);
+            }
+
+            // Get staff under this team leader using the superior name
+            $staff = Staff::where('superior', $teamLeader->name)
+                ->orderBy('name')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $staff,
+            ], 200);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized',
-            ], 401);
+                'message' => 'Failed to fetch staff: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Remove 'Bearer ' prefix if present
-        $token = str_replace('Bearer ', '', $token);
-
-        // Decode token to get employee_id
-        $decoded = base64_decode($token);
-        $parts = explode(':', $decoded);
-        $teamLeaderId = $parts[0] ?? null;
-
-        if (!$teamLeaderId) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid token',
-            ], 401);
-        }
-
-        $staff = Staff::where('team_leader_id', $teamLeaderId)
-            ->orderBy('name')
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $staff,
-        ], 200);
     }
 
     /**
@@ -145,7 +166,6 @@ class AttendanceController extends Controller
             'status_code' => 'required|string',
             // Proof is now optional
             'proof' => 'nullable|file|mimes:jpeg,jpg,png|max:10240',
-            'last_working_day' => 'required|date',
             'reason_for_resign' => 'required|string',
         ]);
 
@@ -175,7 +195,6 @@ class AttendanceController extends Controller
                 'rank' => $request->rank,
                 'device' => $request->device,
                 'report_day' => $request->report_day,
-                'last_working_day' => $request->last_working_day,
                 'ranking_intervals' => $request->ranking_intervals,
                 'group' => $request->group,
                 'reason_for_resign' => $request->reason_for_resign,
@@ -242,7 +261,6 @@ class AttendanceController extends Controller
             'report_day' => 'sometimes|required|date',
             'status_code' => 'sometimes|required|string',
             'proof' => 'nullable|image|mimes:jpeg,jpg,png|max:10240',
-            'last_working_day' => 'nullable|date',
             'ranking_intervals' => 'nullable|string',
             'reason_for_resign' => 'nullable|string',
         ]);

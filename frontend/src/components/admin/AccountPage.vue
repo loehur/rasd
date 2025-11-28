@@ -29,7 +29,7 @@
                             <p
                                 class="text-sm font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400"
                             >
-                                STAFF PERFORMANCE
+                                STAFF DETAILS
                             </p>
                             <p class="text-[0.65rem] text-slate-500">
                                 Performance System
@@ -237,6 +237,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { API_BASE_URL } from "@/config/api";
 
 const user = ref({
     name: "",

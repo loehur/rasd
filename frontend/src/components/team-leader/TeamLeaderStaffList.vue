@@ -27,10 +27,13 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h1
-                            class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700"
+                            class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-green-600 via-emerald-600 to-green-700"
                         >
-                            All Staff
+                            Active Staff
                         </h1>
+                        <p class="text-sm text-gray-600 mt-1">
+                            Staff members who are currently active
+                        </p>
                     </div>
                 </div>
             </div>
@@ -63,13 +66,13 @@
                         :class="[
                             'px-4 py-2 text-sm font-medium rounded-lg transition',
                             filterGroup === ''
-                                ? 'bg-indigo-600 text-white'
+                                ? 'bg-green-600 text-white'
                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
                         ]"
                     >
                         All
                         <span class="ml-1 text-xs opacity-70"
-                            >({{ staffList.length }})</span
+                            >({{ activeStaffList.length }})</span
                         >
                     </button>
                     <button
@@ -170,44 +173,134 @@
                 <!-- Desktop Table View -->
                 <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-xs">
-                        <thead class="bg-gradient-to-r from-indigo-50 to-purple-50">
+                        <thead
+                            class="bg-gradient-to-r from-indigo-50 to-purple-50"
+                        >
                             <tr>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">SN</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Area</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">WFH/Onsite</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">ID Staff</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Name Staff</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Position</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Superior</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Department</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Hiredate</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Rank</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Device</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">WL</th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider"
+                                >
+                                    SN
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider"
+                                >
+                                    Area
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider"
+                                >
+                                    WFH/Onsite
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider"
+                                >
+                                    ID Staff
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider"
+                                >
+                                    Name Staff
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider"
+                                >
+                                    Position
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider"
+                                >
+                                    Superior
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider"
+                                >
+                                    Department
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider"
+                                >
+                                    Hiredate
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider"
+                                >
+                                    Rank
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider"
+                                >
+                                    Device
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider"
+                                >
+                                    WL
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <template v-for="(staffGroup, teamLeader) in groupedByTeamLeader" :key="teamLeader">
+                            <template
+                                v-for="(
+                                    staffGroup, teamLeader
+                                ) in groupedByTeamLeader"
+                                :key="teamLeader"
+                            >
                                 <!-- Team Leader Header Row -->
-                                <tr class="bg-gradient-to-r from-purple-50 to-indigo-50">
-                                    <td colspan="12" class="px-3 py-3 text-left font-bold text-purple-700 text-sm">
-                                        Team Leader: {{ teamLeader }} ({{ staffGroup.length }} staff)
+                                <tr
+                                    class="bg-gradient-to-r from-purple-50 to-indigo-50"
+                                >
+                                    <td
+                                        colspan="12"
+                                        class="px-3 py-3 text-left font-bold text-purple-700 text-sm"
+                                    >
+                                        Team Leader: {{ teamLeader }}
                                     </td>
                                 </tr>
                                 <!-- Staff Rows -->
-                                <tr v-for="(staff, index) in staffGroup" :key="staff.id" class="hover:bg-indigo-50/50 transition border-t border-gray-200">
-                                    <td class="px-3 py-2 text-indigo-600 font-bold">{{ index + 1 }}</td>
-                                    <td class="px-3 py-2">{{ staff.area || '-' }}</td>
-                                    <td class="px-3 py-2">{{ staff.work_location || '-' }}</td>
-                                    <td class="px-3 py-2 text-indigo-600 font-mono font-semibold">{{ staff.staff_id }}</td>
+                                <tr
+                                    v-for="(staff, index) in staffGroup"
+                                    :key="staff.id"
+                                    class="hover:bg-indigo-50/50 transition border-t border-gray-200"
+                                >
+                                    <td
+                                        class="px-3 py-2 text-indigo-600 font-bold"
+                                    >
+                                        {{ index + 1 }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.area || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.work_location || "-" }}
+                                    </td>
+                                    <td
+                                        class="px-3 py-2 text-indigo-600 font-mono font-semibold"
+                                    >
+                                        {{ staff.staff_id }}
+                                    </td>
                                     <td class="px-3 py-2">{{ staff.name }}</td>
-                                    <td class="px-3 py-2">{{ staff.position || '-' }}</td>
-                                    <td class="px-3 py-2">{{ staff.superior || '-' }}</td>
-                                    <td class="px-3 py-2">{{ staff.department || '-' }}</td>
-                                    <td class="px-3 py-2">{{ staff.hire_date }}</td>
-                                    <td class="px-3 py-2">{{ staff.rank || '-' }}</td>
-                                    <td class="px-3 py-2">{{ staff.device || '-' }}</td>
-                                    <td class="px-3 py-2">{{ staff.warning_letter ? 'WL' : '-' }}</td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.position || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.superior || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.department || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.hire_date }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.rank || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.device || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.warning_letter ? "WL" : "-" }}
+                                    </td>
                                 </tr>
                             </template>
                         </tbody>
@@ -216,13 +309,17 @@
 
                 <!-- Mobile Card View -->
                 <div class="md:hidden">
-                    <template v-for="(staffGroup, teamLeader) in groupedByTeamLeader" :key="teamLeader">
+                    <template
+                        v-for="(staffGroup, teamLeader) in groupedByTeamLeader"
+                        :key="teamLeader"
+                    >
                         <!-- Team Leader Header -->
-                        <div class="bg-gradient-to-r from-purple-50 to-indigo-50 px-4 py-3 border-t border-indigo-100">
+                        <div
+                            class="bg-gradient-to-r from-purple-50 to-indigo-50 px-4 py-3 border-t border-indigo-100"
+                        >
                             <h3 class="font-bold text-purple-700 text-sm">
                                 Team Leader: {{ teamLeader }}
                             </h3>
-                            <p class="text-xs text-gray-600 mt-1">{{ staffGroup.length }} staff members</p>
                         </div>
                         <!-- Staff Cards -->
                         <div class="divide-y divide-gray-200">
@@ -234,7 +331,10 @@
                             >
                                 <div class="flex items-start gap-3 mb-3">
                                     <div class="flex items-center gap-2">
-                                        <span class="text-indigo-600 font-bold text-sm">{{ index + 1 }}.</span>
+                                        <span
+                                            class="text-indigo-600 font-bold text-sm"
+                                            >{{ index + 1 }}.</span
+                                        >
                                         <div
                                             class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
                                         >
@@ -247,7 +347,9 @@
                                         >
                                             {{ staff.name }}
                                         </h3>
-                                        <p class="text-xs text-gray-600 truncate">
+                                        <p
+                                            class="text-xs text-gray-600 truncate"
+                                        >
                                             {{ staff.position }}
                                         </p>
                                         <p
@@ -280,13 +382,17 @@
                                 <div class="grid grid-cols-2 gap-2 text-xs">
                                     <div>
                                         <p class="text-gray-500">Department</p>
-                                        <p class="text-gray-700 font-medium truncate">
+                                        <p
+                                            class="text-gray-700 font-medium truncate"
+                                        >
                                             {{ staff.department }}
                                         </p>
                                     </div>
                                     <div>
                                         <p class="text-gray-500">Phone</p>
-                                        <p class="text-gray-700 font-medium truncate">
+                                        <p
+                                            class="text-gray-700 font-medium truncate"
+                                        >
                                             {{ staff.phone_number }}
                                         </p>
                                     </div>
@@ -295,8 +401,6 @@
                         </div>
                     </template>
                 </div>
-
-                
             </div>
 
             <!-- Empty State -->
@@ -529,6 +633,13 @@ const availableGroups = [
     "M2",
 ];
 
+// Filter to show only active staff
+const activeStaffList = computed(() => {
+    return staffList.value.filter(
+        (staff) => staff.staff_status === "active" || !staff.staff_status
+    );
+});
+
 const loadStaff = async () => {
     loading.value = true;
     error.value = "";
@@ -564,7 +675,7 @@ const loadStaff = async () => {
 };
 
 const filteredStaff = computed(() => {
-    let result = staffList.value;
+    let result = activeStaffList.value;
 
     // Group filter (priority filter)
     if (filterGroup.value) {
@@ -603,8 +714,8 @@ const filteredStaff = computed(() => {
 const groupedByTeamLeader = computed(() => {
     const groups = {};
 
-    filteredStaff.value.forEach(staff => {
-        const teamLeader = staff.superior || 'No Team Leader';
+    filteredStaff.value.forEach((staff) => {
+        const teamLeader = staff.superior || "No Team Leader";
         if (!groups[teamLeader]) {
             groups[teamLeader] = [];
         }
@@ -615,17 +726,19 @@ const groupedByTeamLeader = computed(() => {
 });
 
 const departments = computed(() => {
-    return [...new Set(staffList.value.map((s) => s.department))].filter(
+    return [...new Set(activeStaffList.value.map((s) => s.department))].filter(
         Boolean
     );
 });
 
 const positions = computed(() => {
-    return [...new Set(staffList.value.map((s) => s.position))].filter(Boolean);
+    return [...new Set(activeStaffList.value.map((s) => s.position))].filter(
+        Boolean
+    );
 });
 
 const totalOjkCases = computed(() => {
-    return staffList.value.reduce(
+    return activeStaffList.value.reduce(
         (sum, staff) => sum + (staff.ojk_case || 0),
         0
     );
@@ -668,7 +781,8 @@ const getInitials = (name) => {
 };
 
 const getGroupCount = (group) => {
-    return staffList.value.filter((staff) => staff.group === group).length;
+    return activeStaffList.value.filter((staff) => staff.group === group)
+        .length;
 };
 
 const viewStaff = (staff) => {

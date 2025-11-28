@@ -93,7 +93,9 @@
                         </form>
 
                         <!-- Users Table -->
-                        <div class="overflow-x-auto -mx-3 sm:mx-0 hidden md:block">
+                        <div
+                            class="overflow-x-auto -mx-3 sm:mx-0 hidden md:block"
+                        >
                             <table class="min-w-full text-sm">
                                 <thead>
                                     <tr
@@ -122,51 +124,84 @@
                                             {{ u.phone_number }}
                                         </td>
                                         <td class="py-2">{{ u.role }}</td>
-                                        <td class="py-2 flex items-center gap-2">
+                                        <td
+                                            class="py-2 flex items-center gap-2"
+                                        >
                                             <button
-                                                v-if="u.role !== 'super-admin' && currentUser.role === 'super-admin'"
+                                                v-if="
+                                                    u.role !== 'super-admin' &&
+                                                    currentUser.role ===
+                                                        'super-admin'
+                                                "
                                                 @click="resetPassword(u.id)"
                                                 class="w-full sm:w-auto px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 rounded text-white"
                                             >
                                                 Reset
                                             </button>
                                             <button
-                                                v-if="u.role !== 'super-admin' && currentUser.role === 'super-admin'"
+                                                v-if="
+                                                    u.role !== 'super-admin' &&
+                                                    currentUser.role ===
+                                                        'super-admin'
+                                                "
                                                 @click="removeUser(u.id)"
                                                 class="w-full sm:w-auto px-3 py-1 text-sm bg-red-600 hover:bg-red-700 rounded text-white"
                                             >
                                                 Delete
                                             </button>
                                         </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
-                <!-- Mobile list -->
-                <div class="md:hidden space-y-3">
-                    <div v-for="u in users" :key="u.id" class="p-4 bg-slate-800/50 border border-slate-700 rounded-xl">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-semibold text-slate-100">{{ u.name }}</p>
-                                <p class="text-xs text-slate-400">{{ u.phone_number }}</p>
+                        <!-- Mobile list -->
+                        <div class="md:hidden space-y-3">
+                            <div
+                                v-for="u in users"
+                                :key="u.id"
+                                class="p-4 bg-slate-800/50 border border-slate-700 rounded-xl"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p
+                                            class="text-sm font-semibold text-slate-100"
+                                        >
+                                            {{ u.name }}
+                                        </p>
+                                        <p class="text-xs text-slate-400">
+                                            {{ u.phone_number }}
+                                        </p>
+                                    </div>
+                                    <span
+                                        class="text-xs px-2 py-1 rounded bg-slate-700 text-slate-300"
+                                        >{{ u.role }}</span
+                                    >
+                                </div>
+                                <div class="mt-3 flex gap-2">
+                                    <button
+                                        v-if="
+                                            u.role !== 'super-admin' &&
+                                            currentUser.role === 'super-admin'
+                                        "
+                                        @click="resetPassword(u.id)"
+                                        class="flex-1 px-3 py-2 text-xs bg-blue-600 hover:bg-blue-700 rounded text-white"
+                                    >
+                                        Reset
+                                    </button>
+                                    <button
+                                        v-if="
+                                            u.role !== 'super-admin' &&
+                                            currentUser.role === 'super-admin'
+                                        "
+                                        @click="removeUser(u.id)"
+                                        class="flex-1 px-3 py-2 text-xs bg-red-600 hover:bg-red-700 rounded text-white"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
                             </div>
-                            <span class="text-xs px-2 py-1 rounded bg-slate-700 text-slate-300">{{ u.role }}</span>
                         </div>
-                        <div class="mt-3 flex gap-2">
-                            <button
-                                v-if="u.role !== 'super-admin' && currentUser.role === 'super-admin'"
-                                @click="resetPassword(u.id)"
-                                class="flex-1 px-3 py-2 text-xs bg-blue-600 hover:bg-blue-700 rounded text-white"
-                            >Reset</button>
-                            <button
-                                v-if="u.role !== 'super-admin' && currentUser.role === 'super-admin'"
-                                @click="removeUser(u.id)"
-                                class="flex-1 px-3 py-2 text-xs bg-red-600 hover:bg-red-700 rounded text-white"
-                            >Delete</button>
-                        </div>
-                    </div>
-                </div>
                     </div>
                 </div>
 
@@ -281,20 +316,20 @@ const resetPassword = async (id) => {
 
 const removeUser = async (id) => {
     try {
-        if (currentUser.value.role !== 'super-admin') {
-            showToast('Forbidden', 'error');
+        if (currentUser.value.role !== "super-admin") {
+            showToast("Forbidden", "error");
             return;
         }
-        const { deleteUser } = await import('@/utils/api');
+        const { deleteUser } = await import("@/utils/api");
         const res = await deleteUser(id);
         if (res.success) {
-            showToast('User deleted');
+            showToast("User deleted");
             await loadUsers();
         } else {
-            showToast(res.message || 'Delete failed', 'error');
+            showToast(res.message || "Delete failed", "error");
         }
     } catch (e) {
-        showToast('Error deleting user', 'error');
+        showToast("Error deleting user", "error");
     }
 };
 

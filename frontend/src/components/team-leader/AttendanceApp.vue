@@ -1,39 +1,39 @@
 <template>
     <div
-        class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"
+        class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6"
     >
-        <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <div class="flex justify-between items-center">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="mb-8">
+                <button
+                    @click="goBack"
+                    class="mb-4 text-indigo-600 hover:text-indigo-800 flex items-center gap-2 transition"
+                >
+                    <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                        />
+                    </svg>
+                    Back to Dashboard
+                </button>
+                <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">
-                            Attendance Management
+                        <h1
+                            class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700"
+                        >
+                            Staff Attendance
                         </h1>
-                        <p class="text-sm text-gray-600 mt-1">
-                            Record and manage staff attendance
-                        </p>
-                    </div>
-                    <div class="flex space-x-3">
-                        <button
-                            @click="goToDashboard"
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                        >
-                            Back to Dashboard
-                        </button>
-                        <button
-                            @click="logout"
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                        >
-                            Logout
-                        </button>
                     </div>
                 </div>
             </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Action Button -->
             <div class="mb-6">
                 <button
@@ -70,6 +70,19 @@
                 </div>
 
                 <div class="p-6">
+                    <!-- Filter Date -->
+                    <div class="mb-4 flex items-center gap-3">
+                        <label class="text-sm font-medium text-gray-700"
+                            >Filter tanggal (Report Day):</label
+                        >
+                        <input
+                            type="date"
+                            v-model="filterDate"
+                            @change="fetchAttendances(1)"
+                            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                        />
+                    </div>
+
                     <!-- Loading State -->
                     <div v-if="loading" class="text-center py-12">
                         <div
@@ -299,7 +312,7 @@
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
 
         <!-- Create Modal -->
         <div
@@ -341,96 +354,21 @@
                                 </select>
                             </div>
 
-                            <!-- Position (auto-filled) -->
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700 mb-2"
-                                    >Position *</label
-                                >
-                                <input
-                                    v-model="formData.position"
-                                    type="text"
-                                    required
-                                    readonly
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
-                                />
-                            </div>
-
-                            <!-- Superior (auto-filled) -->
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700 mb-2"
-                                    >Superior *</label
-                                >
-                                <input
-                                    v-model="formData.superior"
-                                    type="text"
-                                    required
-                                    readonly
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
-                                />
-                            </div>
-
-                            <!-- Department (auto-filled) -->
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700 mb-2"
-                                    >Department *</label
-                                >
-                                <input
-                                    v-model="formData.department"
-                                    type="text"
-                                    required
-                                    readonly
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
-                                />
-                            </div>
-
-                            <!-- Hire Date (auto-filled) -->
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700 mb-2"
-                                    >Hire Date *</label
-                                >
-                                <input
-                                    v-model="formData.hire_date"
-                                    type="date"
-                                    required
-                                    readonly
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
-                                />
-                            </div>
-
-                            <!-- Rank (auto-filled) -->
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700 mb-2"
-                                    >Rank</label
-                                >
-                                <input
-                                    v-model="formData.rank"
-                                    type="text"
-                                    readonly
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
-                                />
-                            </div>
-
-                            <!-- Device -->
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700 mb-2"
-                                    >Device *</label
-                                >
-                                <select
-                                    v-model="formData.device"
-                                    required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                >
-                                    <option value="">Select Device</option>
-                                    <option value="Mobile">Mobile</option>
-                                    <option value="PC">PC</option>
-                                </select>
-                            </div>
+                            <!-- Hidden fields (auto-filled from staff data) -->
+                            <input v-model="formData.position" type="hidden" />
+                            <input v-model="formData.superior" type="hidden" />
+                            <input
+                                v-model="formData.department"
+                                type="hidden"
+                            />
+                            <input v-model="formData.hire_date" type="hidden" />
+                            <input v-model="formData.rank" type="hidden" />
+                            <input v-model="formData.device" type="hidden" />
+                            <input
+                                v-model="formData.work_status"
+                                type="hidden"
+                            />
+                            <input v-model="formData.group" type="hidden" />
 
                             <!-- Report Day -->
                             <div>
@@ -446,65 +384,27 @@
                                 />
                             </div>
 
-                            <!-- Last Working Day -->
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700 mb-2"
-                                    >Last Working Day *</label
-                                >
-                                <input
-                                    v-model="formData.last_working_day"
-                                    type="date"
-                                    required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                />
-                            </div>
-
-                            <!-- WFH/Onsite -->
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700 mb-2"
-                                    >WFH/Onsite *</label
-                                >
-                                <select
-                                    v-model="formData.work_status"
-                                    required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                >
-                                    <option value="">Select Status</option>
-                                    <option value="WFH">WFH</option>
-                                    <option value="Onsite">Onsite</option>
-                                </select>
-                            </div>
-
                             <!-- Ranking Intervals -->
                             <div>
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
                                     >Ranking/Intervals *</label
                                 >
-                                <input
+                                <select
                                     v-model="formData.ranking_intervals"
-                                    type="text"
                                     required
-                                    placeholder="e.g., 5%-25%"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                />
-                            </div>
-
-                            <!-- Group (auto-filled) -->
-                            <div>
-                                <label
-                                    class="block text-sm font-medium text-gray-700 mb-2"
-                                    >Group *</label
                                 >
-                                <input
-                                    v-model="formData.group"
-                                    type="text"
-                                    required
-                                    readonly
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
-                                />
+                                    <option value="">Select Ranking</option>
+                                    <option value="Top 5%">Top 5%</option>
+                                    <option value="5% ~ 25%">5% ~ 25%</option>
+                                    <option value="25% ~ 50%">25% ~ 50%</option>
+                                    <option value="50% ~ 70%">50% ~ 70%</option>
+                                    <option value="70% ~ 90%">70% ~ 90%</option>
+                                    <option value="Bottom 10%">
+                                        Bottom 10%
+                                    </option>
+                                </select>
                             </div>
 
                             <!-- Status & Code -->
@@ -555,21 +455,20 @@
                             </div>
 
                             <!-- Proof Upload -->
-                            <div class="md:col-span-2">
+                            <div>
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
-                                    >Proof (Image) *</label
+                                    >Proof (Image)</label
                                 >
                                 <input
                                     type="file"
                                     @change="onFileChange"
                                     accept="image/jpeg,image/jpg,image/png"
-                                    required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                 />
                                 <p class="text-xs text-gray-500 mt-1">
-                                    Upload proof of attendance (max 10MB, will
-                                    be compressed to 200KB)
+                                    Upload proof of attendance (optional, max
+                                    10MB, will be compressed to 200KB)
                                 </p>
                             </div>
 
@@ -663,14 +562,6 @@
                         <div>
                             <span class="font-semibold">Report Day:</span>
                             {{ formatDate(viewData.report_day) }}
-                        </div>
-                        <div>
-                            <span class="font-semibold">Last Working Day:</span>
-                            {{
-                                viewData.last_working_day
-                                    ? formatDate(viewData.last_working_day)
-                                    : "-"
-                            }}
                         </div>
                         <div>
                             <span class="font-semibold"
@@ -771,6 +662,7 @@ const submitting = ref(false);
 const viewData = ref(null);
 const toast = ref({ show: false, message: "", type: "success" });
 const proofFile = ref(null);
+const filterDate = ref(new Date().toISOString().split("T")[0]);
 
 const pagination = ref({
     total: 0,
@@ -793,7 +685,6 @@ const formData = ref({
     device: "",
     group: "",
     report_day: new Date().toISOString().split("T")[0],
-    last_working_day: "",
     ranking_intervals: "",
     reason_for_resign: "",
     status_code: "",
@@ -838,7 +729,7 @@ const fetchAttendances = async (page = 1) => {
     error.value = "";
 
     try {
-        const data = await getAttendances(page);
+        const data = await getAttendances(page, filterDate.value || null);
         if (data.success) {
             attendances.value = data.data || [];
             pagination.value = data.pagination;
@@ -878,6 +769,9 @@ const onStaffChange = async () => {
             formData.value.hire_date = staff.hire_date;
             formData.value.rank = staff.rank || "";
             formData.value.group = staff.group || "";
+            formData.value.device = staff.device || "Mobile";
+            const wl = (staff.work_location || "").toUpperCase();
+            formData.value.work_status = wl === "WFH" ? "WFH" : "Onsite";
         }
     } catch (err) {
         console.error("Error fetching staff detail:", err);
@@ -924,7 +818,6 @@ const resetForm = () => {
         device: "",
         group: "",
         report_day: new Date().toISOString().split("T")[0],
-        last_working_day: "",
         ranking_intervals: "",
         reason_for_resign: "",
         status_code: "",
@@ -933,11 +826,6 @@ const resetForm = () => {
 };
 
 const submitForm = async () => {
-    if (!proofFile.value) {
-        showToast("Please upload proof image", "error");
-        return;
-    }
-
     submitting.value = true;
 
     try {
@@ -1001,7 +889,7 @@ const showToast = (message, type = "success") => {
     }, 3000);
 };
 
-const goToDashboard = () => {
+const goBack = () => {
     window.location.href = "/team-leader/dashboard";
 };
 
@@ -1011,3 +899,4 @@ const logout = () => {
     window.location.href = "/";
 };
 </script>
+const goBack = () => { window.location.href = "/team-leader/dashboard"; };

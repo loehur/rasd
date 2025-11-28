@@ -58,12 +58,26 @@
             </div>
 
             <!-- Group Filter Tabs -->
-            <div class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-xl p-4 mb-4">
+            <div
+                class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-xl p-4 mb-4"
+            >
                 <div class="flex items-center gap-2 mb-3">
-                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                    <svg
+                        class="w-5 h-5 text-slate-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                        ></path>
                     </svg>
-                    <span class="text-sm font-medium text-slate-300">Filter by Group:</span>
+                    <span class="text-sm font-medium text-slate-300"
+                        >Filter by Group:</span
+                    >
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <button
@@ -72,11 +86,13 @@
                             'px-4 py-2 text-sm font-medium rounded-lg transition',
                             filterGroup === ''
                                 ? 'bg-blue-600/30 text-blue-300 border border-blue-500/50'
-                                : 'bg-slate-800/50 text-slate-400 border border-slate-700 hover:bg-slate-700/50 hover:text-slate-200'
+                                : 'bg-slate-800/50 text-slate-400 border border-slate-700 hover:bg-slate-700/50 hover:text-slate-200',
                         ]"
                     >
                         All
-                        <span class="ml-1 text-xs opacity-70">({{ staffList.length }})</span>
+                        <span class="ml-1 text-xs opacity-70"
+                            >({{ staffList.length }})</span
+                        >
                     </button>
                     <button
                         v-for="group in availableGroups"
@@ -86,11 +102,13 @@
                             'px-4 py-2 text-sm font-medium rounded-lg transition',
                             filterGroup === group
                                 ? 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/50'
-                                : 'bg-slate-800/50 text-slate-400 border border-slate-700 hover:bg-slate-700/50 hover:text-slate-200'
+                                : 'bg-slate-800/50 text-slate-400 border border-slate-700 hover:bg-slate-700/50 hover:text-slate-200',
                         ]"
                     >
                         {{ group }}
-                        <span class="ml-1 text-xs opacity-70">({{ getGroupCount(group) }})</span>
+                        <span class="ml-1 text-xs opacity-70"
+                            >({{ getGroupCount(group) }})</span
+                        >
                     </button>
                 </div>
             </div>
@@ -176,42 +194,131 @@
                     <table class="w-full text-xs">
                         <thead class="bg-slate-800/50">
                             <tr>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">SN</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Area</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">WFH/Onsite</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">ID Staff</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Name Staff</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Position</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Superior</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Department</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Hiredate</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Rank</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Device</th>
-                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">WL</th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    SN
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    Area
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    WFH/Onsite
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    ID Staff
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    Name Staff
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    Position
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    Superior
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    Department
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    Hiredate
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    Rank
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    Device
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    WL
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <template v-for="(staffGroup, teamLeader) in groupedByTeamLeader" :key="teamLeader">
+                            <template
+                                v-for="(
+                                    staffGroup, teamLeader
+                                ) in groupedByTeamLeader"
+                                :key="teamLeader"
+                            >
                                 <!-- Team Leader Header Row -->
                                 <tr class="bg-slate-800/70">
-                                    <td colspan="12" class="px-3 py-3 text-left font-bold text-emerald-400 text-sm">
-                                        Team Leader: {{ teamLeader }} ({{ staffGroup.length }} staff)
+                                    <td
+                                        colspan="12"
+                                        class="px-3 py-3 text-left font-bold text-emerald-400 text-sm"
+                                    >
+                                        Team Leader: {{ teamLeader }} ({{
+                                            staffGroup.length
+                                        }}
+                                        staff)
                                     </td>
                                 </tr>
                                 <!-- Staff Rows -->
-                                <tr v-for="(staff, index) in staffGroup" :key="staff.id" class="hover:bg-slate-800/30 transition border-t border-slate-800/50">
-                                    <td class="px-3 py-2 text-blue-300 font-semibold">{{ index + 1 }}</td>
-                                    <td class="px-3 py-2">{{ staff.area || '-' }}</td>
-                                    <td class="px-3 py-2">{{ staff.work_location || '-' }}</td>
-                                    <td class="px-3 py-2 text-blue-400 font-mono">{{ staff.staff_id }}</td>
+                                <tr
+                                    v-for="(staff, index) in staffGroup"
+                                    :key="staff.id"
+                                    class="hover:bg-slate-800/30 transition border-t border-slate-800/50"
+                                >
+                                    <td
+                                        class="px-3 py-2 text-blue-300 font-semibold"
+                                    >
+                                        {{ index + 1 }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.area || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.work_location || "-" }}
+                                    </td>
+                                    <td
+                                        class="px-3 py-2 text-blue-400 font-mono"
+                                    >
+                                        {{ staff.staff_id }}
+                                    </td>
                                     <td class="px-3 py-2">{{ staff.name }}</td>
-                                    <td class="px-3 py-2">{{ staff.position || '-' }}</td>
-                                    <td class="px-3 py-2">{{ staff.superior || '-' }}</td>
-                                    <td class="px-3 py-2">{{ staff.department || '-' }}</td>
-                                    <td class="px-3 py-2">{{ staff.hire_date }}</td>
-                                    <td class="px-3 py-2">{{ staff.rank || '-' }}</td>
-                                    <td class="px-3 py-2">{{ staff.device || '-' }}</td>
-                                    <td class="px-3 py-2">{{ staff.warning_letter ? 'WL' : '-' }}</td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.position || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.superior || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.department || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.hire_date }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.rank || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.device || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ staff.warning_letter ? "WL" : "-" }}
+                                    </td>
                                 </tr>
                             </template>
                         </tbody>
@@ -220,13 +327,20 @@
 
                 <!-- Mobile Card View -->
                 <div class="md:hidden">
-                    <template v-for="(staffGroup, teamLeader) in groupedByTeamLeader" :key="teamLeader">
+                    <template
+                        v-for="(staffGroup, teamLeader) in groupedByTeamLeader"
+                        :key="teamLeader"
+                    >
                         <!-- Team Leader Header -->
-                        <div class="bg-slate-800/70 px-4 py-3 border-t border-slate-800/50">
+                        <div
+                            class="bg-slate-800/70 px-4 py-3 border-t border-slate-800/50"
+                        >
                             <h3 class="font-bold text-emerald-400 text-sm">
                                 Team Leader: {{ teamLeader }}
                             </h3>
-                            <p class="text-xs text-slate-400 mt-1">{{ staffGroup.length }} staff members</p>
+                            <p class="text-xs text-slate-400 mt-1">
+                                {{ staffGroup.length }} staff members
+                            </p>
                         </div>
                         <!-- Staff Cards -->
                         <div class="divide-y divide-slate-800/50">
@@ -238,7 +352,10 @@
                             >
                                 <div class="flex items-start gap-3 mb-3">
                                     <div class="flex items-center gap-2">
-                                        <span class="text-blue-300 font-bold text-sm">{{ index + 1 }}.</span>
+                                        <span
+                                            class="text-blue-300 font-bold text-sm"
+                                            >{{ index + 1 }}.</span
+                                        >
                                         <div
                                             class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
                                         >
@@ -251,10 +368,14 @@
                                         >
                                             {{ staff.name }}
                                         </h3>
-                                        <p class="text-xs text-slate-400 truncate">
+                                        <p
+                                            class="text-xs text-slate-400 truncate"
+                                        >
                                             {{ staff.position }}
                                         </p>
-                                        <p class="text-xs font-mono text-blue-400 mt-1">
+                                        <p
+                                            class="text-xs font-mono text-blue-400 mt-1"
+                                        >
                                             {{ staff.staff_id }}
                                         </p>
                                     </div>
@@ -282,13 +403,17 @@
                                 <div class="grid grid-cols-2 gap-2 text-xs">
                                     <div>
                                         <p class="text-slate-500">Department</p>
-                                        <p class="text-slate-300 font-medium truncate">
+                                        <p
+                                            class="text-slate-300 font-medium truncate"
+                                        >
                                             {{ staff.department }}
                                         </p>
                                     </div>
                                     <div>
                                         <p class="text-slate-500">Phone</p>
-                                        <p class="text-slate-300 font-medium truncate">
+                                        <p
+                                            class="text-slate-300 font-medium truncate"
+                                        >
                                             {{ staff.phone_number }}
                                         </p>
                                     </div>
@@ -297,8 +422,6 @@
                         </div>
                     </template>
                 </div>
-
-                
             </div>
 
             <!-- Empty State -->
@@ -525,7 +648,17 @@ const itemsPerPage = ref(5);
 const selectedStaff = ref(null);
 
 // Available groups in order
-const availableGroups = ['P-1', 'P', 'A1-1', 'A1-2', 'A1-3', 'A2', 'B1', 'B2', 'M2'];
+const availableGroups = [
+    "P-1",
+    "P",
+    "A1-1",
+    "A1-2",
+    "A1-3",
+    "A2",
+    "B1",
+    "B2",
+    "M2",
+];
 
 const loadStaff = async () => {
     loading.value = true;
@@ -560,9 +693,7 @@ const filteredStaff = computed(() => {
 
     // Group filter (priority filter)
     if (filterGroup.value) {
-        result = result.filter(
-            (staff) => staff.group === filterGroup.value
-        );
+        result = result.filter((staff) => staff.group === filterGroup.value);
     }
 
     // Search filter
@@ -597,8 +728,8 @@ const filteredStaff = computed(() => {
 const groupedByTeamLeader = computed(() => {
     const groups = {};
 
-    filteredStaff.value.forEach(staff => {
-        const teamLeader = staff.superior || 'No Team Leader';
+    filteredStaff.value.forEach((staff) => {
+        const teamLeader = staff.superior || "No Team Leader";
         if (!groups[teamLeader]) {
             groups[teamLeader] = [];
         }
@@ -662,7 +793,7 @@ const getInitials = (name) => {
 };
 
 const getGroupCount = (group) => {
-    return staffList.value.filter(staff => staff.group === group).length;
+    return staffList.value.filter((staff) => staff.group === group).length;
 };
 
 const viewStaff = (staff) => {

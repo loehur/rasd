@@ -22,7 +22,6 @@ class Attendance extends Model
         'rank',
         'device',
         'report_day',
-        'last_working_day',
         'ranking_intervals',
         'group',
         'reason_for_resign',
@@ -39,7 +38,6 @@ class Attendance extends Model
     protected $casts = [
         'hire_date' => 'date',
         'report_day' => 'date',
-        'last_working_day' => 'date',
     ];
 
     /**

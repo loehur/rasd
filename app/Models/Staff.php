@@ -55,6 +55,7 @@ class Staff extends Model
         'device',
         'team_leader_id',
         'warning_letter',
+        'staff_status',
         'ojk_case',
         'notes',
     ];

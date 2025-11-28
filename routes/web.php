@@ -86,6 +86,14 @@ $router->get('/team-leader/staff-list', function () {
     return file_get_contents(base_path('public/pages/team-leader/staff-list.html'));
 });
 
+$router->get('/team-leader/inactive-staff', function () {
+    return file_get_contents(base_path('public/pages/team-leader/inactive-staff.html'));
+});
+
+$router->get('/team-leader/resignation', function () {
+    return file_get_contents(base_path('public/pages/team-leader/resignation.html'));
+});
+
 // API Routes
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('login', 'AuthController@login');
@@ -124,4 +132,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('users', 'UserController@store');
     $router->post('users/{id}/reset-password', 'UserController@resetPassword');
     $router->delete('users/{id}', 'UserController@destroy');
+
+    // Resignation routes
+    $router->get('resignations', 'ResignationController@index');
+    $router->post('resignations', 'ResignationController@store');
+    $router->get('resignations/{id}', 'ResignationController@show');
 });
