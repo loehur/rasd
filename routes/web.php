@@ -26,6 +26,10 @@ $router->get('/admin/staff-list', function () {
     return file_get_contents(base_path('public/pages/admin/staff-list.html'));
 });
 
+$router->get('/admin/inactive-staff', function () {
+    return file_get_contents(base_path('public/pages/admin/inactive-staff.html'));
+});
+
 $router->get('/admin/import-staff', function () {
     return file_get_contents(base_path('public/pages/admin/import-staff.html'));
 });

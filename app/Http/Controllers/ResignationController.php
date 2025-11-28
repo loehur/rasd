@@ -14,40 +14,46 @@ class ResignationController extends Controller
     public function index(Request $request)
     {
         try {
-            // Get token from Authorization header
-            $token = $request->header('Authorization');
-            if (!$token) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthorized'
-                ], 401);
-            }
+            // Allow Admin/Super-Admin to access without Team Leader validation
+            $role = $request->header('X-Role') ?? ($request->input('role') ?? null);
+            $isAdmin = in_array($role, ['admin', 'super-admin'], true);
 
-            // Remove 'Bearer ' prefix if present
-            $token = str_replace('Bearer ', '', $token);
+            if (!$isAdmin) {
+                // Get token from Authorization header (Team Leader)
+                $token = $request->header('Authorization');
+                if (!$token) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Unauthorized'
+                    ], 401);
+                }
 
-            // Decode token to get employee_id
-            $decoded = base64_decode($token);
-            $parts = explode(':', $decoded);
-            $employeeId = $parts[0] ?? null;
+                // Remove 'Bearer ' prefix if present
+                $token = str_replace('Bearer ', '', $token);
 
-            if (!$employeeId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid token'
-                ], 401);
-            }
+                // Decode token to get employee_id
+                $decoded = base64_decode($token);
+                $parts = explode(':', $decoded);
+                $employeeId = $parts[0] ?? null;
 
-            // Get team leader info
-            $teamLeader = DB::table('team_leaders')
-                ->where('employee_id', $employeeId)
-                ->first();
+                if (!$employeeId) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid token'
+                    ], 401);
+                }
 
-            if (!$teamLeader) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Team leader not found'
-                ], 401);
+                // Get team leader info
+                $teamLeader = DB::table('team_leaders')
+                    ->where('employee_id', $employeeId)
+                    ->first();
+
+                if (!$teamLeader) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Team leader not found'
+                    ], 401);
+                }
             }
 
             // Get query parameters
