@@ -75,6 +75,10 @@ $router->get('/team-leader/change-password', function () {
     return file_get_contents(base_path('public/pages/team-leader/change-password.html'));
 });
 
+$router->get('/team-leader/staff-list', function () {
+    return file_get_contents(base_path('public/pages/team-leader/staff-list.html'));
+});
+
 // API Routes
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('login', 'AuthController@login');
