@@ -176,6 +176,7 @@
                     <table class="w-full text-xs">
                         <thead class="bg-slate-800/50">
                             <tr>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">SN</th>
                                 <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Area</th>
                                 <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">WFH/Onsite</th>
                                 <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">ID Staff</th>
@@ -189,87 +190,112 @@
                                 <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">WL</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/50">
-                            <tr v-for="staff in filteredStaff" :key="staff.id" class="hover:bg-slate-800/30 transition">
-                                <td class="px-3 py-2">{{ staff.area || '-' }}</td>
-                                <td class="px-3 py-2">{{ staff.work_location || '-' }}</td>
-                                <td class="px-3 py-2 text-blue-400 font-mono">{{ staff.staff_id }}</td>
-                                <td class="px-3 py-2">{{ staff.name }}</td>
-                                <td class="px-3 py-2">{{ staff.position || '-' }}</td>
-                                <td class="px-3 py-2">{{ staff.superior || '-' }}</td>
-                                <td class="px-3 py-2">{{ staff.department || '-' }}</td>
-                                <td class="px-3 py-2">{{ staff.hire_date }}</td>
-                                <td class="px-3 py-2">{{ staff.rank || '-' }}</td>
-                                <td class="px-3 py-2">{{ staff.device || '-' }}</td>
-                                <td class="px-3 py-2">{{ staff.warning_letter ? 'WL' : '-' }}</td>
-                            </tr>
+                        <tbody>
+                            <template v-for="(staffGroup, teamLeader) in groupedByTeamLeader" :key="teamLeader">
+                                <!-- Team Leader Header Row -->
+                                <tr class="bg-slate-800/70">
+                                    <td colspan="12" class="px-3 py-3 text-left font-bold text-emerald-400 text-sm">
+                                        Team Leader: {{ teamLeader }} ({{ staffGroup.length }} staff)
+                                    </td>
+                                </tr>
+                                <!-- Staff Rows -->
+                                <tr v-for="(staff, index) in staffGroup" :key="staff.id" class="hover:bg-slate-800/30 transition border-t border-slate-800/50">
+                                    <td class="px-3 py-2 text-blue-300 font-semibold">{{ index + 1 }}</td>
+                                    <td class="px-3 py-2">{{ staff.area || '-' }}</td>
+                                    <td class="px-3 py-2">{{ staff.work_location || '-' }}</td>
+                                    <td class="px-3 py-2 text-blue-400 font-mono">{{ staff.staff_id }}</td>
+                                    <td class="px-3 py-2">{{ staff.name }}</td>
+                                    <td class="px-3 py-2">{{ staff.position || '-' }}</td>
+                                    <td class="px-3 py-2">{{ staff.superior || '-' }}</td>
+                                    <td class="px-3 py-2">{{ staff.department || '-' }}</td>
+                                    <td class="px-3 py-2">{{ staff.hire_date }}</td>
+                                    <td class="px-3 py-2">{{ staff.rank || '-' }}</td>
+                                    <td class="px-3 py-2">{{ staff.device || '-' }}</td>
+                                    <td class="px-3 py-2">{{ staff.warning_letter ? 'WL' : '-' }}</td>
+                                </tr>
+                            </template>
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Mobile Card View -->
-                <div class="md:hidden divide-y divide-slate-800/50">
-                    <div
-                        v-for="staff in filteredStaff"
-                        :key="staff.id"
-                        @click="viewStaff(staff)"
-                        class="p-4 hover:bg-slate-800/30 transition cursor-pointer"
-                    >
-                        <div class="flex items-start gap-3 mb-3">
+                <div class="md:hidden">
+                    <template v-for="(staffGroup, teamLeader) in groupedByTeamLeader" :key="teamLeader">
+                        <!-- Team Leader Header -->
+                        <div class="bg-slate-800/70 px-4 py-3 border-t border-slate-800/50">
+                            <h3 class="font-bold text-emerald-400 text-sm">
+                                Team Leader: {{ teamLeader }}
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-1">{{ staffGroup.length }} staff members</p>
+                        </div>
+                        <!-- Staff Cards -->
+                        <div class="divide-y divide-slate-800/50">
                             <div
-                                class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+                                v-for="(staff, index) in staffGroup"
+                                :key="staff.id"
+                                @click="viewStaff(staff)"
+                                class="p-4 hover:bg-slate-800/30 transition cursor-pointer"
                             >
-                                {{ getInitials(staff.name) }}
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h3
-                                    class="text-sm font-semibold text-slate-100 truncate"
-                                >
-                                    {{ staff.name }}
-                                </h3>
-                                <p class="text-xs text-slate-400 truncate">
-                                    {{ staff.position }}
-                                </p>
-                                <p class="text-xs font-mono text-blue-400 mt-1">
-                                    {{ staff.staff_id }}
-                                </p>
-                            </div>
-                            <div>
-                                <span
-                                    v-if="staff.ojk_case > 0"
-                                    class="px-2 py-1 text-xs font-medium rounded-full bg-red-500/20 text-red-300 border border-red-500/30"
-                                >
-                                    OJK
-                                </span>
-                                <span
-                                    v-else-if="staff.warning_letter"
-                                    class="px-2 py-1 text-xs font-medium rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30"
-                                >
-                                    Warning
-                                </span>
-                                <span
-                                    v-else
-                                    class="px-2 py-1 text-xs font-medium rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                                >
-                                    Active
-                                </span>
+                                <div class="flex items-start gap-3 mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-blue-300 font-bold text-sm">{{ index + 1 }}.</span>
+                                        <div
+                                            class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+                                        >
+                                            {{ getInitials(staff.name) }}
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h3
+                                            class="text-sm font-semibold text-slate-100 truncate"
+                                        >
+                                            {{ staff.name }}
+                                        </h3>
+                                        <p class="text-xs text-slate-400 truncate">
+                                            {{ staff.position }}
+                                        </p>
+                                        <p class="text-xs font-mono text-blue-400 mt-1">
+                                            {{ staff.staff_id }}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <span
+                                            v-if="staff.ojk_case > 0"
+                                            class="px-2 py-1 text-xs font-medium rounded-full bg-red-500/20 text-red-300 border border-red-500/30"
+                                        >
+                                            OJK
+                                        </span>
+                                        <span
+                                            v-else-if="staff.warning_letter"
+                                            class="px-2 py-1 text-xs font-medium rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30"
+                                        >
+                                            Warning
+                                        </span>
+                                        <span
+                                            v-else
+                                            class="px-2 py-1 text-xs font-medium rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                        >
+                                            Active
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <div>
+                                        <p class="text-slate-500">Department</p>
+                                        <p class="text-slate-300 font-medium truncate">
+                                            {{ staff.department }}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p class="text-slate-500">Phone</p>
+                                        <p class="text-slate-300 font-medium truncate">
+                                            {{ staff.phone_number }}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div>
-                                <p class="text-slate-500">Department</p>
-                                <p class="text-slate-300 font-medium truncate">
-                                    {{ staff.department }}
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-slate-500">Phone</p>
-                                <p class="text-slate-300 font-medium truncate">
-                                    {{ staff.phone_number }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    </template>
                 </div>
 
                 
@@ -565,6 +591,21 @@ const filteredStaff = computed(() => {
     }
 
     return result;
+});
+
+// Group staff by team leader
+const groupedByTeamLeader = computed(() => {
+    const groups = {};
+
+    filteredStaff.value.forEach(staff => {
+        const teamLeader = staff.superior || 'No Team Leader';
+        if (!groups[teamLeader]) {
+            groups[teamLeader] = [];
+        }
+        groups[teamLeader].push(staff);
+    });
+
+    return groups;
 });
 
 const departments = computed(() => {
