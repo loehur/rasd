@@ -9,7 +9,11 @@
       "Bash(cat:*)",
       "Bash(taskkill:*)",
       "Bash(php artisan:*)",
-      "Bash(composer require:*)"
+      "Bash(composer require:*)",
+      "Bash(curl:*)",
+      "Bash(php check_tl.php:*)",
+      "Bash(php reset_tl_password.php:*)",
+      "Bash(php:*)"
     ],
     "deny": [],
     "ask": []

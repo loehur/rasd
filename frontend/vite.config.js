@@ -51,7 +51,6 @@ export default defineConfig(({ command }) => {
             rollupOptions: {
                 input: {
                     // Public pages
-                    index: resolve(__dirname, "pages/public/index.html"),
                     teamLeaderLogin: resolve(
                         __dirname,
                         "pages/public/team-leader-login.html"
@@ -87,6 +86,10 @@ export default defineConfig(({ command }) => {
                     teamLeaderList: resolve(
                         __dirname,
                         "pages/admin/team-leader-list.html"
+                    ),
+                    editTeamLeader: resolve(
+                        __dirname,
+                        "pages/admin/edit-team-leader.html"
                     ),
                     staffList: resolve(
                         __dirname,

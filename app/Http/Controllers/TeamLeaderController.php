@@ -46,7 +46,7 @@ class TeamLeaderController extends Controller
                 ], 401);
             }
 
-            // Check if using default password
+            // Check if using default password (tl1230)
             $isDefaultPassword = password_verify('tl1230', $teamLeader->password);
 
             // Generate token (simple token for now)
@@ -502,8 +502,8 @@ class TeamLeaderController extends Controller
                 ], 401);
             }
 
-            // Update password
-            $teamLeader->password = password_hash($request->new_password, PASSWORD_DEFAULT);
+            // Update password - pass plain text, let the model mutator hash it
+            $teamLeader->password = $request->new_password;
             $teamLeader->save();
 
             return response()->json([
@@ -514,6 +514,112 @@ class TeamLeaderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update password: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Reset team leader password to default (Admin only)
+     */
+    public function resetPassword($employeeId)
+    {
+        try {
+            // Find team leader by employee_id
+            $teamLeader = TeamLeader::where('employee_id', $employeeId)->first();
+
+            if (!$teamLeader) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Team leader not found'
+                ], 404);
+            }
+
+            // Reset password to "tl1230" - pass plain text, let the model mutator hash it
+            $teamLeader->password = 'tl1230';
+            $teamLeader->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset successfully. New password: tl1230'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reset password: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get single team leader by employee_id
+     */
+    public function show($employeeId)
+    {
+        try {
+            $teamLeader = TeamLeader::where('employee_id', $employeeId)->first();
+
+            if (!$teamLeader) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Team leader not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $teamLeader
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to get team leader: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update team leader data
+     */
+    public function update(Request $request, $employeeId)
+    {
+        try {
+            $teamLeader = TeamLeader::where('employee_id', $employeeId)->first();
+
+            if (!$teamLeader) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Team leader not found'
+                ], 404);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'name' => 'sometimes|required|string',
+                'position' => 'nullable|string',
+                'team' => 'nullable|string',
+                'department' => 'nullable|string',
+                'area' => 'nullable|string',
+                'hire_date' => 'nullable|date',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $teamLeader->update($request->all());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Team leader updated successfully',
+                'data' => $teamLeader
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update team leader: ' . $e->getMessage()
             ], 500);
         }
     }

@@ -27,11 +27,8 @@
                         <h1
                             class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-300"
                         >
-                            Team Leader List
+                            Team Leader
                         </h1>
-                        <p class="text-slate-400 mt-2">
-                            View and manage all team leaders
-                        </p>
                     </div>
                     <div class="flex gap-3">
                         <button
@@ -236,30 +233,52 @@
                                     }}</span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <button
-                                        @click="viewTeamLeader(tl)"
-                                        class="text-blue-400 hover:text-blue-300 transition"
-                                    >
-                                        <svg
-                                            class="w-5 h-5"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
+                                    <div class="flex items-center gap-2">
+                                        <button
+                                            @click="viewTeamLeader(tl)"
+                                            class="text-blue-400 hover:text-blue-300 transition"
+                                            title="View Details"
                                         >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                            ></path>
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                            ></path>
-                                        </svg>
-                                    </button>
+                                            <svg
+                                                class="w-5 h-5"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                                ></path>
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                                ></path>
+                                            </svg>
+                                        </button>
+                                        <button
+                                            @click="editTeamLeader(tl)"
+                                            class="text-emerald-400 hover:text-emerald-300 transition"
+                                            title="Edit Team Leader"
+                                        >
+                                            <svg
+                                                class="w-5 h-5"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                                ></path>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -271,8 +290,7 @@
                     <div
                         v-for="tl in paginatedTeamLeaders"
                         :key="tl.id"
-                        @click="viewTeamLeader(tl)"
-                        class="p-4 hover:bg-slate-800/30 transition cursor-pointer"
+                        class="p-4 hover:bg-slate-800/30 transition"
                     >
                         <div class="flex items-start gap-3 mb-3">
                             <div
@@ -289,9 +307,7 @@
                                 <p class="text-xs text-slate-400 truncate">
                                     {{ tl.position }}
                                 </p>
-                                <p
-                                    class="text-xs font-mono text-blue-400 mt-1"
-                                >
+                                <p class="text-xs font-mono text-blue-400 mt-1">
                                     {{ tl.employee_id }}
                                 </p>
                             </div>
@@ -302,23 +318,68 @@
                                 >
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="grid grid-cols-2 gap-2 text-xs mb-3">
                             <div>
                                 <p class="text-slate-500">Department</p>
-                                <p
-                                    class="text-slate-300 font-medium truncate"
-                                >
+                                <p class="text-slate-300 font-medium truncate">
                                     {{ tl.department }}
                                 </p>
                             </div>
                             <div>
                                 <p class="text-slate-500">Area</p>
-                                <p
-                                    class="text-slate-300 font-medium truncate"
-                                >
+                                <p class="text-slate-300 font-medium truncate">
                                     {{ tl.area }}
                                 </p>
                             </div>
+                        </div>
+                        <!-- Action Buttons for Mobile -->
+                        <div
+                            class="flex gap-2 pt-3 border-t border-slate-800/50"
+                        >
+                            <button
+                                @click="viewTeamLeader(tl)"
+                                class="flex-1 px-3 py-2 bg-blue-600/20 text-blue-400 border border-blue-600/30 rounded-lg hover:bg-blue-600/30 transition flex items-center justify-center gap-2 text-sm"
+                            >
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                    ></path>
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                    ></path>
+                                </svg>
+                                View
+                            </button>
+                            <button
+                                @click="editTeamLeader(tl)"
+                                class="flex-1 px-3 py-2 bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 rounded-lg hover:bg-emerald-600/30 transition flex items-center justify-center gap-2 text-sm"
+                            >
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                    ></path>
+                                </svg>
+                                Edit
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -412,14 +473,10 @@
                             <div
                                 class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl font-bold"
                             >
-                                {{
-                                    getInitials(selectedTeamLeader.name)
-                                }}
+                                {{ getInitials(selectedTeamLeader.name) }}
                             </div>
                             <div>
-                                <h2
-                                    class="text-2xl font-bold text-slate-100"
-                                >
+                                <h2 class="text-2xl font-bold text-slate-100">
                                     {{ selectedTeamLeader.name }}
                                 </h2>
                                 <p class="text-slate-400">
@@ -448,9 +505,7 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <p
-                                class="text-xs text-slate-500 uppercase mb-1"
-                            >
+                            <p class="text-xs text-slate-500 uppercase mb-1">
                                 Employee ID
                             </p>
                             <p class="text-sm text-slate-100 font-mono">
@@ -458,9 +513,7 @@
                             </p>
                         </div>
                         <div>
-                            <p
-                                class="text-xs text-slate-500 uppercase mb-1"
-                            >
+                            <p class="text-xs text-slate-500 uppercase mb-1">
                                 Team
                             </p>
                             <p class="text-sm text-slate-100">
@@ -468,21 +521,15 @@
                             </p>
                         </div>
                         <div>
-                            <p
-                                class="text-xs text-slate-500 uppercase mb-1"
-                            >
+                            <p class="text-xs text-slate-500 uppercase mb-1">
                                 Department
                             </p>
                             <p class="text-sm text-slate-100">
-                                {{
-                                    selectedTeamLeader.department || "-"
-                                }}
+                                {{ selectedTeamLeader.department || "-" }}
                             </p>
                         </div>
                         <div>
-                            <p
-                                class="text-xs text-slate-500 uppercase mb-1"
-                            >
+                            <p class="text-xs text-slate-500 uppercase mb-1">
                                 Area
                             </p>
                             <p class="text-sm text-slate-100">
@@ -490,15 +537,11 @@
                             </p>
                         </div>
                         <div>
-                            <p
-                                class="text-xs text-slate-500 uppercase mb-1"
-                            >
+                            <p class="text-xs text-slate-500 uppercase mb-1">
                                 Hire Date
                             </p>
                             <p class="text-sm text-slate-100">
-                                {{
-                                    selectedTeamLeader.hire_date || "-"
-                                }}
+                                {{ selectedTeamLeader.hire_date || "-" }}
                             </p>
                         </div>
                     </div>
@@ -519,7 +562,7 @@ const error = ref("");
 // UI: search & pagination
 const searchQuery = ref("");
 const currentPage = ref(1);
-const itemsPerPage = ref(10);
+const itemsPerPage = ref(5);
 const selectedTeamLeader = ref(null);
 
 const filteredTeamLeaders = computed(() => {
@@ -597,12 +640,17 @@ const fetchTeamLeaders = async () => {
             teamLeaders.value = [];
         }
     } catch (e) {
-        error.value = "Connection error. Please make sure the server is running.";
+        error.value =
+            "Connection error. Please make sure the server is running.";
         console.error("Load error:", e);
         teamLeaders.value = [];
     } finally {
         loading.value = false;
     }
+};
+
+const editTeamLeader = (teamLeader) => {
+    window.location.href = `/admin/team-leader/edit/${teamLeader.employee_id}`;
 };
 
 onMounted(fetchTeamLeaders);

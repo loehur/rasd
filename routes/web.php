@@ -42,6 +42,10 @@ $router->get('/admin/team-leader-list', function () {
     return file_get_contents(base_path('public/pages/admin/team-leader-list.html'));
 });
 
+$router->get('/admin/team-leader/edit/{employeeId}', function () {
+    return file_get_contents(base_path('public/pages/admin/edit-team-leader.html'));
+});
+
 $router->get('/admin/change-password', function () {
     return file_get_contents(base_path('public/pages/admin/change-password.html'));
 });
@@ -88,6 +92,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('team-leaders', 'TeamLeaderController@index');
     $router->post('team-leaders/import', 'TeamLeaderController@import');
     $router->get('team-leaders/template', 'TeamLeaderController@downloadTemplate');
+    $router->get('team-leaders/{employeeId}', 'TeamLeaderController@show');
+    $router->put('team-leaders/{employeeId}', 'TeamLeaderController@update');
+    $router->post('team-leaders/{employeeId}/reset-password', 'TeamLeaderController@resetPassword');
 
     // Account routes
     $router->put('account/name', 'AccountController@updateName');
