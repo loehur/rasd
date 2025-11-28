@@ -559,7 +559,7 @@
                             </div>
 
                             <!-- Position (auto-filled) -->
-                            <div>
+                            <div class="hidden">
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
                                     >Position *</label
@@ -574,7 +574,7 @@
                             </div>
 
                             <!-- Superior (auto-filled) -->
-                            <div>
+                            <div class="hidden">
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
                                     >Superior</label
@@ -588,7 +588,7 @@
                             </div>
 
                             <!-- Department (auto-filled) -->
-                            <div>
+                            <div class="hidden">
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
                                     >Department *</label
@@ -603,7 +603,7 @@
                             </div>
 
                             <!-- Hire Date (auto-filled) -->
-                            <div>
+                            <div class="hidden">
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
                                     >Hire Date *</label
@@ -618,7 +618,7 @@
                             </div>
 
                             <!-- Rank (auto-filled, read-only) -->
-                            <div>
+                            <div class="hidden">
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
                                     >Rank *</label
@@ -633,7 +633,7 @@
                             </div>
 
                             <!-- Device (auto-filled, read-only) -->
-                            <div>
+                            <div class="hidden">
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
                                     >Device *</label
@@ -675,7 +675,7 @@
                             </div>
 
                             <!-- WFH/Onsite (auto-filled from staff, read-only) -->
-                            <div>
+                            <div class="hidden">
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
                                     >WFH/Onsite *</label
@@ -713,7 +713,7 @@
                             </div>
 
                             <!-- Group (auto-filled, read-only) -->
-                            <div>
+                            <div class="hidden">
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
                                     >Group</label
