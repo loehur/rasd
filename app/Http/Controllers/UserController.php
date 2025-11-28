@@ -82,6 +82,7 @@ class UserController extends Controller
 
         $user->password = 'Admin123!';
         $user->save();
+        $this->logAction($request, 'admin_user_reset_password', ['user_id' => $id]);
 
         return response()->json(['success' => true, 'message' => 'Password reset to default']);
     }
@@ -106,6 +107,7 @@ class UserController extends Controller
         }
 
         $user->delete();
+        $this->logAction($request, 'admin_user_delete', ['user_id' => $id]);
         return response()->json(['success' => true, 'message' => 'User deleted']);
     }
 }

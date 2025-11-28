@@ -466,6 +466,7 @@ class ResignationController extends Controller
                     ]);
 
                 DB::commit();
+                $this->logAction($request, 'staff_reactivate', ['staff_id' => $staffId]);
 
                 return response()->json([
                     'success' => true,

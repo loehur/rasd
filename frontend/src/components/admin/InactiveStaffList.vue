@@ -278,15 +278,21 @@
                                 <td class="px-3 py-2">
                                     <button
                                         @click="reactivate(resignation)"
-                                        :disabled="reactivatingId === resignation.id"
+                                        :disabled="
+                                            reactivatingId === resignation.id
+                                        "
                                         class="px-3 py-1.5 text-xs rounded-lg border transition"
                                         :class="[
                                             reactivatingId === resignation.id
                                                 ? 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 opacity-70 cursor-not-allowed'
-                                                : 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-600/30'
+                                                : 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-600/30',
                                         ]"
                                     >
-                                        {{ reactivatingId === resignation.id ? 'Activating...' : 'Activate' }}
+                                        {{
+                                            reactivatingId === resignation.id
+                                                ? "Activating..."
+                                                : "Activate"
+                                        }}
                                     </button>
                                 </td>
                             </tr>
@@ -371,10 +377,14 @@
                                 :class="[
                                     reactivatingId === resignation.id
                                         ? 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 opacity-70 cursor-not-allowed'
-                                        : 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-600/30'
+                                        : 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-600/30',
                                 ]"
                             >
-                                {{ reactivatingId === resignation.id ? 'Activating...' : 'Activate' }}
+                                {{
+                                    reactivatingId === resignation.id
+                                        ? "Activating..."
+                                        : "Activate"
+                                }}
                             </button>
                         </div>
                     </div>
@@ -441,7 +451,6 @@ const loadResignations = async () => {
 
         const endpoints = [
             `${API_BASE_URL}/api/resignations?per_page=1000`,
-            `${API_BASE_URL}/api/admin/resignations?per_page=1000`,
             `${API_BASE_URL}/api/resignations`,
         ];
 
@@ -484,17 +493,13 @@ const loadResignations = async () => {
             }
         }
 
-        if (items.length) {
-            resignations.value = items
-                .filter((r) => r && (r.report_day || r.last_working_day))
-                .sort(
-                    (a, b) =>
-                        new Date(b.report_day || b.last_working_day) -
-                        new Date(a.report_day || a.last_working_day)
-                );
-        } else {
-            error.value = "Failed to load resignation data";
-        }
+        resignations.value = (items || [])
+            .filter((r) => r && (r.report_day || r.last_working_day))
+            .sort(
+                (a, b) =>
+                    new Date(b.report_day || b.last_working_day) -
+                    new Date(a.report_day || a.last_working_day)
+            );
     } catch (err) {
         error.value = "Connection error. Please make sure you're logged in.";
         console.error("Load error:", err);
@@ -562,7 +567,8 @@ const reactivate = async (r) => {
     try {
         reactivatingId.value = r.id;
         const token = localStorage.getItem("auth_token");
-        const role = JSON.parse(localStorage.getItem("user") || "{}").role || "admin";
+        const role =
+            JSON.parse(localStorage.getItem("user") || "{}").role || "admin";
         const res = await fetch(`${API_BASE_URL}/api/resignations/reactivate`, {
             method: "POST",
             headers: {
@@ -575,7 +581,9 @@ const reactivate = async (r) => {
         });
         const data = await res.json();
         if (data && data.success) {
-            resignations.value = resignations.value.filter((x) => x.staff_id !== r.staff_id);
+            resignations.value = resignations.value.filter(
+                (x) => x.staff_id !== r.staff_id
+            );
         } else {
             error.value = data?.message || "Failed to reactivate staff";
         }

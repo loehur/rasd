@@ -521,7 +521,7 @@ class TeamLeaderController extends Controller
     /**
      * Reset team leader password to default (Admin only)
      */
-    public function resetPassword($employeeId)
+    public function resetPassword(Request $request, $employeeId)
     {
         try {
             // Find team leader by employee_id
@@ -538,6 +538,7 @@ class TeamLeaderController extends Controller
             $teamLeader->password = 'tl1230';
             $teamLeader->save();
 
+            $this->logAction($request, 'team_leader_reset_password', ['employee_id' => $employeeId]);
             return response()->json([
                 'success' => true,
                 'message' => 'Password reset successfully. New password: tl1230'

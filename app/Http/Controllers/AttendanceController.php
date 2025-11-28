@@ -333,6 +333,7 @@ class AttendanceController extends Controller
         }
 
         $attendance->delete();
+        $this->logAction($request, 'attendance_delete', ['attendance_id' => $id]);
 
         return response()->json([
             'success' => true,
