@@ -214,6 +214,11 @@
                                 >
                                     Reason
                                 </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -269,6 +274,20 @@
                                     :title="resignation.reason"
                                 >
                                     {{ resignation.reason }}
+                                </td>
+                                <td class="px-3 py-2">
+                                    <button
+                                        @click="reactivate(resignation)"
+                                        :disabled="reactivatingId === resignation.id"
+                                        class="px-3 py-1.5 text-xs rounded-lg border transition"
+                                        :class="[
+                                            reactivatingId === resignation.id
+                                                ? 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 opacity-70 cursor-not-allowed'
+                                                : 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-600/30'
+                                        ]"
+                                    >
+                                        {{ reactivatingId === resignation.id ? 'Activating...' : 'Activate' }}
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -344,6 +363,20 @@
                                 </p>
                             </div>
                         </div>
+                        <div class="mt-3">
+                            <button
+                                @click="reactivate(resignation)"
+                                :disabled="reactivatingId === resignation.id"
+                                class="w-full px-3 py-2 text-xs rounded-lg border transition"
+                                :class="[
+                                    reactivatingId === resignation.id
+                                        ? 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 opacity-70 cursor-not-allowed'
+                                        : 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-600/30'
+                                ]"
+                            >
+                                {{ reactivatingId === resignation.id ? 'Activating...' : 'Activate' }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -384,6 +417,7 @@ const error = ref("");
 const errorDetail = ref("");
 const searchQuery = ref("");
 const filterYear = ref(new Date().getFullYear());
+const reactivatingId = ref(null);
 
 const availableYears = computed(() => {
     const years = resignations.value.map((r) =>
@@ -523,4 +557,32 @@ onMounted(() => {
     }
     loadResignations();
 });
+
+const reactivate = async (r) => {
+    try {
+        reactivatingId.value = r.id;
+        const token = localStorage.getItem("auth_token");
+        const role = JSON.parse(localStorage.getItem("user") || "{}").role || "admin";
+        const res = await fetch(`${API_BASE_URL}/api/resignations/reactivate`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                "X-Role": role,
+            },
+            body: JSON.stringify({ staff_id: r.staff_id }),
+        });
+        const data = await res.json();
+        if (data && data.success) {
+            resignations.value = resignations.value.filter((x) => x.staff_id !== r.staff_id);
+        } else {
+            error.value = data?.message || "Failed to reactivate staff";
+        }
+    } catch (e) {
+        error.value = "Connection error. Please make sure you're logged in.";
+    } finally {
+        reactivatingId.value = null;
+    }
+};
 </script>

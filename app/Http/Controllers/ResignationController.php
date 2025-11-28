@@ -424,4 +424,62 @@ class ResignationController extends Controller
         $file->move($directory, $filename);
         return $path;
     }
+
+    public function reactivate(Request $request)
+    {
+        try {
+            $role = $request->header('X-Role') ?? ($request->input('role') ?? null);
+            $isAdmin = in_array($role, ['admin', 'super-admin'], true);
+
+            if (!$isAdmin) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'staff_id' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $staffId = $request->input('staff_id');
+
+            DB::beginTransaction();
+            try {
+                DB::table('staff_resignation_log')
+                    ->where('staff_id', $staffId)
+                    ->delete();
+
+                DB::table('staff')
+                    ->where('staff_id', $staffId)
+                    ->update([
+                        'staff_status' => 'active',
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ]);
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Staff reactivated successfully'
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reactivate staff: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

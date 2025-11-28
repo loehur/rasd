@@ -141,4 +141,5 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('resignations', 'ResignationController@index');
     $router->post('resignations', 'ResignationController@store');
     $router->get('resignations/{id}', 'ResignationController@show');
+    $router->post('resignations/reactivate', 'ResignationController@reactivate');
 });
