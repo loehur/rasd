@@ -3,18 +3,20 @@
         class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"
     >
         <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-gray-200">
+        <header
+            class="bg-gradient-to-r from-slate-50 via-indigo-50 to-sky-50 text-slate-800 border-b border-slate-200 shadow-sm"
+        >
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">
+                        <h1 class="text-2xl font-bold tracking-tight">
                             Team Leader
                         </h1>
                     </div>
                     <div class="relative">
                         <button
                             @click="showDropdown = !showDropdown"
-                            class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                            class="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-white/70 border border-slate-300 rounded-lg hover:bg-white text-slate-800"
                         >
                             <svg
                                 class="w-5 h-5"
@@ -29,7 +31,7 @@
                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                                 ></path>
                             </svg>
-                            <span>{{ userName }}</span>
+                            <span class="truncate">{{ userName }}</span>
                             <svg
                                 class="w-4 h-4"
                                 fill="none"
@@ -49,11 +51,11 @@
                         <div
                             v-if="showDropdown"
                             @click.stop
-                            class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
+                            class="absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50"
                         >
                             <a
                                 href="/team-leader/account"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-700 transition"
                             >
                                 <svg
                                     class="w-4 h-4 inline-block mr-2"
@@ -72,7 +74,7 @@
                             </a>
                             <a
                                 href="/team-leader/change-password"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-700 transition"
                             >
                                 <svg
                                     class="w-4 h-4 inline-block mr-2"
@@ -124,17 +126,47 @@
                     class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-emerald-300 transition-all cursor-pointer group"
                 >
                     <div class="flex items-center">
-                        <div class="p-3 rounded-lg bg-emerald-100 group-hover:bg-emerald-200 transition-colors">
-                            <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7M15 7a3 3 0 11-6 0 3 3 0 016 0" />
+                        <div
+                            class="p-3 rounded-lg bg-emerald-100 group-hover:bg-emerald-200 transition-colors"
+                        >
+                            <svg
+                                class="w-8 h-8 text-emerald-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7M15 7a3 3 0 11-6 0 3 3 0 016 0"
+                                />
                             </svg>
                         </div>
                         <div class="ml-4 flex-1">
-                            <p class="text-sm font-medium text-gray-600 group-hover:text-emerald-600">Staff Lists</p>
-                            <p class="text-lg font-bold text-gray-900 group-hover:text-emerald-700">Active</p>
+                            <p
+                                class="text-sm font-medium text-gray-600 group-hover:text-emerald-600"
+                            >
+                                Staff Lists
+                            </p>
+                            <p
+                                class="text-lg font-bold text-gray-900 group-hover:text-emerald-700"
+                            >
+                                Active
+                            </p>
                         </div>
-                        <svg class="w-6 h-6 text-gray-400 group-hover:text-emerald-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        <svg
+                            class="w-6 h-6 text-gray-400 group-hover:text-emerald-600 transition-colors"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 5l7 7-7 7"
+                            ></path>
                         </svg>
                     </div>
                 </a>
@@ -144,17 +176,47 @@
                     class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer group"
                 >
                     <div class="flex items-center">
-                        <div class="p-3 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
-                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13" />
+                        <div
+                            class="p-3 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors"
+                        >
+                            <svg
+                                class="w-8 h-8 text-blue-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13"
+                                />
                             </svg>
                         </div>
                         <div class="ml-4 flex-1">
-                            <p class="text-sm font-medium text-gray-600 group-hover:text-blue-600">Staff Lists</p>
-                            <p class="text-lg font-bold text-gray-900 group-hover:text-blue-700">Inactive</p>
+                            <p
+                                class="text-sm font-medium text-gray-600 group-hover:text-blue-600"
+                            >
+                                Staff Lists
+                            </p>
+                            <p
+                                class="text-lg font-bold text-gray-900 group-hover:text-blue-700"
+                            >
+                                Inactive
+                            </p>
                         </div>
-                        <svg class="w-6 h-6 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        <svg
+                            class="w-6 h-6 text-gray-400 group-hover:text-blue-600 transition-colors"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 5l7 7-7 7"
+                            ></path>
                         </svg>
                     </div>
                 </a>
@@ -819,8 +881,6 @@ onMounted(() => {
 
     fetchStaffList();
     fetchAttendances();
-
-    
 });
 
 const fetchStaffList = async () => {

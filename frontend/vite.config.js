@@ -44,6 +44,23 @@ export default defineConfig(({ command }) => {
                                 const page = req.url.replace("/admin/", "");
                                 req.url = `/pages/admin/${page}.html`;
                             }
+                            // Team Leader login routes
+                            else if (
+                                req.url === "/" ||
+                                req.url === "/team-leader" ||
+                                req.url === "/team-leader/"
+                            ) {
+                                req.url =
+                                    "/pages/public/team-leader-login.html";
+                            }
+                            // Rewrite /team-leader/<page> -> /pages/team-leader/<page>.html
+                            else if (req.url.startsWith("/team-leader/")) {
+                                const page = req.url.replace(
+                                    "/team-leader/",
+                                    ""
+                                );
+                                req.url = `/pages/team-leader/${page}.html`;
+                            }
                             next();
                         });
                     },
