@@ -617,42 +617,34 @@
                                 />
                             </div>
 
-                            <!-- Rank (dropdown S1-S6) -->
+                            <!-- Rank (auto-filled, read-only) -->
                             <div>
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
                                     >Rank *</label
                                 >
-                                <select
+                                <input
                                     v-model="formData.rank"
+                                    type="text"
                                     required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                >
-                                    <option value="">Select Rank</option>
-                                    <option value="S1">S1</option>
-                                    <option value="S2">S2</option>
-                                    <option value="S3">S3</option>
-                                    <option value="S4">S4</option>
-                                    <option value="S5">S5</option>
-                                    <option value="S6">S6</option>
-                                </select>
+                                    readonly
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                                />
                             </div>
 
-                            <!-- Device -->
+                            <!-- Device (auto-filled, read-only) -->
                             <div>
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
                                     >Device *</label
                                 >
-                                <select
+                                <input
                                     v-model="formData.device"
+                                    type="text"
                                     required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                >
-                                    <option value="">Select Device</option>
-                                    <option value="Mobile">Mobile</option>
-                                    <option value="PC">PC</option>
-                                </select>
+                                    readonly
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                                />
                             </div>
 
                             <!-- Report Day -->
@@ -682,21 +674,19 @@
                                 />
                             </div>
 
-                            <!-- WFH/Onsite -->
+                            <!-- WFH/Onsite (auto-filled from staff, read-only) -->
                             <div>
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
                                     >WFH/Onsite *</label
                                 >
-                                <select
+                                <input
                                     v-model="formData.work_status"
+                                    type="text"
                                     required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                >
-                                    <option value="">Select Status</option>
-                                    <option value="WFH">WFH</option>
-                                    <option value="Onsite">Onsite</option>
-                                </select>
+                                    readonly
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                                />
                             </div>
 
                             <!-- Ranking Intervals -->
@@ -705,13 +695,21 @@
                                     class="block text-sm font-medium text-gray-700 mb-2"
                                     >Ranking/Intervals *</label
                                 >
-                                <input
+                                <select
                                     v-model="formData.ranking_intervals"
-                                    type="text"
                                     required
-                                    placeholder="e.g., 5%-25%"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                />
+                                >
+                                    <option value="">Select Ranking</option>
+                                    <option value="Top 5%">Top 5%</option>
+                                    <option value="5% ~ 25%">5% ~ 25%</option>
+                                    <option value="25% ~ 50%">25% ~ 50%</option>
+                                    <option value="50% ~ 70%">50% ~ 70%</option>
+                                    <option value="70% ~ 90%">70% ~ 90%</option>
+                                    <option value="Bottom 10%">
+                                        Bottom 10%
+                                    </option>
+                                </select>
                             </div>
 
                             <!-- Group (auto-filled, read-only) -->
@@ -779,13 +777,12 @@
                             <div class="md:col-span-2">
                                 <label
                                     class="block text-sm font-medium text-gray-700 mb-2"
-                                    >Proof (Image) *</label
+                                    >Proof (Image)</label
                                 >
                                 <input
                                     type="file"
                                     @change="onFileChange"
                                     accept="image/jpeg,image/jpg,image/png"
-                                    required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                 />
                                 <p class="text-xs text-gray-500 mt-1">
@@ -1140,6 +1137,8 @@ const onStaffChange = async (event) => {
             formData.value.hire_date = staff.hire_date || "";
             formData.value.rank = staff.rank || "";
             formData.value.group = staff.group || "";
+            formData.value.work_status = staff.work_location || "";
+            formData.value.device = staff.device || "PC";
 
             console.log("Form data after auto-fill:", formData.value);
         } else {
@@ -1191,10 +1190,7 @@ const resetForm = () => {
 };
 
 const submitForm = async () => {
-    if (!proofFile.value) {
-        showToast("Please upload proof image", "error");
-        return;
-    }
+    // Proof is optional now
 
     submitting.value = true;
 

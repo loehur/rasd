@@ -50,6 +50,10 @@ $router->get('/admin/change-password', function () {
     return file_get_contents(base_path('public/pages/admin/change-password.html'));
 });
 
+$router->get('/admin/users', function () {
+    return file_get_contents(base_path('public/pages/admin/users.html'));
+});
+
 $router->get('/admin', function () {
     return file_get_contents(base_path('public/pages/admin/login.html'));
 });
@@ -112,4 +116,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('attendances/{id}', 'AttendanceController@show');
     $router->put('attendances/{id}', 'AttendanceController@update');
     $router->delete('attendances/{id}', 'AttendanceController@destroy');
+    // Users management routes
+    $router->get('users', 'UserController@index');
+    $router->post('users', 'UserController@store');
+    $router->post('users/{id}/reset-password', 'UserController@resetPassword');
 });

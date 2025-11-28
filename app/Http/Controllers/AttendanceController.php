@@ -134,11 +134,11 @@ class AttendanceController extends Controller
             'hire_date' => 'required|date',
             'rank' => 'required|string',
             'report_day' => 'required|date',
-            'ranking_intervals' => 'required|string',
+            'ranking_intervals' => 'required|in:Top 5%,5% ~ 25%,25% ~ 50%,50% ~ 70%,70% ~ 90%,Bottom 10%',
             'group' => 'required|string',
             'status_code' => 'required|string',
-            // Use file+mimes to reduce dependency on PHP fileinfo "image" validator
-            'proof' => 'required|file|mimes:jpeg,jpg,png|max:10240',
+            // Proof is now optional
+            'proof' => 'nullable|file|mimes:jpeg,jpg,png|max:10240',
             'last_working_day' => 'required|date',
             'reason_for_resign' => 'required|string',
         ]);

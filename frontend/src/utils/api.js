@@ -158,3 +158,34 @@ export async function deleteAttendance(id) {
 
     return await response.json();
 }
+
+export async function getUsers() {
+    const token = localStorage.getItem('auth_token');
+    const role = JSON.parse(localStorage.getItem('user') || '{}').role;
+    const response = await fetch(`${API_BASE_URL}/api/users`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}`, 'X-Role': role },
+    });
+    return await response.json();
+}
+
+export async function createAdminUser(name, phone_number) {
+    const token = localStorage.getItem('auth_token');
+    const role = JSON.parse(localStorage.getItem('user') || '{}').role;
+    const response = await fetch(`${API_BASE_URL}/api/users`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'X-Role': role },
+        body: JSON.stringify({ name, phone_number }),
+    });
+    return await response.json();
+}
+
+export async function resetUserPassword(id) {
+    const token = localStorage.getItem('auth_token');
+    const role = JSON.parse(localStorage.getItem('user') || '{}').role;
+    const response = await fetch(`${API_BASE_URL}/api/users/${id}/reset-password`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'X-Role': role },
+    });
+    return await response.json();
+}

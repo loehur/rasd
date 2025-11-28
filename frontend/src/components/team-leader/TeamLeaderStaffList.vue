@@ -169,152 +169,35 @@
             >
                 <!-- Desktop Table View -->
                 <div class="hidden md:block overflow-x-auto">
-                    <table class="w-full">
-                        <thead
-                            class="bg-gradient-to-r from-indigo-50 to-purple-50"
-                        >
+                    <table class="w-full text-xs">
+                        <thead class="bg-gradient-to-r from-indigo-50 to-purple-50">
                             <tr>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                                >
-                                    Staff ID
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                                >
-                                    Name
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                                >
-                                    Position
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                                >
-                                    Department
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                                >
-                                    Phone
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                                >
-                                    Work Location
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                                >
-                                    Status
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                                >
-                                    Actions
-                                </th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Area</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">WFH/Onsite</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">ID Staff</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Name Staff</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Position</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Superior</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Department</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Hiredate</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Rank</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">Device</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-gray-700 uppercase tracking-wider">WL</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            <tr
-                                v-for="staff in paginatedStaff"
-                                :key="staff.id"
-                                class="hover:bg-indigo-50/50 transition"
-                            >
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="text-sm font-mono text-indigo-600 font-semibold"
-                                        >{{ staff.staff_id }}</span
-                                    >
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold"
-                                        >
-                                            {{ getInitials(staff.name) }}
-                                        </div>
-                                        <div>
-                                            <p
-                                                class="text-sm font-semibold text-gray-900"
-                                            >
-                                                {{ staff.name }}
-                                            </p>
-                                            <p class="text-xs text-gray-500">
-                                                {{ staff.email || "No email" }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-sm text-gray-700">{{
-                                        staff.position
-                                    }}</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span
-                                        class="px-3 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-700 border border-purple-300"
-                                    >
-                                        {{ staff.department }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-sm text-gray-600">{{
-                                        staff.phone_number
-                                    }}</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-sm text-gray-600">{{
-                                        staff.work_location || "-"
-                                    }}</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span
-                                        v-if="staff.ojk_case > 0"
-                                        class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700 border border-red-300"
-                                    >
-                                        OJK Case
-                                    </span>
-                                    <span
-                                        v-else-if="staff.warning_letter"
-                                        class="px-3 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-700 border border-orange-300"
-                                    >
-                                        Warning
-                                    </span>
-                                    <span
-                                        v-else
-                                        class="px-3 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300"
-                                    >
-                                        Active
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <button
-                                        @click="viewStaff(staff)"
-                                        class="text-indigo-600 hover:text-indigo-800 transition"
-                                    >
-                                        <svg
-                                            class="w-5 h-5"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                            ></path>
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                            ></path>
-                                        </svg>
-                                    </button>
-                                </td>
+                            <tr v-for="staff in filteredStaff" :key="staff.id" class="hover:bg-indigo-50/50 transition">
+                                <td class="px-3 py-2">{{ staff.area || '-' }}</td>
+                                <td class="px-3 py-2">{{ staff.work_location || '-' }}</td>
+                                <td class="px-3 py-2 text-indigo-600 font-mono font-semibold">{{ staff.staff_id }}</td>
+                                <td class="px-3 py-2">{{ staff.name }}</td>
+                                <td class="px-3 py-2">{{ staff.position || '-' }}</td>
+                                <td class="px-3 py-2">{{ staff.superior || '-' }}</td>
+                                <td class="px-3 py-2">{{ staff.department || '-' }}</td>
+                                <td class="px-3 py-2">{{ staff.hire_date }}</td>
+                                <td class="px-3 py-2">{{ staff.rank || '-' }}</td>
+                                <td class="px-3 py-2">{{ staff.device || '-' }}</td>
+                                <td class="px-3 py-2">{{ staff.warning_letter ? 'WL' : '-' }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -323,7 +206,7 @@
                 <!-- Mobile Card View -->
                 <div class="md:hidden divide-y divide-gray-200">
                     <div
-                        v-for="staff in paginatedStaff"
+                        v-for="staff in filteredStaff"
                         :key="staff.id"
                         @click="viewStaff(staff)"
                         class="p-4 hover:bg-indigo-50/50 transition cursor-pointer"
@@ -387,51 +270,7 @@
                     </div>
                 </div>
 
-                <!-- Pagination -->
-                <div
-                    v-if="totalPages > 1"
-                    class="px-6 py-4 bg-gray-50 flex items-center justify-between border-t border-gray-200"
-                >
-                    <p class="text-sm text-gray-600">
-                        Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
-                        {{
-                            Math.min(
-                                currentPage * itemsPerPage,
-                                filteredStaff.length
-                            )
-                        }}
-                        of {{ filteredStaff.length }} staff
-                    </p>
-                    <div class="flex gap-2">
-                        <button
-                            @click="currentPage--"
-                            :disabled="currentPage === 1"
-                            class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Previous
-                        </button>
-                        <button
-                            v-for="page in visiblePages"
-                            :key="page"
-                            @click="currentPage = page"
-                            :class="[
-                                'px-4 py-2 border rounded-lg transition',
-                                currentPage === page
-                                    ? 'bg-indigo-600 border-indigo-600 text-white'
-                                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50',
-                            ]"
-                        >
-                            {{ page }}
-                        </button>
-                        <button
-                            @click="currentPage++"
-                            :disabled="currentPage === totalPages"
-                            class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Next
-                        </button>
-                    </div>
-                </div>
+                
             </div>
 
             <!-- Empty State -->

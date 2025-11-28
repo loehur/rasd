@@ -173,150 +173,35 @@
             >
                 <!-- Desktop Table View -->
                 <div class="hidden md:block overflow-x-auto">
-                    <table class="w-full">
+                    <table class="w-full text-xs">
                         <thead class="bg-slate-800/50">
                             <tr>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Staff ID
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Name
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Position
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Department
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Phone
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Work Location
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Status
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Actions
-                                </th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Area</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">WFH/Onsite</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">ID Staff</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Name Staff</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Position</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Superior</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Department</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Hiredate</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Rank</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">Device</th>
+                                <th class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider">WL</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/50">
-                            <tr
-                                v-for="staff in paginatedStaff"
-                                :key="staff.id"
-                                class="hover:bg-slate-800/30 transition"
-                            >
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="text-sm font-mono text-blue-400"
-                                        >{{ staff.staff_id }}</span
-                                    >
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold"
-                                        >
-                                            {{ getInitials(staff.name) }}
-                                        </div>
-                                        <div>
-                                            <p
-                                                class="text-sm font-semibold text-slate-100"
-                                            >
-                                                {{ staff.name }}
-                                            </p>
-                                            <p class="text-xs text-slate-500">
-                                                {{ staff.email || "No email" }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-sm text-slate-300">{{
-                                        staff.position
-                                    }}</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span
-                                        class="px-3 py-1 text-xs font-medium rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                                    >
-                                        {{ staff.department }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-sm text-slate-400">{{
-                                        staff.phone_number
-                                    }}</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-sm text-slate-400">{{
-                                        staff.work_location || "-"
-                                    }}</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span
-                                        v-if="staff.ojk_case > 0"
-                                        class="px-3 py-1 text-xs font-medium rounded-full bg-red-500/20 text-red-300 border border-red-500/30"
-                                    >
-                                        OJK Case
-                                    </span>
-                                    <span
-                                        v-else-if="staff.warning_letter"
-                                        class="px-3 py-1 text-xs font-medium rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30"
-                                    >
-                                        Warning
-                                    </span>
-                                    <span
-                                        v-else
-                                        class="px-3 py-1 text-xs font-medium rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                                    >
-                                        Active
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <button
-                                        @click="viewStaff(staff)"
-                                        class="text-blue-400 hover:text-blue-300 transition"
-                                    >
-                                        <svg
-                                            class="w-5 h-5"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                            ></path>
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                            ></path>
-                                        </svg>
-                                    </button>
-                                </td>
+                            <tr v-for="staff in filteredStaff" :key="staff.id" class="hover:bg-slate-800/30 transition">
+                                <td class="px-3 py-2">{{ staff.area || '-' }}</td>
+                                <td class="px-3 py-2">{{ staff.work_location || '-' }}</td>
+                                <td class="px-3 py-2 text-blue-400 font-mono">{{ staff.staff_id }}</td>
+                                <td class="px-3 py-2">{{ staff.name }}</td>
+                                <td class="px-3 py-2">{{ staff.position || '-' }}</td>
+                                <td class="px-3 py-2">{{ staff.superior || '-' }}</td>
+                                <td class="px-3 py-2">{{ staff.department || '-' }}</td>
+                                <td class="px-3 py-2">{{ staff.hire_date }}</td>
+                                <td class="px-3 py-2">{{ staff.rank || '-' }}</td>
+                                <td class="px-3 py-2">{{ staff.device || '-' }}</td>
+                                <td class="px-3 py-2">{{ staff.warning_letter ? 'WL' : '-' }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -325,7 +210,7 @@
                 <!-- Mobile Card View -->
                 <div class="md:hidden divide-y divide-slate-800/50">
                     <div
-                        v-for="staff in paginatedStaff"
+                        v-for="staff in filteredStaff"
                         :key="staff.id"
                         @click="viewStaff(staff)"
                         class="p-4 hover:bg-slate-800/30 transition cursor-pointer"
@@ -387,51 +272,7 @@
                     </div>
                 </div>
 
-                <!-- Pagination -->
-                <div
-                    v-if="totalPages > 1"
-                    class="px-6 py-4 bg-slate-800/30 flex items-center justify-between"
-                >
-                    <p class="text-sm text-slate-400">
-                        Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
-                        {{
-                            Math.min(
-                                currentPage * itemsPerPage,
-                                filteredStaff.length
-                            )
-                        }}
-                        of {{ filteredStaff.length }} staff
-                    </p>
-                    <div class="flex gap-2">
-                        <button
-                            @click="currentPage--"
-                            :disabled="currentPage === 1"
-                            class="px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-700/50 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Previous
-                        </button>
-                        <button
-                            v-for="page in visiblePages"
-                            :key="page"
-                            @click="currentPage = page"
-                            :class="[
-                                'px-4 py-2 border rounded-lg transition',
-                                currentPage === page
-                                    ? 'bg-blue-600/30 border-blue-500 text-blue-300'
-                                    : 'bg-slate-800/50 border-slate-700 text-slate-300 hover:bg-slate-700/50',
-                            ]"
-                        >
-                            {{ page }}
-                        </button>
-                        <button
-                            @click="currentPage++"
-                            :disabled="currentPage === totalPages"
-                            class="px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-700/50 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Next
-                        </button>
-                    </div>
-                </div>
+                
             </div>
 
             <!-- Empty State -->
