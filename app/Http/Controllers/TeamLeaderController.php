@@ -611,6 +611,10 @@ class TeamLeaderController extends Controller
             }
 
             $teamLeader->update($request->all());
+            $this->logAction($request, 'team_leader_update', [
+                'employee_id' => $employeeId,
+                'fields' => array_keys($request->all()),
+            ]);
 
             return response()->json([
                 'success' => true,
