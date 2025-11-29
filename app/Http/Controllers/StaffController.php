@@ -251,4 +251,28 @@ class StaffController extends Controller
             'data' => $staff,
         ], 200);
     }
+
+    /**
+     * Delete a staff by staff_id (admin only)
+     */
+    public function destroy($staffId, Request $request)
+    {
+        $role = $request->header('X-Role') ?? ($request->input('role') ?? null);
+        if (!in_array($role, ['admin', 'super-admin'], true)) {
+            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+        }
+
+        $staff = Staff::where('staff_id', $staffId)->first();
+        if (!$staff) {
+            return response()->json(['success' => false, 'message' => 'Staff not found'], 404);
+        }
+
+        try {
+            $staff->delete();
+            $this->logAction($request, 'admin_staff_delete', ['staff_id' => $staffId]);
+            return response()->json(['success' => true, 'message' => 'Staff deleted']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to delete staff'], 500);
+        }
+    }
 }

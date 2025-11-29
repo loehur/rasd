@@ -254,3 +254,17 @@ export async function deleteUser(id) {
     });
     return await response.json();
 }
+
+export async function adminDeleteStaff(staffId) {
+    const token = localStorage.getItem("auth_token");
+    const role = JSON.parse(localStorage.getItem("user") || "{}").role;
+    const response = await fetch(`${API_BASE_URL}/api/staff/${staffId}`, {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            "X-Role": role,
+        },
+    });
+    return await response.json();
+}

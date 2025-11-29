@@ -110,6 +110,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('staff', 'StaffController@index');
     $router->post('staff/import', 'StaffController@import');
     $router->get('staff/template', 'StaffController@downloadTemplate');
+    $router->delete('staff/{staffId}', 'StaffController@destroy');
 
     // Team Leader routes
     $router->post('team-leader/login', 'TeamLeaderController@login');
