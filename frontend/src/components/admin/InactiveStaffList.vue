@@ -94,9 +94,9 @@
 
             <!-- Search -->
             <div
-                class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-xl p-4 mb-4"
+                class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-xl p-3 md:p-4 mb-4"
             >
-                <div class="flex gap-2 items-center">
+                <div class="flex flex-wrap gap-2 items-center">
                     <input
                         v-model="searchQuery"
                         type="text"
@@ -105,7 +105,7 @@
                     />
                     <button
                         @click="resetFilters"
-                        class="px-3 py-2 text-sm bg-slate-800/50 border border-slate-700 rounded-lg text-slate-400 hover:text-slate-200 hover:border-slate-600 transition flex items-center justify-center"
+                        class="shrink-0 px-3 py-2 text-sm bg-slate-800/50 border border-slate-700 rounded-lg text-slate-400 hover:text-slate-200 hover:border-slate-600 transition flex items-center justify-center"
                         title="Reset search"
                     >
                         <svg
@@ -124,20 +124,20 @@
                     </button>
                     <button
                         @click="exportResignations"
-                        class="px-3 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 rounded-lg text-white transition"
+                        class="shrink-0 px-3 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 rounded-lg text-white transition"
                     >
                         Export
                     </button>
                     <a
                         :href="`${API_BASE_URL}/api/resignations/template`"
                         download
-                        class="px-3 py-2 text-sm bg-slate-700 hover:bg-slate-600 rounded-lg text-white transition"
+                        class="shrink-0 px-3 py-2 text-sm bg-slate-700 hover:bg-slate-600 rounded-lg text-white transition"
                     >
                         Download Template
                     </a>
                     <button
                         @click="$refs.fileInput.click()"
-                        class="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition"
+                        class="shrink-0 px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition"
                     >
                         Import
                     </button>
@@ -153,7 +153,7 @@
 
             <div
                 v-if="selectedFile"
-                class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl p-6 mb-4"
+                class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl p-6 mb-2"
             >
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -237,37 +237,35 @@
                         }}</span>
                     </button>
                 </div>
+            </div>
 
+            <div
+                v-if="resultMessage"
+                :class="[
+                    'mb-4 p-4 rounded-xl border',
+                    resultSuccess
+                        ? 'bg-emerald-500/10 border-emerald-500/30'
+                        : 'bg-red-500/10 border-red-500/30',
+                ]"
+            >
+                <p class="text-slate-100 font-medium">{{ resultMessage }}</p>
                 <div
-                    v-if="resultMessage"
-                    :class="[
-                        'mt-4 p-4 rounded-xl border',
-                        resultSuccess
-                            ? 'bg-emerald-500/10 border-emerald-500/30'
-                            : 'bg-red-500/10 border-red-500/30',
-                    ]"
+                    v-if="importErrors.length"
+                    class="bg-slate-950/50 rounded-lg p-3 max-h-40 overflow-y-auto mt-2"
                 >
-                    <p class="text-slate-100 font-medium">
-                        {{ resultMessage }}
-                    </p>
-                    <div
-                        v-if="importErrors.length"
-                        class="bg-slate-950/50 rounded-lg p-3 max-h-40 overflow-y-auto mt-2"
-                    >
-                        <ul class="text-xs space-y-1">
-                            <li
-                                v-for="(error, index) in importErrors"
-                                :key="index"
-                                :class="[
-                                    resultSuccess
-                                        ? 'text-orange-200'
-                                        : 'text-red-200',
-                                ]"
-                            >
-                                • {{ error }}
-                            </li>
-                        </ul>
-                    </div>
+                    <ul class="text-xs space-y-1">
+                        <li
+                            v-for="(error, index) in importErrors"
+                            :key="index"
+                            :class="[
+                                resultSuccess
+                                    ? 'text-orange-200'
+                                    : 'text-red-200',
+                            ]"
+                        >
+                            • {{ error }}
+                        </li>
+                    </ul>
                 </div>
             </div>
 
@@ -314,18 +312,18 @@
                 v-else-if="filteredResignations.length > 0"
                 class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl overflow-x-auto"
             >
-                <table class="min-w-full text-xs">
+                <table class="min-w-full text-[11px] md:text-xs">
                     <thead class="bg-slate-800/50">
                         <tr>
                             <th
                                 v-for="col in columnsOrdered"
                                 :key="col"
-                                class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap"
+                                class="px-2 md:px-3 py-2 text-left text-[10px] md:text-[11px] font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap"
                             >
                                 {{ col }}
                             </th>
                             <th
-                                class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap"
+                                class="px-2 md:px-3 py-2 text-left text-[10px] md:text-[11px] font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap"
                             >
                                 Actions
                             </th>
@@ -340,7 +338,7 @@
                             <td
                                 v-for="col in columnsOrdered"
                                 :key="col"
-                                class="px-3 py-2 whitespace-nowrap"
+                                class="px-2 md:px-3 py-2 whitespace-nowrap"
                             >
                                 <template v-if="col === 'Proof'">
                                     <a
@@ -357,13 +355,13 @@
                                     {{ colValue(col, resignation, i) }}
                                 </template>
                             </td>
-                            <td class="px-3 py-2">
+                            <td class="px-2 md:px-3 py-2">
                                 <button
                                     @click="reactivate(resignation)"
                                     :disabled="
                                         reactivatingId === resignation.id
                                     "
-                                    class="px-3 py-1.5 text-xs rounded-lg border transition"
+                                    class="px-3 py-1.5 text-[11px] md:text-xs rounded-lg border transition"
                                     :class="[
                                         reactivatingId === resignation.id
                                             ? 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 opacity-70 cursor-not-allowed'
@@ -725,10 +723,11 @@ const parseCSV = (file) => {
     reader.onload = (e) => {
         const text = e.target.result;
         const lines = String(text)
-            .split("\n")
+            .split(/\r?\n/)
             .filter((line) => line.trim());
         if (lines.length > 0) {
-            csvHeaders.value = lines[0].split(",").map((h) => h.trim());
+            const first = lines[0].replace(/^\ufeff/, "");
+            csvHeaders.value = first.split(",").map((h) => h.trim());
             csvData.value = lines.slice(1).map((line) => {
                 const values = line.split(",");
                 const row = {};
@@ -746,9 +745,6 @@ const clearFile = () => {
     selectedFile.value = null;
     csvHeaders.value = [];
     csvData.value = [];
-    resultMessage.value = "";
-    importErrors.value = [];
-    resultSuccess.value = false;
 };
 
 const importResignations = async () => {
@@ -792,7 +788,6 @@ const importResignations = async () => {
             importErrors.value = data.data?.errors || [];
             // Refresh table after import
             await loadResignations();
-            clearFile();
         } else {
             resultSuccess.value = false;
             resultMessage.value = data.message || "Import failed";
