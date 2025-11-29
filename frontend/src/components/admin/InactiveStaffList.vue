@@ -128,6 +128,146 @@
                     >
                         Export
                     </button>
+                    <a
+                        :href="`${API_BASE_URL}/api/resignations/template`"
+                        download
+                        class="px-3 py-2 text-sm bg-slate-700 hover:bg-slate-600 rounded-lg text-white transition"
+                    >
+                        Download Template
+                    </a>
+                    <button
+                        @click="$refs.fileInput.click()"
+                        class="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition"
+                    >
+                        Import
+                    </button>
+                    <input
+                        ref="fileInput"
+                        type="file"
+                        accept=".csv"
+                        @change="handleFileSelect"
+                        class="hidden"
+                    />
+                </div>
+            </div>
+
+            <div
+                v-if="selectedFile"
+                class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl p-6 mb-4"
+            >
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-sm text-slate-400">Selected file</p>
+                        <p class="text-slate-100 font-semibold">
+                            {{ selectedFile.name }}
+                        </p>
+                        <p class="text-xs text-slate-500">
+                            {{ formatFileSize(selectedFile.size) }} •
+                            {{ csvData.length }} rows detected
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a
+                            :href="`${API_BASE_URL}/api/resignations/template`"
+                            download
+                            class="text-sm font-medium text-blue-400 hover:text-blue-300 underline"
+                        >
+                            Download Template
+                        </a>
+                        <button
+                            @click="clearFile"
+                            class="px-3 py-2 text-sm bg-red-600/20 text-red-400 border border-red-600/30 rounded-lg hover:bg-red-600/30 transition"
+                        >
+                            Remove
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table
+                        class="w-full text-xs border-collapse border border-slate-700 rounded-lg"
+                    >
+                        <thead class="bg-slate-800/50">
+                            <tr>
+                                <th
+                                    v-for="h in csvHeaders"
+                                    :key="h"
+                                    class="border border-slate-700 px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase"
+                                >
+                                    {{ h }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="(row, idx) in csvData.slice(0, 5)"
+                                :key="idx"
+                                class="hover:bg-slate-800/30"
+                            >
+                                <td
+                                    v-for="h in csvHeaders"
+                                    :key="h"
+                                    class="border border-slate-700 px-3 py-2 text-slate-300"
+                                >
+                                    {{ row[h] || "-" }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p
+                        v-if="csvData.length > 5"
+                        class="text-xs text-slate-500 mt-2"
+                    >
+                        Showing first 5 of {{ csvData.length }} rows
+                    </p>
+                </div>
+
+                <div class="mt-4">
+                    <button
+                        @click="importResignations"
+                        :disabled="uploading"
+                        class="py-2 px-4 bg-gradient-to-r from-blue-600 to-emerald-500 text-white font-semibold rounded-lg hover:from-blue-500 hover:to-emerald-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <span
+                            v-if="uploading"
+                            class="w-4 h-4 mr-2 inline-block border-2 border-white/70 border-t-transparent rounded-full animate-spin"
+                        ></span>
+                        <span>{{
+                            uploading ? "Importing..." : "Import Resignations"
+                        }}</span>
+                    </button>
+                </div>
+
+                <div
+                    v-if="resultMessage"
+                    :class="[
+                        'mt-4 p-4 rounded-xl border',
+                        resultSuccess
+                            ? 'bg-emerald-500/10 border-emerald-500/30'
+                            : 'bg-red-500/10 border-red-500/30',
+                    ]"
+                >
+                    <p class="text-slate-100 font-medium">
+                        {{ resultMessage }}
+                    </p>
+                    <div
+                        v-if="importErrors.length"
+                        class="bg-slate-950/50 rounded-lg p-3 max-h-40 overflow-y-auto mt-2"
+                    >
+                        <ul class="text-xs space-y-1">
+                            <li
+                                v-for="(error, index) in importErrors"
+                                :key="index"
+                                :class="[
+                                    resultSuccess
+                                        ? 'text-orange-200'
+                                        : 'text-red-200',
+                                ]"
+                            >
+                                • {{ error }}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -139,9 +279,7 @@
                 <div
                     class="inline-block w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"
                 ></div>
-                <p class="text-slate-400 mt-4">
-                    Loading resign staff data...
-                </p>
+                <p class="text-slate-400 mt-4">Loading resign staff data...</p>
             </div>
 
             <!-- Error -->
@@ -174,227 +312,74 @@
             <!-- Table -->
             <div
                 v-else-if="filteredResignations.length > 0"
-                class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl overflow-hidden"
+                class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl overflow-x-auto"
             >
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="w-full text-xs">
-                        <thead class="bg-slate-800/50">
-                            <tr>
-                                <th
-                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Report Day
-                                </th>
-                                <th
-                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    ID Staff
-                                </th>
-                                <th
-                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Name Staff
-                                </th>
-                                <th
-                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Position
-                                </th>
-                                <th
-                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Superior
-                                </th>
-                                <th
-                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Last Working Day
-                                </th>
-                                <th
-                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Type
-                                </th>
-                                <th
-                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Reason
-                                </th>
-                                <th
-                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Actions
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="resignation in filteredResignations"
-                                :key="resignation.id"
-                                class="hover:bg-slate-800/30 transition border-t border-slate-800/50"
+                <table class="min-w-full text-xs">
+                    <thead class="bg-slate-800/50">
+                        <tr>
+                            <th
+                                v-for="col in columnsOrdered"
+                                :key="col"
+                                class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap"
                             >
-                                <td
-                                    class="px-3 py-2 text-slate-300 font-semibold"
-                                >
-                                    {{ formatDate(resignation.report_day) }}
-                                </td>
-                                <td
-                                    class="px-3 py-2 text-blue-300 font-mono font-semibold"
-                                >
-                                    {{ resignation.staff_id }}
-                                </td>
-                                <td class="px-3 py-2">
-                                    {{ resignation.staff_name }}
-                                </td>
-                                <td class="px-3 py-2">
-                                    {{ resignation.staff_position || "-" }}
-                                </td>
-                                <td class="px-3 py-2">
-                                    {{ resignation.staff_superior || "-" }}
-                                </td>
-                                <td class="px-3 py-2">
-                                    {{
-                                        formatDate(resignation.last_working_day)
-                                    }}
-                                </td>
-                                <td class="px-3 py-2">
-                                    <span
-                                        :class="[
-                                            'px-2 py-1 text-xs font-medium rounded-full',
-                                            resignation.resignation_type ===
-                                            'voluntary'
-                                                ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                                                : 'bg-orange-500/20 text-orange-300 border border-orange-500/30',
-                                        ]"
+                                {{ col }}
+                            </th>
+                            <th
+                                class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap"
+                            >
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="resignation in filteredResignations"
+                            :key="resignation.id"
+                            class="hover:bg-slate-800/30 transition border-t border-slate-800/50"
+                        >
+                            <td
+                                v-for="col in columnsOrdered"
+                                :key="col"
+                                class="px-3 py-2 whitespace-nowrap"
+                            >
+                                <template v-if="col === 'Proof'">
+                                    <a
+                                        v-if="resignation.proof"
+                                        :href="proofUrl(resignation.proof)"
+                                        target="_blank"
+                                        class="text-blue-300 underline"
                                     >
-                                        {{
-                                            resignation.resignation_type ===
-                                            "voluntary"
-                                                ? "Voluntary"
-                                                : "Involuntary"
-                                        }}
-                                    </span>
-                                </td>
-                                <td
-                                    class="px-3 py-2 max-w-xs truncate"
-                                    :title="resignation.reason"
+                                        Open
+                                    </a>
+                                    <span v-else>-</span>
+                                </template>
+                                <template v-else>
+                                    {{ colValue(col, resignation, i) }}
+                                </template>
+                            </td>
+                            <td class="px-3 py-2">
+                                <button
+                                    @click="reactivate(resignation)"
+                                    :disabled="
+                                        reactivatingId === resignation.id
+                                    "
+                                    class="px-3 py-1.5 text-xs rounded-lg border transition"
+                                    :class="[
+                                        reactivatingId === resignation.id
+                                            ? 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 opacity-70 cursor-not-allowed'
+                                            : 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-600/30',
+                                    ]"
                                 >
-                                    {{ resignation.reason }}
-                                </td>
-                                <td class="px-3 py-2">
-                                    <button
-                                        @click="reactivate(resignation)"
-                                        :disabled="
-                                            reactivatingId === resignation.id
-                                        "
-                                        class="px-3 py-1.5 text-xs rounded-lg border transition"
-                                        :class="[
-                                            reactivatingId === resignation.id
-                                                ? 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 opacity-70 cursor-not-allowed'
-                                                : 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-600/30',
-                                        ]"
-                                    >
-                                        {{
-                                            reactivatingId === resignation.id
-                                                ? "Activating..."
-                                                : "Activate"
-                                        }}
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Mobile List -->
-                <div class="md:hidden divide-y divide-slate-800/50">
-                    <div
-                        v-for="resignation in filteredResignations"
-                        :key="resignation.id"
-                        class="p-4 hover:bg-slate-800/30 transition"
-                    >
-                        <div class="flex items-start justify-between mb-3">
-                            <div class="flex-1 min-w-0">
-                                <h3
-                                    class="text-sm font-semibold text-slate-100"
-                                >
-                                    {{ resignation.staff_name }}
-                                </h3>
-                                <p class="text-xs font-mono text-blue-300 mt-1">
-                                    {{ resignation.staff_id }}
-                                </p>
-                            </div>
-                            <span
-                                :class="[
-                                    'px-2 py-1 text-xs font-medium rounded-full',
-                                    resignation.resignation_type === 'voluntary'
-                                        ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                                        : 'bg-orange-500/20 text-orange-300 border border-orange-500/30',
-                                ]"
-                            >
-                                {{
-                                    resignation.resignation_type === "voluntary"
-                                        ? "Voluntary"
-                                        : "Involuntary"
-                                }}
-                            </span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div>
-                                <p class="text-slate-500">Report Day</p>
-                                <p class="text-slate-300 font-medium">
-                                    {{ formatDate(resignation.report_day) }}
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-slate-500">Last Working Day</p>
-                                <p class="text-slate-300 font-medium">
                                     {{
-                                        formatDate(resignation.last_working_day)
+                                        reactivatingId === resignation.id
+                                            ? "Activating..."
+                                            : "Activate"
                                     }}
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-slate-500">Position</p>
-                                <p class="text-slate-300 font-medium truncate">
-                                    {{ resignation.staff_position || "-" }}
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-slate-500">Superior</p>
-                                <p class="text-slate-300 font-medium truncate">
-                                    {{ resignation.staff_superior || "-" }}
-                                </p>
-                            </div>
-                            <div class="col-span-2">
-                                <p class="text-slate-500">Reason</p>
-                                <p
-                                    class="text-slate-300 text-xs mt-1 line-clamp-2"
-                                >
-                                    {{ resignation.reason }}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <button
-                                @click="reactivate(resignation)"
-                                :disabled="reactivatingId === resignation.id"
-                                class="w-full px-3 py-2 text-xs rounded-lg border transition"
-                                :class="[
-                                    reactivatingId === resignation.id
-                                        ? 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 opacity-70 cursor-not-allowed'
-                                        : 'bg-emerald-600/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-600/30',
-                                ]"
-                            >
-                                {{
-                                    reactivatingId === resignation.id
-                                        ? "Activating..."
-                                        : "Activate"
-                                }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
             <!-- Empty State -->
@@ -440,6 +425,13 @@ const filterMonth = ref(
     )}`
 );
 const reactivatingId = ref(null);
+const selectedFile = ref(null);
+const csvHeaders = ref([]);
+const csvData = ref([]);
+const uploading = ref(false);
+const resultMessage = ref("");
+const resultSuccess = ref(false);
+const importErrors = ref([]);
 
 const availableMonths = computed(() => {
     const months = resignations.value.map((r) => {
@@ -515,6 +507,7 @@ const loadResignations = async () => {
                     new Date(b.report_day || b.last_working_day) -
                     new Date(a.report_day || a.last_working_day)
             );
+        await loadStaffProfiles();
     } catch (err) {
         error.value = "Connection error. Please make sure you're logged in.";
         console.error("Load error:", err);
@@ -548,6 +541,136 @@ const filteredResignations = computed(() => {
     }
 
     return result;
+});
+
+const columnsOrdered = [
+    "SN",
+    "Area",
+    "WFH/Oniste",
+    "ID Staff",
+    "Name Staff",
+    "Position",
+    "Superior",
+    "Department",
+    "Hiredate",
+    "Rank",
+    "Device",
+    "Report day",
+    "Last working day",
+    "Ranking Intervals",
+    "Group",
+    "Voluntary/Involuntary",
+    "Subtype of Resignation",
+    "Reason for resignation",
+    "Proof",
+];
+
+const staffMap = ref({});
+
+const toTitle = (s) => {
+    const v = String(s || "").replace(/_/g, " ");
+    return v
+        .split(" ")
+        .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : ""))
+        .join(" ");
+};
+
+const colValue = (col, r, i) => {
+    const s = staffMap.value[r.staff_id] || {};
+    switch (col) {
+        case "SN":
+            return i + 1;
+        case "Area":
+            return s.area || "";
+        case "WFH/Oniste":
+            return s.work_location || "";
+        case "ID Staff":
+            return r.staff_id || "";
+        case "Name Staff":
+            return r.staff_name || s.name || "";
+        case "Position":
+            return r.staff_position || s.position || "";
+        case "Superior":
+            return r.staff_superior || "";
+        case "Department":
+            return s.department || "";
+        case "Hiredate":
+            return s.hire_date
+                ? new Date(s.hire_date).toLocaleDateString()
+                : "";
+        case "Rank":
+            return s.rank || "";
+        case "Device":
+            return s.device || "";
+        case "Report day":
+            return r.report_day
+                ? new Date(r.report_day).toLocaleDateString()
+                : "";
+        case "Last working day":
+            return r.last_working_day
+                ? new Date(r.last_working_day).toLocaleDateString()
+                : "";
+        case "Ranking Intervals":
+            return r.ranking_intervals || "";
+        case "Group":
+            return s.group || "";
+        case "Voluntary/Involuntary":
+            return r.resignation_type === "voluntary"
+                ? "Voluntary"
+                : r.resignation_type === "involuntary"
+                ? "Involuntary"
+                : "";
+        case "Subtype of Resignation":
+            return toTitle(r.resignation_subtype);
+        case "Reason for resignation":
+            return r.reason || "";
+        default:
+            return "";
+    }
+};
+
+const loadStaffProfiles = async () => {
+    const token =
+        localStorage.getItem("auth_token") ||
+        localStorage.getItem("tl_auth_token");
+    const ids = [
+        ...new Set(resignations.value.map((r) => r.staff_id).filter(Boolean)),
+    ];
+    for (const id of ids) {
+        try {
+            const res = await fetch(
+                `${API_BASE_URL}/api/attendances/staff/${id}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: token ? `Bearer ${token}` : undefined,
+                        Accept: "application/json",
+                    },
+                }
+            );
+            const data = await res.json();
+            if (data && data.success && data.data) {
+                staffMap.value[id] = data.data;
+            }
+        } catch {}
+    }
+};
+
+const displayColumns = computed(() => {
+    const omit = new Set([
+        "password",
+        "role",
+        "submitted_by",
+        "created_at",
+        "updated_at",
+    ]);
+    const cols = new Set();
+    filteredResignations.value.forEach((r) => {
+        Object.keys(r || {}).forEach((k) => {
+            if (!omit.has(k)) cols.add(k);
+        });
+    });
+    return Array.from(cols);
 });
 
 const getMonthCount = (month) => {
@@ -585,6 +708,108 @@ const goBack = () => {
 const resetFilters = () => {
     searchQuery.value = "";
     filterMonth.value = "";
+};
+
+const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === "text/csv") {
+        selectedFile.value = file;
+        parseCSV(file);
+    } else {
+        alert("Please select a valid CSV file");
+    }
+};
+
+const parseCSV = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const text = e.target.result;
+        const lines = String(text)
+            .split("\n")
+            .filter((line) => line.trim());
+        if (lines.length > 0) {
+            csvHeaders.value = lines[0].split(",").map((h) => h.trim());
+            csvData.value = lines.slice(1).map((line) => {
+                const values = line.split(",");
+                const row = {};
+                csvHeaders.value.forEach((header, index) => {
+                    row[header] = values[index]?.trim() || "";
+                });
+                return row;
+            });
+        }
+    };
+    reader.readAsText(file);
+};
+
+const clearFile = () => {
+    selectedFile.value = null;
+    csvHeaders.value = [];
+    csvData.value = [];
+    resultMessage.value = "";
+    importErrors.value = [];
+    resultSuccess.value = false;
+};
+
+const importResignations = async () => {
+    if (!selectedFile.value) return;
+    uploading.value = true;
+    resultMessage.value = "";
+    importErrors.value = [];
+    resultSuccess.value = false;
+
+    try {
+        const token = localStorage.getItem("auth_token");
+        const role =
+            JSON.parse(localStorage.getItem("user") || "{}").role || "admin";
+        const formData = new FormData();
+        formData.append("file", selectedFile.value);
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/resignations/import`,
+            {
+                method: "POST",
+                headers: { Authorization: `Bearer ${token}`, "X-Role": role },
+                body: formData,
+            }
+        );
+
+        const text = await response.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            resultSuccess.value = false;
+            resultMessage.value =
+                "Server error: unexpected response (not JSON).";
+            console.error("Import response (non-JSON):", text);
+            return;
+        }
+
+        if (data.success) {
+            resultSuccess.value = true;
+            resultMessage.value = data.message;
+            importErrors.value = data.data?.errors || [];
+            // Refresh table after import
+            await loadResignations();
+            clearFile();
+        } else {
+            resultSuccess.value = false;
+            resultMessage.value = data.message || "Import failed";
+            importErrors.value = data.data?.errors || [];
+        }
+    } catch (error) {
+        resultSuccess.value = false;
+        resultMessage.value = "Error: " + error.message;
+    } finally {
+        uploading.value = false;
+    }
+};
+
+const formatFileSize = (bytes) => {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1048576) return (bytes / 1024).toFixed(2) + " KB";
+    return (bytes / 1048576).toFixed(2) + " MB";
 };
 
 const exportResignations = async () => {
@@ -706,6 +931,20 @@ const exportResignations = async () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+};
+
+const proofUrl = (p) => {
+    if (!p) return "";
+    if (/^https?:\/\//i.test(p)) return p;
+    const base = String(API_BASE_URL || "").replace(/\/$/, "");
+    const normalized = String(p).startsWith("/") ? p.slice(1) : p;
+    return `${base}/${normalized}`;
+};
+
+const formatValue = (v) => {
+    if (v === null || v === undefined) return "-";
+    if (typeof v === "string" && v.length === 0) return "-";
+    return v;
 };
 
 onMounted(() => {

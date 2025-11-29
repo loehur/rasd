@@ -172,6 +172,7 @@ class ResignationController extends Controller
                 'report_day' => 'required|date',
                 'reason' => 'required|string|max:1000',
                 'proof' => 'nullable|file|mimes:jpeg,jpg,png|max:10240',
+                'ranking_intervals' => 'required|in:Top 5%,5% ~ 25%,25% ~ 50%,50% ~ 70%,70% ~ 90%,Bottom 10%'
             ]);
 
             if ($validator->fails()) {
@@ -228,6 +229,7 @@ class ResignationController extends Controller
                     'last_working_day' => $request->last_working_day,
                     'report_day' => $request->report_day,
                     'reason' => $request->reason,
+                    'ranking_intervals' => $request->ranking_intervals,
                     'proof' => $proofPath,
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s'),
@@ -491,5 +493,235 @@ class ResignationController extends Controller
                 'message' => 'Failed to reactivate staff: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Download CSV template for resignation import
+     */
+    public function downloadTemplate()
+    {
+        $templatePath = base_path('assets/resignation_import_template.csv');
+
+        if (!file_exists($templatePath)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Template file not found',
+            ], 404);
+        }
+
+        $content = file_get_contents($templatePath);
+
+        return response($content, 200)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', 'attachment; filename="resignation_import_template.csv"');
+    }
+
+    /**
+     * Import resignation data from CSV (admin only)
+     */
+    public function import(Request $request)
+    {
+        $role = $request->header('X-Role') ?? ($request->input('role') ?? null);
+        if (!in_array($role, ['admin', 'super-admin'], true)) {
+            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|mimes:csv,txt|max:4096',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid file. Please upload a CSV file (max 4MB).',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $file = $request->file('file');
+            $lines = file($file->getRealPath());
+            if ($lines === false) {
+                throw new \Exception('Unable to read uploaded file');
+            }
+
+            $csv = [];
+            foreach ($lines as $idx => $line) {
+                $normalized = $this->normalizeUtf8($line);
+                if ($idx === 0) {
+                    $normalized = preg_replace('/^\xEF\xBB\xBF/', '', $normalized);
+                }
+                $csv[] = str_getcsv($normalized);
+            }
+
+            $header = array_shift($csv);
+            $header = array_map(function ($h) {
+                return trim($this->normalizeUtf8($h));
+            }, $header);
+            $headerCount = count($header);
+
+            $required = ['staff_id', 'last_working_day', 'resignation_type', 'resignation_subtype', 'report_day', 'reason', 'ranking_intervals'];
+            $missing = array_diff($required, $header);
+            if (!empty($missing)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Missing required columns: ' . implode(', ', $missing),
+                ], 422);
+            }
+
+            $imported = 0;
+            $skipped = 0;
+            $errors = [];
+
+            DB::beginTransaction();
+            try {
+                foreach ($csv as $index => $row) {
+                    if (empty(array_filter($row))) {
+                        continue;
+                    }
+                    $row = array_map(function ($v) {
+                        return $this->normalizeUtf8($v);
+                    }, $row);
+                    $rowCount = count($row);
+                    if ($rowCount < $headerCount) {
+                        $row = array_pad($row, $headerCount, '');
+                    } elseif ($rowCount > $headerCount) {
+                        $row = array_slice($row, 0, $headerCount);
+                    }
+                    $data = array_combine($header, $row);
+
+                    // Basic validation
+                    if (empty($data['staff_id'])) {
+                        $skipped++;
+                        $errors[] = 'Row ' . ($index + 2) . ': staff_id is required';
+                        continue;
+                    }
+
+                    $staff = DB::table('staff')->where('staff_id', $data['staff_id'])->first();
+                    if (!$staff) {
+                        $skipped++;
+                        $errors[] = 'Row ' . ($index + 2) . ': staff not found';
+                        continue;
+                    }
+
+                    $lastWorking = $this->parseDate($data['last_working_day']);
+                    $report = $this->parseDate($data['report_day']) ?? date('Y-m-d');
+                    if (!$lastWorking) {
+                        $skipped++;
+                        $errors[] = 'Row ' . ($index + 2) . ': invalid last_working_day';
+                        continue;
+                    }
+
+                    $type = strtolower($data['resignation_type']);
+                    $subtype = strtolower($data['resignation_subtype']);
+                    if (!in_array($type, ['voluntary', 'involuntary'], true)) {
+                        $skipped++;
+                        $errors[] = 'Row ' . ($index + 2) . ': invalid resignation_type';
+                        continue;
+                    }
+                    if (!in_array($subtype, ['personal_reason', 'management_reason'], true)) {
+                        $skipped++;
+                        $errors[] = 'Row ' . ($index + 2) . ': invalid resignation_subtype';
+                        continue;
+                    }
+
+                    $rankIntervals = $data['ranking_intervals'];
+                    $allowedIntervals = ['Top 5%', '5% ~ 25%', '25% ~ 50%', '50% ~ 70%', '70% ~ 90%', 'Bottom 10%'];
+                    if (!in_array($rankIntervals, $allowedIntervals, true)) {
+                        $skipped++;
+                        $errors[] = 'Row ' . ($index + 2) . ': invalid ranking_intervals';
+                        continue;
+                    }
+
+                    $proofPath = null;
+                    if (!empty($data['proof'])) {
+                        // Accept URL or relative path; store as given
+                        $proofPath = $data['proof'];
+                    }
+
+                    DB::table('staff_resignation_log')->insert([
+                        'staff_id' => $data['staff_id'],
+                        'submitted_by' => $staff->team_leader_id ?: 'admin',
+                        'resignation_type' => $type,
+                        'resignation_subtype' => $subtype,
+                        'last_working_day' => $lastWorking,
+                        'report_day' => $report,
+                        'reason' => $data['reason'],
+                        'ranking_intervals' => $rankIntervals,
+                        'proof' => $proofPath,
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ]);
+
+                    DB::table('staff')
+                        ->where('staff_id', $data['staff_id'])
+                        ->update([
+                            'staff_status' => 'inactive',
+                            'updated_at' => date('Y-m-d H:i:s'),
+                        ]);
+
+                    $imported++;
+                }
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Import completed: {$imported} imported, {$skipped} skipped",
+                'data' => [
+                    'imported' => $imported,
+                    'skipped' => $skipped,
+                    'errors' => $errors,
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Import failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    private function normalizeUtf8($value)
+    {
+        if ($value === null) {
+            return '';
+        }
+        $str = (string) $value;
+        $str = preg_replace('/^\xEF\xBB\xBF/', '', $str);
+        $enc = mb_detect_encoding($str, ['UTF-8', 'ISO-8859-1', 'Windows-1252'], true);
+        if ($enc && $enc !== 'UTF-8') {
+            $str = iconv($enc, 'UTF-8//IGNORE', $str);
+        } else {
+            $str = mb_convert_encoding($str, 'UTF-8', 'UTF-8');
+        }
+        $str = trim($str);
+        if ($str === '-') {
+            return '';
+        }
+        return $str;
+    }
+
+    private function parseDate($dateString)
+    {
+        if (empty($dateString) || $dateString === '-') {
+            return null;
+        }
+        try {
+            $dateString = trim((string) $dateString);
+            $date = \DateTime::createFromFormat('n/j/Y', $dateString);
+            if ($date) {
+                return $date->format('Y-m-d');
+            }
+            $timestamp = strtotime($dateString);
+            if ($timestamp) {
+                return date('Y-m-d', $timestamp);
+            }
+        } catch (\Exception $e) {
+        }
+        return null;
     }
 }

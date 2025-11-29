@@ -219,7 +219,7 @@ const exportExcel = () => {
         "Hiredate",
         "Rank",
         "Device",
-        "Report  Date",
+        "Report Date",
         "Ranking Intervals",
         "Group",
         "Reason for resign",
@@ -237,6 +237,8 @@ const exportExcel = () => {
                 : normalized
                 ? `${base}/${normalized}`
                 : "";
+            const tl = a.team_leader || a.teamLeader;
+            const superiorName = a.superior || (tl && tl.name) || "";
             return [
                 i + 1,
                 a.status_code || "",
@@ -244,7 +246,7 @@ const exportExcel = () => {
                 a.staff_id || "",
                 a.name || "",
                 a.position || "",
-                a.superior || "",
+                superiorName,
                 a.department || "",
                 a.hire_date ? new Date(a.hire_date).toLocaleDateString() : "",
                 a.rank || "",

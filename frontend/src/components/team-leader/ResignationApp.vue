@@ -390,6 +390,29 @@
                                 </select>
                             </div>
 
+                            <!-- Ranking Intervals -->
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-2"
+                                    >Ranking/Intervals</label
+                                >
+                                <select
+                                    v-model="formData.ranking_intervals"
+                                    required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                                >
+                                    <option value="">Select Ranking</option>
+                                    <option value="Top 5%">Top 5%</option>
+                                    <option value="5% ~ 25%">5% ~ 25%</option>
+                                    <option value="25% ~ 50%">25% ~ 50%</option>
+                                    <option value="50% ~ 70%">50% ~ 70%</option>
+                                    <option value="70% ~ 90%">70% ~ 90%</option>
+                                    <option value="Bottom 10%">
+                                        Bottom 10%
+                                    </option>
+                                </select>
+                            </div>
+
                             <!-- Report Day -->
                             <div>
                                 <label
@@ -591,6 +614,7 @@ const formData = ref({
     report_day: new Date().toISOString().split("T")[0],
     reason: "",
     proof: null,
+    ranking_intervals: "",
 });
 
 const proofPreview = ref(null);
@@ -784,6 +808,7 @@ const resetForm = () => {
         report_day: new Date().toISOString().split("T")[0],
         reason: "",
         proof: null,
+        ranking_intervals: "",
     };
     proofPreview.value = null;
 };
@@ -811,6 +836,10 @@ const submitForm = async () => {
         );
         formDataToSend.append("report_day", formData.value.report_day);
         formDataToSend.append("reason", formData.value.reason);
+        formDataToSend.append(
+            "ranking_intervals",
+            formData.value.ranking_intervals || ""
+        );
 
         // Append proof file if exists
         if (formData.value.proof) {
