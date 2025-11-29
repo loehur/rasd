@@ -254,11 +254,6 @@
                                 >
                                     WL
                                 </th>
-                                <th
-                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Actions
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -271,7 +266,7 @@
                                 <!-- Team Leader Header Row -->
                                 <tr class="bg-slate-800/70">
                                     <td
-                                        colspan="13"
+                                        colspan="12"
                                         class="px-3 py-3 text-left font-bold text-emerald-400 text-sm"
                                     >
                                         Team Leader: {{ teamLeader }} ({{
@@ -323,15 +318,6 @@
                                     </td>
                                     <td class="px-3 py-2">
                                         {{ staff.warning_letter ? "WL" : "-" }}
-                                    </td>
-                                    <td class="px-3 py-2">
-                                        <button
-                                            v-if="isAdmin"
-                                            @click.stop="onDeleteStaff(staff)"
-                                            class="px-3 py-1 text-xs bg-red-600 hover:bg-red-700 text-white rounded"
-                                        >
-                                            Delete
-                                        </button>
                                     </td>
                                 </tr>
                             </template>
@@ -431,15 +417,6 @@
                                             {{ staff.phone_number }}
                                         </p>
                                     </div>
-                                </div>
-                                <div class="mt-3">
-                                    <button
-                                        v-if="isAdmin"
-                                        @click.stop="onDeleteStaff(staff)"
-                                        class="w-full px-3 py-2 text-xs bg-red-600 hover:bg-red-700 rounded text-white"
-                                    >
-                                        Delete
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -651,84 +628,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Delete Confirmation Modal -->
-            <div
-                v-if="deleteModal.show"
-                @click="closeDeleteModal"
-                class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-            >
-                <div
-                    @click.stop
-                    class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-lg w-full shadow-xl"
-                >
-                    <div class="flex items-start gap-4 mb-4">
-                        <div
-                            class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-600 to-orange-500 flex items-center justify-center text-white"
-                        >
-                            <svg
-                                class="w-6 h-6"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                ></path>
-                            </svg>
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="text-xl font-bold text-slate-100">
-                                Hapus Staff?
-                            </h3>
-                            <p class="text-slate-400 mt-1">
-                                Anda akan menghapus
-                                <span class="text-slate-100 font-semibold">{{
-                                    deleteModal.staff?.name
-                                }}</span>
-                                (<span class="font-mono text-blue-400">{{
-                                    deleteModal.staff?.staff_id
-                                }}</span
-                                >). Tindakan ini tidak dapat dibatalkan.
-                            </p>
-                            <p class="text-slate-500 text-xs mt-2">
-                                Data terkait tidak akan bisa dipulihkan setelah
-                                dihapus.
-                            </p>
-                            <p
-                                v-if="deleteModal.error"
-                                class="mt-2 text-sm text-red-400"
-                            >
-                                {{ deleteModal.error }}
-                            </p>
-                        </div>
-                    </div>
-                    <div
-                        class="flex justify-end gap-3 pt-4 border-t border-slate-800"
-                    >
-                        <button
-                            @click="closeDeleteModal"
-                            class="px-4 py-2 text-sm bg-slate-800/60 border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-800"
-                        >
-                            Batal
-                        </button>
-                        <button
-                            @click="confirmDelete"
-                            :disabled="deleteModal.submitting"
-                            class="px-5 py-2 text-sm bg-red-600 hover:bg-red-700 rounded-lg text-white disabled:opacity-60"
-                        >
-                            {{
-                                deleteModal.submitting
-                                    ? "Menghapus..."
-                                    : "Hapus"
-                            }}
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </template>
@@ -736,7 +635,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { API_BASE_URL } from "@/config/api";
-import { adminDeleteStaff } from "@/utils/api";
 
 const staffList = ref([]);
 const currentUser = ref({ role: "" });
@@ -749,12 +647,6 @@ const filterGroup = ref(""); // Group filter
 const currentPage = ref(1);
 const itemsPerPage = ref(5);
 const selectedStaff = ref(null);
-const deleteModal = ref({
-    show: false,
-    staff: null,
-    submitting: false,
-    error: "",
-});
 
 // Available groups in order
 const availableGroups = [
@@ -922,42 +814,6 @@ const getInitials = (name) => {
         .join("")
         .toUpperCase()
         .substring(0, 2);
-};
-
-const isAdmin = computed(() => {
-    return ["admin", "super-admin"].includes(currentUser.value.role || "");
-});
-
-const onDeleteStaff = (staff) => {
-    if (!isAdmin.value) return;
-    if (!staff?.staff_id) return;
-    deleteModal.value = { show: true, staff, submitting: false, error: "" };
-};
-
-const closeDeleteModal = () => {
-    deleteModal.value.show = false;
-    deleteModal.value.staff = null;
-    deleteModal.value.error = "";
-};
-
-const confirmDelete = async () => {
-    if (!deleteModal.value.staff?.staff_id) return;
-    deleteModal.value.submitting = true;
-    deleteModal.value.error = "";
-    try {
-        const res = await adminDeleteStaff(deleteModal.value.staff.staff_id);
-        if (res.success) {
-            closeDeleteModal();
-            await loadStaff();
-        } else {
-            deleteModal.value.error = res.message || "Gagal menghapus staff";
-        }
-    } catch (e) {
-        console.error("Delete staff error:", e);
-        deleteModal.value.error = "Terjadi kesalahan saat menghapus";
-    } finally {
-        deleteModal.value.submitting = false;
-    }
 };
 
 const getGroupCount = (group) => {
