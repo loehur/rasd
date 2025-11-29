@@ -60,20 +60,6 @@
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <button
-                        @click="filterMonth = ''"
-                        :class="[
-                            'px-4 py-2 text-sm font-medium rounded-lg transition',
-                            filterMonth === ''
-                                ? 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/50'
-                                : 'bg-slate-800/50 text-slate-400 border border-slate-700 hover:bg-slate-700/50 hover:text-slate-200',
-                        ]"
-                    >
-                        All Months
-                        <span class="ml-1 text-xs opacity-70"
-                            >({{ resignations.length }})</span
-                        >
-                    </button>
-                    <button
                         v-for="month in availableMonths"
                         :key="month"
                         @click="filterMonth = month"
@@ -331,7 +317,7 @@
                     </thead>
                     <tbody>
                         <tr
-                            v-for="resignation in filteredResignations"
+                            v-for="(resignation, i) in filteredResignations"
                             :key="resignation.id"
                             class="hover:bg-slate-800/30 transition border-t border-slate-800/50"
                         >
@@ -407,10 +393,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { API_BASE_URL } from "@/config/api";
 
 const resignations = ref([]);
+const months = ref([]);
 const loading = ref(false);
 const error = ref("");
 const errorDetail = ref("");
@@ -432,14 +419,38 @@ const resultSuccess = ref(false);
 const importErrors = ref([]);
 
 const availableMonths = computed(() => {
-    const months = resignations.value.map((r) => {
-        const date = new Date(r.report_day);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        return `${year}-${month}`;
-    });
-    return [...new Set(months)].sort((a, b) => b.localeCompare(a));
+    return (months.value || [])
+        .map((m) => m.month)
+        .filter(Boolean)
+        .sort((a, b) => b.localeCompare(a));
 });
+
+const loadMonths = async () => {
+    try {
+        const token =
+            localStorage.getItem("auth_token") ||
+            localStorage.getItem("tl_auth_token");
+        if (!token) {
+            window.location.href = "/admin";
+            return;
+        }
+        const url = `${API_BASE_URL}/api/resignations/months`;
+        const res = await fetch(url, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+                "X-Role":
+                    JSON.parse(localStorage.getItem("user") || "{}").role ||
+                    "admin",
+            },
+        });
+        const data = await res.json();
+        if (data && data.success) {
+            months.value = Array.isArray(data.data) ? data.data : [];
+        }
+    } catch (e) {}
+};
 
 const loadResignations = async () => {
     loading.value = true;
@@ -454,48 +465,41 @@ const loadResignations = async () => {
             return;
         }
 
-        const endpoints = [
-            `${API_BASE_URL}/api/resignations?per_page=1000`,
-            `${API_BASE_URL}/api/resignations`,
-        ];
+        const monthParam = filterMonth.value;
+        const url = `${API_BASE_URL}/api/resignations?month=${monthParam}&per_page=1000`;
 
         let items = [];
-        for (const url of endpoints) {
+        try {
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "application/json",
+                    "X-Role":
+                        JSON.parse(localStorage.getItem("user") || "{}").role ||
+                        "admin",
+                },
+            });
+            let data;
             try {
-                const res = await fetch(url, {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        Accept: "application/json",
-                        "X-Role":
-                            JSON.parse(localStorage.getItem("user") || "{}")
-                                .role || "admin",
-                    },
-                });
-                let data;
-                try {
-                    data = await res.json();
-                } catch (jsonErr) {
-                    const text = await res.text();
-                    errorDetail.value = `Status: ${res.status} ${
-                        res.statusText
-                    }\nURL: ${url}\nResponse: ${text.substring(0, 500)}`;
-                    continue;
-                }
-                if (data && data.success === true) {
-                    items = Array.isArray(data.data)
-                        ? data.data
-                        : data.results || [];
-                } else if (Array.isArray(data)) {
-                    items = data;
-                } else if (data && Array.isArray(data.data)) {
-                    items = data.data;
-                }
-                if (items.length) break;
-            } catch (e) {
-                // try next endpoint
-                errorDetail.value = String(e?.message || e);
+                data = await res.json();
+            } catch (jsonErr) {
+                const text = await res.text();
+                errorDetail.value = `Status: ${res.status} ${
+                    res.statusText
+                }\nURL: ${url}\nResponse: ${text.substring(0, 500)}`;
             }
+            if (data && data.success === true) {
+                items = Array.isArray(data.data)
+                    ? data.data
+                    : data.results || [];
+            } else if (Array.isArray(data)) {
+                items = data;
+            } else if (data && Array.isArray(data.data)) {
+                items = data.data;
+            }
+        } catch (e) {
+            errorDetail.value = String(e?.message || e);
         }
 
         resignations.value = (items || [])
@@ -505,7 +509,7 @@ const loadResignations = async () => {
                     new Date(b.report_day || b.last_working_day) -
                     new Date(a.report_day || a.last_working_day)
             );
-        await loadStaffProfiles();
+        // Backend enriches staff fields; avoid per-row fetches
     } catch (err) {
         error.value = "Connection error. Please make sure you're logged in.";
         console.error("Load error:", err);
@@ -563,7 +567,7 @@ const columnsOrdered = [
     "Proof",
 ];
 
-const staffMap = ref({});
+// Backend enriches staff fields; avoid per-row fetches
 
 const toTitle = (s) => {
     const v = String(s || "").replace(/_/g, " ");
@@ -574,32 +578,31 @@ const toTitle = (s) => {
 };
 
 const colValue = (col, r, i) => {
-    const s = staffMap.value[r.staff_id] || {};
     switch (col) {
         case "SN":
             return i + 1;
         case "Area":
-            return s.area || "";
+            return r.area || "";
         case "WFH/Oniste":
-            return s.work_location || "";
+            return r.work_location || "";
         case "ID Staff":
             return r.staff_id || "";
         case "Name Staff":
-            return r.staff_name || s.name || "";
+            return r.staff_name || "";
         case "Position":
-            return r.staff_position || s.position || "";
+            return r.staff_position || "";
         case "Superior":
             return r.staff_superior || "";
         case "Department":
-            return s.department || "";
+            return r.department || "";
         case "Hiredate":
-            return s.hire_date
-                ? new Date(s.hire_date).toLocaleDateString()
+            return r.hire_date
+                ? new Date(r.hire_date).toLocaleDateString()
                 : "";
         case "Rank":
-            return s.rank || "";
+            return r.rank || "";
         case "Device":
-            return s.device || "";
+            return r.device || "";
         case "Report day":
             return r.report_day
                 ? new Date(r.report_day).toLocaleDateString()
@@ -611,7 +614,7 @@ const colValue = (col, r, i) => {
         case "Ranking Intervals":
             return r.ranking_intervals || "";
         case "Group":
-            return s.group || "";
+            return r.group || "";
         case "Voluntary/Involuntary":
             return r.resignation_type === "voluntary"
                 ? "Voluntary"
@@ -627,32 +630,7 @@ const colValue = (col, r, i) => {
     }
 };
 
-const loadStaffProfiles = async () => {
-    const token =
-        localStorage.getItem("auth_token") ||
-        localStorage.getItem("tl_auth_token");
-    const ids = [
-        ...new Set(resignations.value.map((r) => r.staff_id).filter(Boolean)),
-    ];
-    for (const id of ids) {
-        try {
-            const res = await fetch(
-                `${API_BASE_URL}/api/attendances/staff/${id}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: token ? `Bearer ${token}` : undefined,
-                        Accept: "application/json",
-                    },
-                }
-            );
-            const data = await res.json();
-            if (data && data.success && data.data) {
-                staffMap.value[id] = data.data;
-            }
-        } catch {}
-    }
-};
+// Removed loadStaffProfiles to avoid N HTTP requests
 
 const displayColumns = computed(() => {
     const omit = new Set([
@@ -672,13 +650,8 @@ const displayColumns = computed(() => {
 });
 
 const getMonthCount = (month) => {
-    return resignations.value.filter((r) => {
-        const date = new Date(r.report_day);
-        const year = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, "0");
-        const resignationMonth = `${year}-${m}`;
-        return resignationMonth === month;
-    }).length;
+    const found = (months.value || []).find((m) => m.month === month);
+    return found ? found.count : 0;
 };
 
 const formatMonthLabel = (month) => {
@@ -942,12 +915,17 @@ const formatValue = (v) => {
     return v;
 };
 
-onMounted(() => {
+onMounted(async () => {
     const token = localStorage.getItem("auth_token");
     if (!token) {
         window.location.href = "/admin";
         return;
     }
+    await loadMonths();
+    await loadResignations();
+});
+
+watch(filterMonth, () => {
     loadResignations();
 });
 

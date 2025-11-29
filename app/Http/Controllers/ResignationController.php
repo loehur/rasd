@@ -59,15 +59,40 @@ class ResignationController extends Controller
 
             // Get query parameters
             $page = (int) $request->query('page', 1);
-            $perPage = (int) $request->query('per_page', 15);
+            $perPage = (int) $request->query('per_page', 1000);
             $reportDay = $request->query('report_day');
+            $month = $request->query('month'); // format YYYY-MM
 
-            // Base query for resignations (include all, not limited to current team leader)
-            $query = DB::table('staff_resignation_log');
+            // Base query: join staff for enrichment
+            $query = DB::table('staff_resignation_log')
+                ->leftJoin('staff', 'staff_resignation_log.staff_id', '=', 'staff.staff_id')
+                ->leftJoin('staff as tl', 'staff.team_leader_id', '=', 'tl.staff_id')
+                ->select(
+                    'staff_resignation_log.*',
+                    'staff.name as staff_name',
+                    'staff.position as staff_position',
+                    'staff.department',
+                    'staff.group',
+                    'staff.rank',
+                    'staff.hire_date',
+                    'staff.area',
+                    'tl.name as staff_superior'
+                );
 
-            // Apply date filter if provided
+            // Apply day filter if provided
             if ($reportDay) {
-                $query->whereDate('report_day', $reportDay);
+                $query->whereDate('staff_resignation_log.report_day', $reportDay);
+            }
+
+            // Apply month filter (default to current month to avoid huge datasets)
+            if ($month) {
+                [$y, $m] = explode('-', $month);
+                $query->whereYear('staff_resignation_log.report_day', (int) $y)
+                    ->whereMonth('staff_resignation_log.report_day', (int) $m);
+            } else {
+                $now = new \DateTime();
+                $query->whereYear('staff_resignation_log.report_day', (int) $now->format('Y'))
+                    ->whereMonth('staff_resignation_log.report_day', (int) $now->format('n'));
             }
 
             // Get total count
@@ -75,27 +100,10 @@ class ResignationController extends Controller
 
             // Get paginated results
             $resignations = $query
-                ->orderBy('created_at', 'desc')
+                ->orderBy('staff_resignation_log.created_at', 'desc')
                 ->offset(($page - 1) * $perPage)
                 ->limit($perPage)
                 ->get();
-
-            // Enrich with staff details
-            foreach ($resignations as $resignation) {
-                $staff = DB::table('staff')
-                    ->where('staff_id', $resignation->staff_id)
-                    ->first();
-
-                $resignation->staff_name = $staff ? $staff->name : 'Unknown';
-                $resignation->staff_position = $staff ? $staff->position : null;
-                $resignation->staff_superior = null;
-                if ($staff && !empty($staff->team_leader_id)) {
-                    $tl = DB::table('staff')
-                        ->where('staff_id', $staff->team_leader_id)
-                        ->first();
-                    $resignation->staff_superior = $tl ? $tl->name : null;
-                }
-            }
 
             // Calculate pagination data
             $lastPage = ceil($total / $perPage);
@@ -166,10 +174,10 @@ class ResignationController extends Controller
             // Validate input
             $validator = Validator::make($request->all(), [
                 'staff_id' => 'required|string',
-                'last_working_day' => 'required|date',
+                'last_working_day' => 'required',
                 'resignation_type' => 'required|in:voluntary,involuntary',
                 'resignation_subtype' => 'required|in:personal_reason,management_reason',
-                'report_day' => 'required|date',
+                'report_day' => 'required',
                 'reason' => 'required|string|max:1000',
                 'proof' => 'nullable|file|mimes:jpeg,jpg,png|max:10240',
                 'ranking_intervals' => 'required|in:Top 5%,5% ~ 25%,25% ~ 50%,50% ~ 70%,70% ~ 90%,Bottom 10%'
@@ -220,14 +228,20 @@ class ResignationController extends Controller
                     $proofPath = $this->compressAndSaveImage($request->file('proof'));
                 }
 
-                // Insert resignation log
+                $lastWorking = $this->parseDate($request->last_working_day);
+                $reportDay = $this->parseDate($request->report_day);
+
+                if (!$lastWorking || !$reportDay) {
+                    throw new \Exception('Invalid date format for last_working_day or report_day');
+                }
+
                 DB::table('staff_resignation_log')->insert([
                     'staff_id' => $request->staff_id,
                     'submitted_by' => $teamLeader->staff_id,
                     'resignation_type' => $request->resignation_type,
                     'resignation_subtype' => $request->resignation_subtype,
-                    'last_working_day' => $request->last_working_day,
-                    'report_day' => $request->report_day,
+                    'last_working_day' => $lastWorking,
+                    'report_day' => $reportDay,
                     'reason' => $request->reason,
                     'ranking_intervals' => $request->ranking_intervals,
                     'proof' => $proofPath,
@@ -593,44 +607,53 @@ class ResignationController extends Controller
                     // Basic validation
                     if (empty($data['staff_id'])) {
                         $skipped++;
-                        $errors[] = 'Row ' . ($index + 2) . ': staff_id is required';
+                        $errors[] = 'Row ' . ($index + 2) . ': staff_id is required (value: ' . ($data['staff_id'] ?? '') . ')';
                         continue;
                     }
 
                     $staff = DB::table('staff')->where('staff_id', $data['staff_id'])->first();
                     if (!$staff) {
                         $skipped++;
-                        $errors[] = 'Row ' . ($index + 2) . ': staff not found';
+                        $errors[] = 'Row ' . ($index + 2) . ': staff not found (staff_id: ' . $data['staff_id'] . ')';
                         continue;
                     }
 
                     $lastWorking = $this->parseDate($data['last_working_day']);
-                    $report = $this->parseDate($data['report_day']) ?? date('Y-m-d');
+                    $report = $this->parseDate($data['report_day']);
                     if (!$lastWorking) {
                         $skipped++;
-                        $errors[] = 'Row ' . ($index + 2) . ': invalid last_working_day';
+                        $errors[] = 'Row ' . ($index + 2) . ': invalid last_working_day (value: ' . ($data['last_working_day'] ?? '') . ')';
+                        continue;
+                    }
+                    if (!$report) {
+                        $skipped++;
+                        $errors[] = 'Row ' . ($index + 2) . ': invalid report_day (value: ' . ($data['report_day'] ?? '') . ')';
                         continue;
                     }
 
-                    $type = strtolower($data['resignation_type']);
-                    $subtype = strtolower($data['resignation_subtype']);
+                    $type = $this->normalizeType($data['resignation_type']);
+                    $subtype = $this->normalizeSubtype($data['resignation_subtype']);
                     if (!in_array($type, ['voluntary', 'involuntary'], true)) {
                         $skipped++;
-                        $errors[] = 'Row ' . ($index + 2) . ': invalid resignation_type';
+                        $errors[] = 'Row ' . ($index + 2) . ': invalid resignation_type (value: ' . ($data['resignation_type'] ?? '') . ')';
                         continue;
                     }
                     if (!in_array($subtype, ['personal_reason', 'management_reason'], true)) {
                         $skipped++;
-                        $errors[] = 'Row ' . ($index + 2) . ': invalid resignation_subtype';
+                        $errors[] = 'Row ' . ($index + 2) . ': invalid resignation_subtype (value: ' . ($data['resignation_subtype'] ?? '') . ')';
                         continue;
                     }
 
-                    $rankIntervals = $data['ranking_intervals'];
-                    $allowedIntervals = ['Top 5%', '5% ~ 25%', '25% ~ 50%', '50% ~ 70%', '70% ~ 90%', 'Bottom 10%'];
-                    if (!in_array($rankIntervals, $allowedIntervals, true)) {
-                        $skipped++;
-                        $errors[] = 'Row ' . ($index + 2) . ': invalid ranking_intervals';
-                        continue;
+                    $rankIntervals = trim($this->normalizeInterval($data['ranking_intervals']));
+                    // Simplify: accept any normalized range or label; allow empty by storing null
+                    if ($rankIntervals === '') {
+                        $rankIntervals = null;
+                    } else if (preg_match('/^(\d{1,3})%\s*~\s*(\d{1,3})%$/', $rankIntervals, $mm)) {
+                        $a = (int) $mm[1];
+                        $b = (int) $mm[2];
+                        if (!($a >= 0 && $a < $b && $b <= 100)) {
+                            $rankIntervals = null; // fallback: store null if range invalid
+                        }
                     }
 
                     $proofPath = null;
@@ -639,19 +662,21 @@ class ResignationController extends Controller
                         $proofPath = $data['proof'];
                     }
 
-                    DB::table('staff_resignation_log')->insert([
-                        'staff_id' => $data['staff_id'],
-                        'submitted_by' => $staff->team_leader_id ?: 'admin',
-                        'resignation_type' => $type,
-                        'resignation_subtype' => $subtype,
-                        'last_working_day' => $lastWorking,
-                        'report_day' => $report,
-                        'reason' => $data['reason'],
-                        'ranking_intervals' => $rankIntervals,
-                        'proof' => $proofPath,
-                        'created_at' => date('Y-m-d H:i:s'),
-                        'updated_at' => date('Y-m-d H:i:s'),
-                    ]);
+                    DB::table('staff_resignation_log')->updateOrInsert(
+                        ['staff_id' => $data['staff_id']],
+                        [
+                            'submitted_by' => $staff->team_leader_id ?: 'admin',
+                            'resignation_type' => $type,
+                            'resignation_subtype' => $subtype,
+                            'last_working_day' => $lastWorking,
+                            'report_day' => $report,
+                            'reason' => $data['reason'],
+                            'ranking_intervals' => $rankIntervals,
+                            'proof' => $proofPath,
+                            'created_at' => date('Y-m-d H:i:s'),
+                            'updated_at' => date('Y-m-d H:i:s'),
+                        ]
+                    );
 
                     DB::table('staff')
                         ->where('staff_id', $data['staff_id'])
@@ -685,6 +710,51 @@ class ResignationController extends Controller
         }
     }
 
+    public function months(Request $request)
+    {
+        try {
+            $role = $request->header('X-Role') ?? ($request->input('role') ?? null);
+            $isAdmin = in_array($role, ['admin', 'super-admin'], true);
+
+            if (!$isAdmin) {
+                $token = $request->header('Authorization');
+                if (!$token) {
+                    return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+                }
+                $token = str_replace('Bearer ', '', $token);
+                $decoded = base64_decode($token);
+                $parts = explode(':', $decoded);
+                $employeeId = $parts[0] ?? null;
+                if (!$employeeId) {
+                    return response()->json(['success' => false, 'message' => 'Invalid token'], 401);
+                }
+                $teamLeader = DB::table('staff')
+                    ->where('role', 'tl')
+                    ->where('staff_id', $employeeId)
+                    ->first();
+                if (!$teamLeader) {
+                    return response()->json(['success' => false, 'message' => 'Team leader not found'], 401);
+                }
+            }
+
+            $months = DB::table('staff_resignation_log')
+                ->select(DB::raw("DATE_FORMAT(report_day, '%Y-%m') as month"), DB::raw('COUNT(*) as count'))
+                ->groupBy('month')
+                ->orderBy('month', 'desc')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $months,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch months: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     private function normalizeUtf8($value)
     {
         if ($value === null) {
@@ -712,9 +782,25 @@ class ResignationController extends Controller
         }
         try {
             $dateString = trim((string) $dateString);
-            $date = \DateTime::createFromFormat('n/j/Y', $dateString);
-            if ($date) {
-                return $date->format('Y-m-d');
+
+            if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $dateString, $m)) {
+                $a = (int) $m[1];
+                $b = (int) $m[2];
+                $y = (int) $m[3];
+                $dateString = sprintf('%02d/%02d/%04d', $a, $b, $y);
+            } elseif (preg_match('/^(\d{1,2})-(\d{1,2})-(\d{4})$/', $dateString, $m)) {
+                $a = (int) $m[1];
+                $b = (int) $m[2];
+                $y = (int) $m[3];
+                $dateString = sprintf('%02d-%02d-%04d', $a, $b, $y);
+            }
+
+            $formats = ['n/j/Y', 'j/n/Y', 'm/d/Y', 'd/m/Y', 'Y-m-d', 'Y/m/d'];
+            foreach ($formats as $fmt) {
+                $date = \DateTime::createFromFormat($fmt, $dateString);
+                if ($date) {
+                    return $date->format('Y-m-d');
+                }
             }
             $timestamp = strtotime($dateString);
             if ($timestamp) {
@@ -723,5 +809,52 @@ class ResignationController extends Controller
         } catch (\Exception $e) {
         }
         return null;
+    }
+
+    private function normalizeType($value)
+    {
+        $v = strtolower($this->normalizeUtf8($value));
+        if (strpos($v, 'volun') !== false) {
+            return 'voluntary';
+        }
+        if (strpos($v, 'invol') !== false || strpos($v, 'terminat') !== false || strpos($v, 'departure') !== false) {
+            return 'involuntary';
+        }
+        return $v;
+    }
+
+    private function normalizeSubtype($value)
+    {
+        $v = strtolower($this->normalizeUtf8($value));
+        if (strpos($v, 'personal') !== false) {
+            return 'personal_reason';
+        }
+        if (strpos($v, 'manage') !== false || strpos($v, 'company') !== false) {
+            return 'management_reason';
+        }
+        return $v;
+    }
+
+    private function normalizeInterval($value)
+    {
+        $raw = $this->normalizeUtf8($value);
+        $v = strtolower($raw);
+        // Normalize various separators to hyphen
+        $v = str_replace(['–', '—'], '-', $v);
+        $v = preg_replace('/\s*(s\/d|sd|to)\s*/', '-', $v);
+        $v = preg_replace('/\s+/', ' ', $v);
+        if (strpos($v, 'top') !== false) {
+            return 'Top 5%';
+        }
+        if (strpos($v, 'bottom') !== false) {
+            return 'Bottom 10%';
+        }
+        // Match ranges like 70-90, 70%-90%, 70 % - 90 % , 70%~90%
+        if (preg_match('/(\d{1,3})\s*%?\s*[-~]\s*(\d{1,3})\s*%?/', $v, $m)) {
+            $a = (int) $m[1];
+            $b = (int) $m[2];
+            return $a . '% ~ ' . $b . '%';
+        }
+        return $raw;
     }
 }

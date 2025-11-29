@@ -149,6 +149,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('resignations/reactivate', 'ResignationController@reactivate');
     $router->post('resignations/import', 'ResignationController@import');
     $router->get('resignations/template', 'ResignationController@downloadTemplate');
+    $router->get('resignations/months', 'ResignationController@months');
 
     // Staff Change Management routes
     $router->get('staff-changes/all-staff', 'StaffChangeController@getAllStaff');
