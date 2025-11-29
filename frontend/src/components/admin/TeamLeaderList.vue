@@ -132,41 +132,41 @@
             >
                 <!-- Desktop Table View -->
                 <div class="hidden md:block overflow-x-auto">
-                    <table class="w-full">
+                    <table class="w-full text-xs">
                         <thead class="bg-slate-800/50">
                             <tr>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
                                 >
                                     Employee ID
                                 </th>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
                                 >
                                     Name
                                 </th>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
                                 >
                                     Position
                                 </th>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
                                 >
                                     Team
                                 </th>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
                                 >
                                     Department
                                 </th>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
                                 >
                                     Area
                                 </th>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
                                 >
                                     Hire Date
                                 </th>
@@ -174,56 +174,56 @@
                         </thead>
                         <tbody class="divide-y divide-slate-800/50">
                             <tr
-                                v-for="tl in paginatedTeamLeaders"
+                                v-for="tl in filteredTeamLeaders"
                                 :key="tl.id"
                                 class="hover:bg-slate-800/30 transition"
                             >
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-3 py-2 whitespace-nowrap">
                                     <span
                                         class="text-sm font-mono text-blue-400"
                                         >{{ tl.staff_id }}</span
                                     >
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="px-3 py-2">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold"
+                                            class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold text-[11px]"
                                         >
                                             {{ getInitials(tl.name) }}
                                         </div>
                                         <div>
                                             <p
-                                                class="text-sm font-semibold text-slate-100"
+                                                class="text-xs font-semibold text-slate-100"
                                             >
                                                 {{ tl.name }}
                                             </p>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-sm text-slate-300">{{
+                                <td class="px-3 py-2">
+                                    <span class="text-xs text-slate-300">{{
                                         tl.position
                                     }}</span>
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="px-3 py-2">
                                     <span
-                                        class="px-3 py-1 text-xs font-medium rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                                        class="px-2 py-1 text-[10px] font-medium rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30"
                                     >
                                         {{ tl.team || "-" }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-sm text-slate-400">{{
+                                <td class="px-3 py-2">
+                                    <span class="text-xs text-slate-400">{{
                                         tl.department
                                     }}</span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-sm text-slate-400">{{
+                                <td class="px-3 py-2">
+                                    <span class="text-xs text-slate-400">{{
                                         tl.area
                                     }}</span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-sm text-slate-400">{{
+                                <td class="px-3 py-2">
+                                    <span class="text-xs text-slate-400">{{
                                         tl.hire_date
                                     }}</span>
                                 </td>
@@ -235,19 +235,19 @@
                 <!-- Mobile Card View -->
                 <div class="md:hidden divide-y divide-slate-800/50">
                     <div
-                        v-for="tl in paginatedTeamLeaders"
+                        v-for="tl in filteredTeamLeaders"
                         :key="tl.id"
-                        class="p-4 hover:bg-slate-800/30 transition"
+                        class="p-3 hover:bg-slate-800/30 transition"
                     >
                         <div class="flex items-start gap-3 mb-3">
                             <div
-                                class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+                                class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
                             >
                                 {{ getInitials(tl.name) }}
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h3
-                                    class="text-sm font-semibold text-slate-100 truncate"
+                                    class="text-xs font-semibold text-slate-100 truncate"
                                 >
                                     {{ tl.name }}
                                 </h3>
@@ -260,7 +260,7 @@
                             </div>
                             <div>
                                 <span
-                                    class="px-2 py-1 text-xs font-medium rounded-full bg-slate-800/30 text-slate-300 border border-slate-700"
+                                    class="px-2 py-1 text-[10px] font-medium rounded-full bg-slate-800/30 text-slate-300 border border-slate-700"
                                     >{{ tl.team || "-" }}</span
                                 >
                             </div>
@@ -279,52 +279,6 @@
                                 </p>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Pagination -->
-                <div
-                    v-if="totalPages > 1"
-                    class="px-6 py-4 bg-slate-800/30 flex items-center justify-between"
-                >
-                    <p class="text-sm text-slate-400">
-                        Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
-                        {{
-                            Math.min(
-                                currentPage * itemsPerPage,
-                                filteredTeamLeaders.length
-                            )
-                        }}
-                        of {{ filteredTeamLeaders.length }} team leaders
-                    </p>
-                    <div class="flex gap-2">
-                        <button
-                            @click="currentPage--"
-                            :disabled="currentPage === 1"
-                            class="px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-700/50 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Previous
-                        </button>
-                        <button
-                            v-for="page in visiblePages"
-                            :key="page"
-                            @click="currentPage = page"
-                            :class="[
-                                'px-4 py-2 border rounded-lg transition',
-                                currentPage === page
-                                    ? 'bg-blue-600/30 border-blue-500 text-blue-300'
-                                    : 'bg-slate-800/50 border-slate-700 text-slate-300 hover:bg-slate-700/50',
-                            ]"
-                        >
-                            {{ page }}
-                        </button>
-                        <button
-                            @click="currentPage++"
-                            :disabled="currentPage === totalPages"
-                            class="px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-700/50 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Next
-                        </button>
                     </div>
                 </div>
             </div>
@@ -457,10 +411,8 @@ const teamLeaders = ref([]);
 const loading = ref(false);
 const error = ref("");
 
-// UI: search & pagination
+// UI: search
 const searchQuery = ref("");
-const currentPage = ref(1);
-const itemsPerPage = ref(5);
 const selectedTeamLeader = ref(null);
 
 const filteredTeamLeaders = computed(() => {
@@ -475,29 +427,7 @@ const filteredTeamLeaders = computed(() => {
     });
 });
 
-const totalPages = computed(() => {
-    return Math.max(
-        1,
-        Math.ceil(filteredTeamLeaders.value.length / itemsPerPage.value)
-    );
-});
-
-const paginatedTeamLeaders = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage.value;
-    return filteredTeamLeaders.value.slice(start, start + itemsPerPage.value);
-});
-
-const visiblePages = computed(() => {
-    const pages = [];
-    const maxVisible = 5;
-    let start = Math.max(1, currentPage.value - Math.floor(maxVisible / 2));
-    let end = Math.min(totalPages.value, start + maxVisible - 1);
-    if (end - start < maxVisible - 1) {
-        start = Math.max(1, end - maxVisible + 1);
-    }
-    for (let i = start; i <= end; i++) pages.push(i);
-    return pages;
-});
+// No pagination: show all filtered items
 
 const getInitials = (name) => {
     if (!name) return "TL";
@@ -515,7 +445,6 @@ const viewTeamLeader = (tl) => {
 
 const resetFilters = () => {
     searchQuery.value = "";
-    currentPage.value = 1;
 };
 
 const fetchTeamLeaders = async () => {
@@ -546,7 +475,6 @@ const fetchTeamLeaders = async () => {
         loading.value = false;
     }
 };
-
 
 onMounted(fetchTeamLeaders);
 

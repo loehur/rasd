@@ -34,11 +34,11 @@
                         </h2>
                         <div class="flex items-center gap-3">
                             <label class="text-sm text-slate-300"
-                                >Filter tanggal:</label
+                                >Filter bulan:</label
                             >
                             <input
-                                type="date"
-                                v-model="filterDate"
+                                type="month"
+                                v-model="filterMonth"
                                 @change="loadAttendances"
                                 class="px-3 py-2 bg-slate-800/50 border border-slate-700 rounded text-slate-100"
                             />
@@ -137,11 +137,16 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { adminGetAttendances, adminDeleteAttendance } from "@/utils/api";
+import { adminGetAttendancesByMonth, adminDeleteAttendance } from "@/utils/api";
 
 const loading = ref(false);
 const attendances = ref([]);
-const filterDate = ref(new Date().toISOString().split("T")[0]);
+const filterMonth = ref(
+    `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(
+        2,
+        "0"
+    )}`
+);
 const toast = ref({ show: false, message: "", type: "success" });
 
 onMounted(async () => {
@@ -151,7 +156,7 @@ onMounted(async () => {
 const loadAttendances = async () => {
     try {
         loading.value = true;
-        const data = await adminGetAttendances(filterDate.value, 1000);
+        const data = await adminGetAttendancesByMonth(filterMonth.value, 1000);
         if (data.success) {
             attendances.value = data.data || [];
         } else {

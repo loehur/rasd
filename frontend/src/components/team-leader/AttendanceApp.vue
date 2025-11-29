@@ -70,14 +70,14 @@
                 </div>
 
                 <div class="p-6">
-                    <!-- Filter Date -->
+                    <!-- Filter Month -->
                     <div class="mb-4 flex items-center gap-3">
                         <label class="text-sm font-medium text-gray-700"
-                            >Filter tanggal (Report Day):</label
+                            >Filter bulan (Report Day):</label
                         >
                         <input
-                            type="date"
-                            v-model="filterDate"
+                            type="month"
+                            v-model="filterMonth"
                             @change="fetchAttendances(1)"
                             class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                         />
@@ -645,7 +645,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import {
-    getAttendances,
+    getAttendancesByMonth,
     getStaffByTeamLeader,
     getStaffDetail,
     createAttendance,
@@ -662,7 +662,12 @@ const submitting = ref(false);
 const viewData = ref(null);
 const toast = ref({ show: false, message: "", type: "success" });
 const proofFile = ref(null);
-const filterDate = ref(new Date().toISOString().split("T")[0]);
+const filterMonth = ref(
+    `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(
+        2,
+        "0"
+    )}`
+);
 
 const pagination = ref({
     total: 0,
@@ -729,12 +734,24 @@ const fetchAttendances = async (page = 1) => {
     error.value = "";
 
     try {
-        const data = await getAttendances(page, filterDate.value || null);
-        if (data.success) {
-            attendances.value = data.data || [];
-            pagination.value = data.pagination;
+        const perPage = pagination.value.per_page || 15;
+        const res = await getAttendancesByMonth(
+            filterMonth.value,
+            page,
+            perPage
+        );
+        if (res.success) {
+            attendances.value = res.data || [];
+            pagination.value = res.pagination || {
+                total: res.data ? res.data.length : 0,
+                per_page: perPage,
+                current_page: page,
+                last_page: 1,
+                from: res.data && res.data.length ? 1 : 0,
+                to: res.data ? res.data.length : 0,
+            };
         } else {
-            error.value = data.message || "Failed to load attendances";
+            error.value = res.message || "Failed to load attendances";
         }
     } catch (err) {
         error.value = "Failed to load attendances";

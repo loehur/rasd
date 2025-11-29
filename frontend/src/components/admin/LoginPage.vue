@@ -23,15 +23,35 @@
                 <!-- Logo / Brand -->
                 <div class="mb-8 text-center">
                     <div class="relative w-20 h-20 mx-auto mb-4">
-                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500 to-emerald-400 rounded-2xl blur-md opacity-50 animate-pulse"></div>
-                        <div class="relative h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-500 to-emerald-400 flex items-center justify-center shadow-2xl shadow-blue-500/50">
-                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-blue-500 to-emerald-400 rounded-2xl blur-md opacity-50 animate-pulse"
+                        ></div>
+                        <div
+                            class="relative h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-500 to-emerald-400 flex items-center justify-center shadow-2xl shadow-blue-500/50"
+                        >
+                            <svg
+                                class="w-10 h-10 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                />
                             </svg>
                         </div>
                     </div>
-                    <h1 class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">Staff Details</h1>
-                    <p class="text-slate-400 mt-1">Performance Monitoring System</p>
+                    <h1
+                        class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400"
+                    >
+                        Staff Details
+                    </h1>
+                    <p class="text-slate-400 mt-1">
+                        Performance Monitoring System
+                    </p>
                 </div>
 
                 <!-- Heading -->
@@ -157,12 +177,11 @@
 
                 <!-- Footer text -->
                 <p class="mt-6 text-[0.7rem] text-slate-500 text-center">
-                    © {{ new Date().getFullYear() }} Staff Details. All
-                    rights reserved.
+                    © {{ new Date().getFullYear() }} Staff Details.
+                    "pinjamin-develop by Rangga"
                 </p>
             </div>
         </div>
-
     </div>
 </template>
 

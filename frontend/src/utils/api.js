@@ -268,3 +268,45 @@ export async function adminDeleteStaff(staffId) {
     });
     return await response.json();
 }
+
+// Month filter variants
+export async function getAttendancesByMonth(month, page = 1, perPage = 15) {
+    const token = localStorage.getItem("tl_auth_token");
+    const params = new URLSearchParams();
+    params.set("page", String(page));
+    if (perPage) params.set("per_page", String(perPage));
+    if (month) params.set("month", month);
+
+    const response = await fetch(
+        `${API_BASE_URL}/api/attendances?${params.toString()}`,
+        {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        }
+    );
+
+    return await response.json();
+}
+
+export async function adminGetAttendancesByMonth(month, perPage = 1000) {
+    const token = localStorage.getItem("auth_token");
+    const role = JSON.parse(localStorage.getItem("user") || "{}").role;
+    const params = new URLSearchParams();
+    if (perPage) params.set("per_page", String(perPage));
+    if (month) params.set("month", month);
+    const response = await fetch(
+        `${API_BASE_URL}/api/attendances?${params.toString()}`,
+        {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                "X-Role": role,
+            },
+        }
+    );
+    return await response.json();
+}

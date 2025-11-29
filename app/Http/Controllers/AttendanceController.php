@@ -18,28 +18,55 @@ class AttendanceController extends Controller
     {
         $perPage = $request->get('per_page', 15);
         $reportDay = $request->get('report_day');
+        $reportMonth = $request->get('month');
 
-        $query = Attendance::with(['staff', 'teamLeader'])
-            ->orderBy('created_at', 'desc');
+        try {
+            $query = Attendance::with(['staff', 'teamLeader'])
+                ->orderBy('created_at', 'desc');
 
-        if (!empty($reportDay)) {
-            $query->whereDate('report_day', $reportDay);
+            if (!empty($reportDay)) {
+                $query->where('report_day', $reportDay);
+            }
+
+            if (!empty($reportMonth)) {
+                // Expect format YYYY-MM
+                try {
+                    [$year, $month] = explode('-', $reportMonth);
+                    $year = (int) $year;
+                    $month = (int) $month;
+                    if ($year > 0 && $month >= 1 && $month <= 12) {
+                        $start = sprintf('%04d-%02d-01', $year, $month);
+                        $dt = new \DateTimeImmutable($start);
+                        $end = $dt->modify('last day of this month')->format('Y-m-d');
+                        $query->where('report_day', '>=', $start)
+                            ->where('report_day', '<=', $end);
+                    }
+                } catch (\Throwable $e) {
+                    // ignore malformed month filter
+                }
+            }
+
+            $attendances = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => $attendances->items(),
+                'pagination' => [
+                    'total' => $attendances->total(),
+                    'per_page' => $attendances->perPage(),
+                    'current_page' => $attendances->currentPage(),
+                    'last_page' => $attendances->lastPage(),
+                    'from' => $attendances->firstItem(),
+                    'to' => $attendances->lastItem(),
+                ],
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load attendances',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $attendances = $query->paginate($perPage);
-
-        return response()->json([
-            'success' => true,
-            'data' => $attendances->items(),
-            'pagination' => [
-                'total' => $attendances->total(),
-                'per_page' => $attendances->perPage(),
-                'current_page' => $attendances->currentPage(),
-                'last_page' => $attendances->lastPage(),
-                'from' => $attendances->firstItem(),
-                'to' => $attendances->lastItem(),
-            ],
-        ], 200);
     }
 
     /**

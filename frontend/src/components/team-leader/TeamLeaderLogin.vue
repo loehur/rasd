@@ -27,7 +27,9 @@
                 >
                     Team Leader Portal
                 </h1>
-                <p class="text-slate-400 mt-2">Sign in to access your dashboard</p>
+                <p class="text-slate-400 mt-2">
+                    Sign in to access your dashboard
+                </p>
             </div>
 
             <!-- Login Form -->
@@ -189,7 +191,12 @@
                 <!-- Footer -->
                 <div class="mt-6 text-center">
                     <p class="text-xs text-slate-500">
-                        Default password: <span class="font-mono text-emerald-400">tl1230</span>
+                        Default password:
+                        <span class="font-mono text-emerald-400">tl1230</span>
+                    </p>
+                    <p class="mt-6 text-[0.7rem] text-slate-500 text-center">
+                        © {{ new Date().getFullYear() }} Staff Details.
+                        "pinjamin-develop by Rangga"
                     </p>
                 </div>
             </div>

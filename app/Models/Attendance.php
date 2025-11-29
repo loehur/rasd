@@ -53,6 +53,6 @@ class Attendance extends Model
      */
     public function teamLeader()
     {
-        return $this->belongsTo(TeamLeader::class, 'team_leader_id', 'employee_id');
+        return $this->belongsTo(Staff::class, 'team_leader_id', 'staff_id')->where('role', 'tl');
     }
 }
