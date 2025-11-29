@@ -62,7 +62,7 @@
                     <input
                         v-model="searchQuery"
                         type="text"
-                        placeholder="Search by name, employee ID, or team..."
+                        placeholder="Search by name, employee ID, or group..."
                         class="flex-1 px-3 py-2 text-sm bg-slate-800/50 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
                     />
                     <button
@@ -153,7 +153,7 @@
                                 <th
                                     class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
                                 >
-                                    Team
+                                    Group
                                 </th>
                                 <th
                                     class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
@@ -169,6 +169,11 @@
                                     class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
                                 >
                                     Hire Date
+                                </th>
+                                <th
+                                    class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    Actions
                                 </th>
                             </tr>
                         </thead>
@@ -209,7 +214,7 @@
                                     <span
                                         class="px-2 py-1 text-[10px] font-medium rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30"
                                     >
-                                        {{ tl.team || "-" }}
+                                        {{ tl.group || "-" }}
                                     </span>
                                 </td>
                                 <td class="px-3 py-2">
@@ -226,6 +231,15 @@
                                     <span class="text-xs text-slate-400">{{
                                         tl.hire_date
                                     }}</span>
+                                </td>
+                                <td class="px-3 py-2">
+                                    <button
+                                        @click="resetPassword(tl)"
+                                        class="px-2 py-1 text-[10px] font-medium rounded-md bg-orange-500/20 text-orange-300 border border-orange-500/30 hover:bg-orange-500/30 transition"
+                                        title="Reset password to tl1230"
+                                    >
+                                        Reset PW
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -261,7 +275,7 @@
                             <div>
                                 <span
                                     class="px-2 py-1 text-[10px] font-medium rounded-full bg-slate-800/30 text-slate-300 border border-slate-700"
-                                    >{{ tl.team || "-" }}</span
+                                    >{{ tl.group || "-" }}</span
                                 >
                             </div>
                         </div>
@@ -279,6 +293,12 @@
                                 </p>
                             </div>
                         </div>
+                        <button
+                            @click="resetPassword(tl)"
+                            class="w-full px-3 py-2 text-xs font-medium rounded-lg bg-orange-500/20 text-orange-300 border border-orange-500/30 hover:bg-orange-500/30 transition"
+                        >
+                            Reset Password to tl1230
+                        </button>
                     </div>
                 </div>
             </div>
@@ -366,10 +386,10 @@
                         </div>
                         <div>
                             <p class="text-xs text-slate-500 uppercase mb-1">
-                                Team
+                                Group
                             </p>
                             <p class="text-sm text-slate-100">
-                                {{ selectedTeamLeader.team || "-" }}
+                                {{ selectedTeamLeader.group || "-" }}
                             </p>
                         </div>
                         <div>
@@ -422,7 +442,7 @@ const filteredTeamLeaders = computed(() => {
         return (
             (tl.name || "").toLowerCase().includes(q) ||
             (tl.staff_id || "").toLowerCase().includes(q) ||
-            (tl.team || "").toLowerCase().includes(q)
+            (tl.group || "").toLowerCase().includes(q)
         );
     });
 });
@@ -484,5 +504,36 @@ const goBack = () => {
 
 const goToImport = () => {
     window.location.href = "/admin/import-team-leader";
+};
+
+const resetPassword = async (tl) => {
+    if (!confirm(`Reset password for ${tl.name} to default (tl1230)?`)) {
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem("auth_token");
+        const res = await fetch(
+            `${API_BASE_URL}/api/team-leaders/${tl.staff_id}/reset-password`,
+            {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        const data = await res.json();
+
+        if (data.success) {
+            alert(data.message);
+        } else {
+            alert("Failed to reset password: " + data.message);
+        }
+    } catch (e) {
+        console.error("Reset password error:", e);
+        alert("Connection error. Please try again.");
+    }
 };
 </script>

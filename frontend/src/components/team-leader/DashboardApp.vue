@@ -321,6 +321,59 @@
                         </svg>
                     </div>
                 </a>
+
+                <!-- Reports - Performance Card -->
+                <a
+                    href="https://excel.myportofolio98.xyz/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-rose-300 transition-all cursor-pointer group"
+                >
+                    <div class="flex items-center">
+                        <div
+                            class="p-3 rounded-lg bg-rose-100 group-hover:bg-rose-200 transition-colors"
+                        >
+                            <svg
+                                class="w-8 h-8 text-rose-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                                ></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <p
+                                class="text-sm font-medium text-gray-600 group-hover:text-rose-600 transition-colors"
+                            >
+                                Reports
+                            </p>
+                            <p
+                                class="text-lg font-bold text-gray-900 group-hover:text-rose-700 transition-colors"
+                            >
+                                Performance
+                            </p>
+                        </div>
+                        <svg
+                            class="w-6 h-6 text-gray-400 group-hover:text-rose-600 transition-colors"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            ></path>
+                        </svg>
+                    </div>
+                </a>
             </div>
 
             <!-- Attendance section moved to dedicated page /team-leader/attendance -->

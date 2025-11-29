@@ -141,7 +141,38 @@
                     Quick Actions
                 </h2>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <!-- Card 1: Staff Lists - Active -->
+                    <!-- Card 1: System - Users -->
+                    <button
+                        v-if="user.role === 'super-admin'"
+                        @click="goToUsers"
+                        class="bg-gradient-to-br from-cyan-600/20 to-cyan-500/10 border border-cyan-500/40 hover:border-cyan-400/60 hover:from-cyan-600/30 hover:to-cyan-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
+                    >
+                        <div
+                            class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center"
+                        >
+                            <svg
+                                class="w-6 h-6 text-cyan-300"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                                />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-300">System</p>
+                            <p class="text-lg font-semibold text-cyan-300">
+                                Users
+                            </p>
+                        </div>
+                    </button>
+
+                    <!-- Card 2: Staff Lists - Active -->
                     <button
                         @click="goToStaffList"
                         class="bg-gradient-to-br from-emerald-600/20 to-emerald-500/10 border border-emerald-500/40 hover:border-emerald-400/60 hover:from-emerald-600/30 hover:to-emerald-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
@@ -171,7 +202,7 @@
                         </div>
                     </button>
 
-                    <!-- Card 2: Team Leader - List -->
+                    <!-- Card 3: Team Leader - List -->
                     <button
                         @click="goToTeamLeaderList"
                         class="bg-gradient-to-br from-fuchsia-600/20 to-fuchsia-500/10 border border-fuchsia-500/40 hover:border-fuchsia-400/60 hover:from-fuchsia-600/30 hover:to-fuchsia-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
@@ -201,7 +232,7 @@
                         </div>
                     </button>
 
-                    <!-- Card 3: Staff Lists - Resign -->
+                    <!-- Card 4: Staff Lists - Resign -->
                     <button
                         @click="goToInactiveStaff"
                         class="bg-gradient-to-br from-blue-600/20 to-blue-500/10 border border-blue-500/40 hover:border-blue-400/60 hover:from-blue-600/30 hover:to-blue-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
@@ -231,7 +262,7 @@
                         </div>
                     </button>
 
-                    <!-- Card 4: Staff - Attendance -->
+                    <!-- Card 5: Staff - Attendance -->
                     <button
                         @click="goToAttendance"
                         class="bg-gradient-to-br from-orange-600/20 to-orange-500/10 border border-orange-500/40 hover:border-orange-400/60 hover:from-orange-600/30 hover:to-orange-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
@@ -261,7 +292,7 @@
                         </div>
                     </button>
 
-                    <!-- Card 5: Staff - Changes -->
+                    <!-- Card 6: Staff - Changes -->
                     <button
                         @click="goToStaffChanges"
                         class="bg-gradient-to-br from-purple-600/20 to-purple-500/10 border border-purple-500/40 hover:border-purple-400/60 hover:from-purple-600/30 hover:to-purple-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
@@ -291,7 +322,7 @@
                         </div>
                     </button>
 
-                    <!-- Card 6: Reports - Performance -->
+                    <!-- Card 7: Reports - Performance -->
                     <a
                         href="https://excel.myportofolio98.xyz/"
                         target="_blank"

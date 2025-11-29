@@ -635,4 +635,48 @@ class TeamLeaderController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Reset team leader password to default
+     *
+     * @param Request $request
+     * @param string $employeeId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function resetPassword(Request $request, $employeeId)
+    {
+        try {
+            // Find team leader using Staff model to bypass global scope
+            $teamLeader = Staff::where('staff_id', $employeeId)
+                              ->where('role', 'tl')
+                              ->first();
+
+            if (!$teamLeader) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Team leader not found'
+                ], 404);
+            }
+
+            // Reset password to default
+            $defaultPassword = TeamLeader::getDefaultPassword();
+            $teamLeader->password = password_hash($defaultPassword, PASSWORD_DEFAULT);
+            $teamLeader->save();
+
+            $this->logAction($request, 'team_leader_password_reset', [
+                'employee_id' => $employeeId,
+                'reset_by' => 'admin'
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset successfully to default: ' . $defaultPassword
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reset password: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
