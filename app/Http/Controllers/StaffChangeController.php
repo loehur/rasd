@@ -148,6 +148,7 @@ class StaffChangeController extends Controller
             $oldValue = [
                 'role' => $staff->role,
                 'position' => $staff->position,
+                'password' => 'encrypted',
             ];
 
             $newValue = [
@@ -155,6 +156,7 @@ class StaffChangeController extends Controller
                 'position' => 'DC TL',
                 'group' => $request->group,
                 'first_day_tl' => $request->first_day_tl,
+                'password' => 'Admin123! (default)',
             ];
 
             // Update staff to TL
@@ -162,6 +164,8 @@ class StaffChangeController extends Controller
             $staff->position = 'DC TL';
             $staff->group = $request->group;
             $staff->first_day_tl = $request->first_day_tl;
+            // Set default password for new TL
+            $staff->password = password_hash('Admin123!', PASSWORD_DEFAULT);
             $staff->save();
 
             // Create log
@@ -177,8 +181,9 @@ class StaffChangeController extends Controller
             DB::commit();
 
             return response()->json([
-                'message' => 'Promotion to Team Leader completed successfully',
-                'staff' => $staff
+                'message' => 'Promotion to Team Leader completed successfully. Default password set to: Admin123!',
+                'staff' => $staff,
+                'default_password' => 'Admin123!'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
