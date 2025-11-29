@@ -58,7 +58,7 @@ class TeamLeaderController extends Controller
                 'token' => $token,
                 'is_default_password' => $isDefaultPassword,
                 'user' => [
-                    'employee_id' => $teamLeader->employee_id,
+                    'employee_id' => $teamLeader->staff_id,
                     'name' => $teamLeader->name,
                     'position' => $teamLeader->position,
                     'group' => $teamLeader->group,
@@ -114,8 +114,8 @@ class TeamLeaderController extends Controller
             }
 
             // Get staff under this team leader
-            // Assuming staff.team_leader_id references team_leader.employee_id
-            $staff = Staff::where('team_leader_id', $teamLeader->employee_id)
+            // Assuming staff.team_leader_id references team_leader.staff_id
+            $staff = Staff::where('team_leader_id', $teamLeader->staff_id)
                 ->orderBy('name')
                 ->get();
 
@@ -521,39 +521,6 @@ class TeamLeaderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update password: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Reset team leader password to default (Admin only)
-     */
-    public function resetPassword(Request $request, $employeeId)
-    {
-        try {
-            // Find team leader by employee_id
-            $teamLeader = TeamLeader::where('staff_id', $employeeId)->first();
-
-            if (!$teamLeader) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Team leader not found'
-                ], 404);
-            }
-
-            // Reset password to "tl1230" - pass plain text, let the model mutator hash it
-            $teamLeader->password = 'tl1230';
-            $teamLeader->save();
-
-            $this->logAction($request, 'team_leader_reset_password', ['employee_id' => $employeeId]);
-            return response()->json([
-                'success' => true,
-                'message' => 'Password reset successfully. New password: tl1230'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to reset password: ' . $e->getMessage()
             ], 500);
         }
     }
