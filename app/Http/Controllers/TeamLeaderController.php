@@ -210,33 +210,41 @@ class TeamLeaderController extends Controller
                         continue;
                     }
 
+                    // Fallback phone number when missing: use staff_id (keeps uniqueness, non-null)
+                    $phone = $get(['Phone Number', 'Phone']) ?? '';
+                    if ($phone === '') {
+                        $phone = $employeeId;
+                    }
+
                     $data = [
-                        'employee_id' => $employeeId,
+                        'staff_id' => $employeeId,
                         'name' => $get(['Name TL', 'Name']) ?? '',
+                        'phone_number' => $phone,
                         'work_location' => $get(['WFH/Onsite', 'WFH/Oniste', 'Work Location']) ?? '',
-                        'position' => $get(['Position']) ?? '',
+                        'position' => $get(['Position']) ?? 'DC TL',
                         'group' => $get(['Group', 'Team']) ?? '',
                         'department' => $get(['Department']) ?? '',
-                        'hire_date' => $this->parseDate($get(['Hiredate', 'Hire Date'])),
+                        'hire_date' => $this->parseDate($get(['Hiredate', 'Hire Date'])) ?? date('Y-m-d'),
                         'rank' => $get(['Rank']) ?? '',
-                        'first_day_tl' => $this->parseDate($get(['1st day to be TL', '1st day to be TL'])),
+                        'first_day_tl' => $this->parseDate($get(['1st day to be TL', '1st day to be TL'])) ?? date('Y-m-d'),
                         'warning_letter' => $get(['Warning letter']) ?? '',
                         'ojk_case' => ($get(['OJK case']) !== null) ? (int)$get(['OJK case']) : 0,
                         'former_tl' => $get(['Former TL']) ?? '',
                         'area' => $get(['Area']) ?? '',
+                        'role' => 'tl',
                     ];
 
-                    // Check if team leader already exists
-                    $teamLeader = TeamLeader::where('staff_id', $data['employee_id'])->first();
+                    // Check if staff already exists (use Staff model to bypass TeamLeader's global scope)
+                    $existingStaff = Staff::where('staff_id', $employeeId)->first();
 
-                    if ($teamLeader) {
-                        // Update existing team leader (don't change password)
-                        $teamLeader->update($data);
+                    if ($existingStaff) {
+                        // Update existing staff to TL (or update existing TL)
+                        $existingStaff->update($data);
                         $updated++;
                     } else {
                         // Create new team leader with default password
                         $data['password'] = TeamLeader::getDefaultPassword();
-                        TeamLeader::create($data);
+                        Staff::create($data);
                         $imported++;
                     }
                 } catch (\Exception $e) {
@@ -329,6 +337,7 @@ class TeamLeaderController extends Controller
             'WFH/Oniste',
             'ID TL',
             'Name TL',
+            'Phone Number',
             'Position',
             'Group',
             'Department',
@@ -350,6 +359,7 @@ class TeamLeaderController extends Controller
                 'Onsite',
                 'IDNA200001',
                 'John Doe',
+                '628123456789',
                 'DC TL',
                 'A1',
                 'Department Name',
