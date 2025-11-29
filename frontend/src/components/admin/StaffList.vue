@@ -91,7 +91,7 @@
                     >
                         All
                         <span class="ml-1 text-xs opacity-70"
-                            >({{ staffList.length }})</span
+                            >({{ activeStaffList.length }})</span
                         >
                     </button>
                     <button
@@ -688,8 +688,14 @@ const loadStaff = async () => {
     }
 };
 
+const activeStaffList = computed(() => {
+    return staffList.value.filter(
+        (s) => (s.staff_status || "active").toLowerCase() === "active"
+    );
+});
+
 const filteredStaff = computed(() => {
-    let result = staffList.value;
+    let result = activeStaffList.value;
 
     // Group filter (priority filter)
     if (filterGroup.value) {
@@ -793,7 +799,8 @@ const getInitials = (name) => {
 };
 
 const getGroupCount = (group) => {
-    return staffList.value.filter((staff) => staff.group === group).length;
+    return activeStaffList.value.filter((staff) => staff.group === group)
+        .length;
 };
 
 const viewStaff = (staff) => {
