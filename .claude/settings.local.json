@@ -18,7 +18,8 @@
       "Bash(python edit_dashboard.py:*)",
       "Bash(node edit_dashboard.js:*)",
       "Bash(npm run build:teamLeaderResignation:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []
