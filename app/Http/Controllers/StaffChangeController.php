@@ -17,9 +17,9 @@ class StaffChangeController extends Controller
     public function getAllStaff(Request $request)
     {
         try {
-            $staff = Staff::select('staff_id', 'name', 'role', 'position', 'department', 'team_leader_id', 'rank', 'warning_letter')
-                         ->orderBy('name')
-                         ->get();
+            $staff = Staff::select('staff_id', 'name', 'role', 'position', 'department', 'group', 'team_leader_id', 'rank', 'warning_letter')
+                ->orderBy('name')
+                ->get();
 
             return response()->json($staff);
         } catch (\Exception $e) {
@@ -34,8 +34,8 @@ class StaffChangeController extends Controller
     {
         try {
             $teamLeaders = TeamLeader::select('staff_id', 'name', 'group', 'department')
-                                    ->orderBy('name')
-                                    ->get();
+                ->orderBy('name')
+                ->get();
 
             return response()->json($teamLeaders);
         } catch (\Exception $e) {
@@ -66,8 +66,8 @@ class StaffChangeController extends Controller
 
             // Verify new team leader has role='tl'
             $newTL = Staff::where('staff_id', $request->new_team_leader_id)
-                         ->where('role', 'tl')
-                         ->first();
+                ->where('role', 'tl')
+                ->first();
 
             if (!$newTL) {
                 return response()->json(['error' => 'Selected team leader is invalid'], 400);
@@ -296,7 +296,7 @@ class StaffChangeController extends Controller
     {
         try {
             $query = StaffLog::with('staff:staff_id,name,role,position')
-                             ->orderBy('created_at', 'desc');
+                ->orderBy('created_at', 'desc');
 
             if ($staffId) {
                 $query->where('staff_id', $staffId);
@@ -323,9 +323,9 @@ class StaffChangeController extends Controller
             }
 
             $recentLogs = StaffLog::where('staff_id', $staffId)
-                                  ->orderBy('created_at', 'desc')
-                                  ->limit(10)
-                                  ->get();
+                ->orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get();
 
             return response()->json([
                 'staff' => $staff,

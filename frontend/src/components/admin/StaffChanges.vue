@@ -1,7 +1,11 @@
 <template>
-    <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div
+        class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
+    >
         <!-- Header -->
-        <div class="bg-slate-900/50 border-b border-slate-800/50 backdrop-blur-sm sticky top-0 z-10">
+        <div
+            class="bg-slate-900/50 border-b border-slate-800/50 backdrop-blur-sm sticky top-0 z-10"
+        >
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center gap-3">
@@ -9,13 +13,27 @@
                             @click="goBack"
                             class="p-2 rounded-lg hover:bg-slate-800/50 transition text-slate-400 hover:text-slate-300"
                         >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M15 19l-7-7 7-7"
+                                />
                             </svg>
                         </button>
                         <div>
-                            <h1 class="text-xl font-bold text-slate-100">Staff Changes Management</h1>
-                            <p class="text-sm text-slate-400">Manage staff transfers, promotions, and updates</p>
+                            <h1 class="text-xl font-bold text-slate-100">
+                                Staff Changes Management
+                            </h1>
+                            <p class="text-sm text-slate-400">
+                                Manage staff transfers, promotions, and updates
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -24,15 +42,23 @@
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Error/Success Messages -->
-            <div v-if="error" class="mb-6 p-4 bg-red-900/20 border border-red-800/50 rounded-lg text-red-400">
+            <div
+                v-if="error"
+                class="mb-6 p-4 bg-red-900/20 border border-red-800/50 rounded-lg text-red-400"
+            >
                 {{ error }}
             </div>
-            <div v-if="successMessage" class="mb-6 p-4 bg-green-900/20 border border-green-800/50 rounded-lg text-green-400">
+            <div
+                v-if="successMessage"
+                class="mb-6 p-4 bg-green-900/20 border border-green-800/50 rounded-lg text-green-400"
+            >
                 {{ successMessage }}
             </div>
 
             <!-- Tab Navigation -->
-            <div class="mb-8 bg-slate-900/50 border border-slate-800/50 rounded-xl overflow-hidden">
+            <div
+                class="mb-8 bg-slate-900/50 border border-slate-800/50 rounded-xl overflow-hidden"
+            >
                 <div class="flex overflow-x-auto">
                     <button
                         v-for="tab in tabs"
@@ -42,7 +68,7 @@
                             'flex-1 min-w-[200px] px-6 py-4 font-medium transition whitespace-nowrap',
                             activeTab === tab.id
                                 ? 'bg-blue-600 text-white'
-                                : 'text-slate-400 hover:text-slate-300 hover:bg-slate-800/30'
+                                : 'text-slate-400 hover:text-slate-300 hover:bg-slate-800/30',
                         ]"
                     >
                         {{ tab.name }}
@@ -51,44 +77,66 @@
             </div>
 
             <!-- Division Transfer Tab -->
-            <div v-if="activeTab === 'transfer'" class="bg-slate-900/50 border border-slate-800/50 rounded-xl p-6">
-                <h2 class="text-xl font-semibold text-slate-100 mb-6">Transfer Division</h2>
-                <form @submit.prevent="submitTransferDivision" class="space-y-4">
+            <div
+                v-if="activeTab === 'transfer'"
+                class="bg-slate-900/50 border border-slate-800/50 rounded-xl p-6"
+            >
+                <h2 class="text-xl font-semibold text-slate-100 mb-6">
+                    Transfer Division
+                </h2>
+                <form
+                    @submit.prevent="submitTransferDivision"
+                    class="space-y-4"
+                >
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Select Staff</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >Select Staff</label
+                        >
                         <v-select
                             v-model="transferForm.staff_id"
                             :options="staffOptions"
-                            :reduce="option => option.code"
+                            :reduce="(option) => option.code"
                             placeholder="Search staff by ID or name..."
                             class="vue-select-dark"
                         />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">New Department</label>
-                        <input
-                            v-model="transferForm.new_department"
-                            type="text"
-                            required
-                            placeholder="e.g., Collection"
-                            class="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">New Team Leader</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >New Group</label
+                        >
                         <v-select
-                            v-model="transferForm.new_team_leader_id"
-                            :options="teamLeaderOptions"
-                            :reduce="option => option.code"
-                            placeholder="Search team leader..."
+                            v-model="transferForm.new_group"
+                            :options="groupOptions"
+                            :reduce="(option) => option.code"
+                            placeholder="Select group..."
                             class="vue-select-dark"
                         />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Remarks (Optional)</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >New Team Leader</label
+                        >
+                        <v-select
+                            v-model="transferForm.new_team_leader_id"
+                            :options="filteredTeamLeaderOptions"
+                            :reduce="(option) => option.code"
+                            placeholder="Search team leader..."
+                            class="vue-select-dark"
+                            :disabled="!transferForm.new_group"
+                            @update:modelValue="onTeamLeaderSelected"
+                        />
+                    </div>
+
+                    <div>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >Remarks (Optional)</label
+                        >
                         <textarea
                             v-model="transferForm.remarks"
                             rows="3"
@@ -102,39 +150,53 @@
                         :disabled="submitting"
                         class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-medium rounded-lg transition"
                     >
-                        {{ submitting ? 'Processing...' : 'Transfer Division' }}
+                        {{ submitting ? "Processing..." : "Transfer Division" }}
                     </button>
                 </form>
             </div>
 
             <!-- Promotion Tab -->
-            <div v-if="activeTab === 'promotion'" class="bg-slate-900/50 border border-slate-800/50 rounded-xl p-6">
-                <h2 class="text-xl font-semibold text-slate-100 mb-6">Promote to Team Leader</h2>
+            <div
+                v-if="activeTab === 'promotion'"
+                class="bg-slate-900/50 border border-slate-800/50 rounded-xl p-6"
+            >
+                <h2 class="text-xl font-semibold text-slate-100 mb-6">
+                    Promote to Team Leader
+                </h2>
                 <form @submit.prevent="submitPromotion" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Select Staff</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >Select Staff</label
+                        >
                         <v-select
                             v-model="promotionForm.staff_id"
                             :options="staffOnlyOptions"
-                            :reduce="option => option.code"
+                            :reduce="(option) => option.code"
                             placeholder="Search staff (non-TL only)..."
                             class="vue-select-dark"
                         />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Group Name</label>
-                        <input
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >New Group</label
+                        >
+                        <v-select
                             v-model="promotionForm.group"
-                            type="text"
-                            required
-                            placeholder="e.g., Group A"
-                            class="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            :options="groupOptions"
+                            :reduce="(option) => option.code"
+                            placeholder="Select group..."
+                            class="vue-select-dark"
                         />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">First Day as TL</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >First Day as TL</label
+                        >
                         <input
                             v-model="promotionForm.first_day_tl"
                             type="date"
@@ -144,7 +206,10 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Remarks (Optional)</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >Remarks (Optional)</label
+                        >
                         <textarea
                             v-model="promotionForm.remarks"
                             rows="3"
@@ -158,21 +223,33 @@
                         :disabled="submitting"
                         class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-medium rounded-lg transition"
                     >
-                        {{ submitting ? 'Processing...' : 'Promote to Team Leader' }}
+                        {{
+                            submitting
+                                ? "Processing..."
+                                : "Promote to Team Leader"
+                        }}
                     </button>
                 </form>
             </div>
 
             <!-- Rank Change Tab -->
-            <div v-if="activeTab === 'rank'" class="bg-slate-900/50 border border-slate-800/50 rounded-xl p-6">
-                <h2 class="text-xl font-semibold text-slate-100 mb-6">Change Rank</h2>
+            <div
+                v-if="activeTab === 'rank'"
+                class="bg-slate-900/50 border border-slate-800/50 rounded-xl p-6"
+            >
+                <h2 class="text-xl font-semibold text-slate-100 mb-6">
+                    Change Rank
+                </h2>
                 <form @submit.prevent="submitRankChange" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Select Staff</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >Select Staff</label
+                        >
                         <v-select
                             v-model="rankForm.staff_id"
                             :options="staffOptions"
-                            :reduce="option => option.code"
+                            :reduce="(option) => option.code"
                             placeholder="Search staff by ID or name..."
                             class="vue-select-dark"
                             @update:modelValue="onStaffSelectForRank"
@@ -180,7 +257,10 @@
                     </div>
 
                     <div v-if="rankForm.staff_id">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Current Rank</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >Current Rank</label
+                        >
                         <input
                             :value="currentRank"
                             type="text"
@@ -190,7 +270,10 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">New Rank</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >New Rank</label
+                        >
                         <select
                             v-model="rankForm.new_rank"
                             required
@@ -209,7 +292,10 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Remarks (Optional)</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >Remarks (Optional)</label
+                        >
                         <textarea
                             v-model="rankForm.remarks"
                             rows="3"
@@ -223,21 +309,29 @@
                         :disabled="submitting"
                         class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-medium rounded-lg transition"
                     >
-                        {{ submitting ? 'Processing...' : 'Change Rank' }}
+                        {{ submitting ? "Processing..." : "Change Rank" }}
                     </button>
                 </form>
             </div>
 
             <!-- Warning Letter Tab -->
-            <div v-if="activeTab === 'warning'" class="bg-slate-900/50 border border-slate-800/50 rounded-xl p-6">
-                <h2 class="text-xl font-semibold text-slate-100 mb-6">Update Warning Letter</h2>
+            <div
+                v-if="activeTab === 'warning'"
+                class="bg-slate-900/50 border border-slate-800/50 rounded-xl p-6"
+            >
+                <h2 class="text-xl font-semibold text-slate-100 mb-6">
+                    Update Warning Letter
+                </h2>
                 <form @submit.prevent="submitWarningLetter" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Select Staff</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >Select Staff</label
+                        >
                         <v-select
                             v-model="warningForm.staff_id"
                             :options="staffOptions"
-                            :reduce="option => option.code"
+                            :reduce="(option) => option.code"
                             placeholder="Search staff by ID or name..."
                             class="vue-select-dark"
                             @update:modelValue="onStaffSelectForWarning"
@@ -245,7 +339,10 @@
                     </div>
 
                     <div v-if="warningForm.staff_id">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Current Warning Letter</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >Current Warning Letter</label
+                        >
                         <input
                             :value="currentWarningLetter"
                             type="text"
@@ -255,13 +352,18 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">New Warning Letter</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >New Warning Letter</label
+                        >
                         <select
                             v-model="warningForm.warning_letter"
                             required
                             class="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
-                            <option value="">-- Select Warning Letter --</option>
+                            <option value="">
+                                -- Select Warning Letter --
+                            </option>
                             <option value="1st">1st Warning Letter</option>
                             <option value="2nd">2nd Warning Letter</option>
                             <option value="3rd">3rd Warning Letter</option>
@@ -269,7 +371,10 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Remarks (Optional)</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >Remarks (Optional)</label
+                        >
                         <textarea
                             v-model="warningForm.remarks"
                             rows="3"
@@ -283,24 +388,36 @@
                         :disabled="submitting"
                         class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-medium rounded-lg transition"
                     >
-                        {{ submitting ? 'Processing...' : 'Update Warning Letter' }}
+                        {{
+                            submitting
+                                ? "Processing..."
+                                : "Update Warning Letter"
+                        }}
                     </button>
                 </form>
             </div>
 
             <!-- Logs Tab -->
-            <div v-if="activeTab === 'logs'" class="bg-slate-900/50 border border-slate-800/50 rounded-xl overflow-hidden">
+            <div
+                v-if="activeTab === 'logs'"
+                class="bg-slate-900/50 border border-slate-800/50 rounded-xl overflow-hidden"
+            >
                 <div class="p-6">
-                    <h2 class="text-xl font-semibold text-slate-100 mb-4">Change History</h2>
+                    <h2 class="text-xl font-semibold text-slate-100 mb-4">
+                        Change History
+                    </h2>
 
                     <!-- Filter by Staff -->
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Filter by Staff (Optional)</label>
+                        <label
+                            class="block text-sm font-medium text-slate-300 mb-2"
+                            >Filter by Staff (Optional)</label
+                        >
                         <div class="w-full md:w-96">
                             <v-select
                                 v-model="selectedStaffForLogs"
                                 :options="staffOptions"
-                                :reduce="option => option.code"
+                                :reduce="(option) => option.code"
                                 placeholder="All Staff (or search to filter)"
                                 class="vue-select-dark"
                                 :clearable="true"
@@ -314,43 +431,99 @@
                     <table class="w-full">
                         <thead class="bg-slate-800/50">
                             <tr>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase">Date</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase">Staff</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase">Change Type</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase">Details</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase">Changed By</th>
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase"
+                                >
+                                    Date
+                                </th>
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase"
+                                >
+                                    Staff
+                                </th>
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase"
+                                >
+                                    Change Type
+                                </th>
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase"
+                                >
+                                    Details
+                                </th>
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase"
+                                >
+                                    Changed By
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/50">
                             <tr v-if="logs.length === 0">
-                                <td colspan="5" class="px-6 py-8 text-center text-slate-400">
+                                <td
+                                    colspan="5"
+                                    class="px-6 py-8 text-center text-slate-400"
+                                >
                                     No change history found
                                 </td>
                             </tr>
-                            <tr v-for="log in logs" :key="log.id" class="hover:bg-slate-800/30 transition">
+                            <tr
+                                v-for="log in logs"
+                                :key="log.id"
+                                class="hover:bg-slate-800/30 transition"
+                            >
                                 <td class="px-6 py-4 text-sm text-slate-300">
                                     {{ formatDate(log.created_at) }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm text-slate-100">{{ log.staff?.name }}</div>
-                                    <div class="text-xs text-slate-400 font-mono">{{ log.staff_id }}</div>
+                                    <div class="text-sm text-slate-100">
+                                        {{ log.staff?.name }}
+                                    </div>
+                                    <div
+                                        class="text-xs text-slate-400 font-mono"
+                                    >
+                                        {{ log.staff_id }}
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span :class="getChangeTypeClass(log.change_type)">
-                                        {{ getChangeTypeLabel(log.change_type) }}
+                                    <span
+                                        :class="
+                                            getChangeTypeClass(log.change_type)
+                                        "
+                                    >
+                                        {{
+                                            getChangeTypeLabel(log.change_type)
+                                        }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-slate-300">
                                     <div class="space-y-1">
                                         <div v-if="log.old_value">
-                                            <span class="text-slate-500">From:</span>
-                                            <span class="text-slate-400">{{ formatLogValue(log.change_type, log.old_value) }}</span>
+                                            <span class="text-slate-500"
+                                                >From:</span
+                                            >
+                                            <span class="text-slate-400">{{
+                                                formatLogValue(
+                                                    log.change_type,
+                                                    log.old_value
+                                                )
+                                            }}</span>
                                         </div>
                                         <div v-if="log.new_value">
-                                            <span class="text-slate-500">To:</span>
-                                            <span class="text-green-400">{{ formatLogValue(log.change_type, log.new_value) }}</span>
+                                            <span class="text-slate-500"
+                                                >To:</span
+                                            >
+                                            <span class="text-green-400">{{
+                                                formatLogValue(
+                                                    log.change_type,
+                                                    log.new_value
+                                                )
+                                            }}</span>
                                         </div>
-                                        <div v-if="log.remarks" class="text-xs text-slate-500 italic">
+                                        <div
+                                            v-if="log.remarks"
+                                            class="text-xs text-slate-500 italic"
+                                        >
                                             {{ log.remarks }}
                                         </div>
                                     </div>
@@ -368,94 +541,120 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { API_BASE_URL } from '@/config/api';
-import vSelect from 'vue-select';
-import 'vue-select/dist/vue-select.css';
+import { ref, computed, onMounted } from "vue";
+import { API_BASE_URL } from "@/config/api";
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 
 const API_BASE = `${API_BASE_URL}/api`;
 
 // State
-const activeTab = ref('transfer');
+const activeTab = ref("transfer");
 const allStaff = ref([]);
 const teamLeaders = ref([]);
 const logs = ref([]);
-const error = ref('');
-const successMessage = ref('');
+const error = ref("");
+const successMessage = ref("");
 const submitting = ref(false);
-const selectedStaffForLogs = ref('');
-const currentRank = ref('');
-const currentWarningLetter = ref('');
+const selectedStaffForLogs = ref("");
+const currentRank = ref("");
+const currentWarningLetter = ref("");
 
 // Tabs
 const tabs = [
-    { id: 'transfer', name: 'Division Transfer' },
-    { id: 'promotion', name: 'Promote to TL' },
-    { id: 'rank', name: 'Change Rank' },
-    { id: 'warning', name: 'Warning Letter' },
-    { id: 'logs', name: 'Change History' },
+    { id: "transfer", name: "Division Transfer" },
+    { id: "promotion", name: "Promote to TL" },
+    { id: "rank", name: "Change Rank" },
+    { id: "warning", name: "Warning Letter" },
+    { id: "logs", name: "Change History" },
 ];
 
 // Forms
 const transferForm = ref({
-    staff_id: '',
-    new_department: '',
-    new_team_leader_id: '',
-    remarks: '',
+    staff_id: "",
+    new_group: "",
+    new_department: "",
+    new_team_leader_id: "",
+    remarks: "",
 });
 
 const promotionForm = ref({
-    staff_id: '',
-    group: '',
-    first_day_tl: '',
-    remarks: '',
+    staff_id: "",
+    group: "",
+    first_day_tl: "",
+    remarks: "",
 });
 
 const rankForm = ref({
-    staff_id: '',
-    new_rank: '',
-    remarks: '',
+    staff_id: "",
+    new_rank: "",
+    remarks: "",
 });
 
 const warningForm = ref({
-    staff_id: '',
-    warning_letter: '',
-    remarks: '',
+    staff_id: "",
+    warning_letter: "",
+    remarks: "",
 });
 
 // Computed
-const staffOnly = computed(() => allStaff.value.filter(s => s.role === 'staff'));
+const staffOnly = computed(() =>
+    allStaff.value.filter((s) => s.role === "staff")
+);
 
 // Formatted options for vue-select
 const staffOptions = computed(() =>
-    allStaff.value.map(staff => ({
+    allStaff.value.map((staff) => ({
         label: `${staff.staff_id} - ${staff.name} (${staff.position})`,
         code: staff.staff_id,
-        ...staff
+        ...staff,
     }))
 );
 
 const staffOnlyOptions = computed(() =>
-    staffOnly.value.map(staff => ({
+    staffOnly.value.map((staff) => ({
         label: `${staff.staff_id} - ${staff.name} (${staff.position})`,
         code: staff.staff_id,
-        ...staff
+        ...staff,
     }))
 );
 
 const teamLeaderOptions = computed(() =>
-    teamLeaders.value.map(tl => ({
-        label: `${tl.staff_id} - ${tl.name} (Group: ${tl.group || 'N/A'})`,
+    teamLeaders.value.map((tl) => ({
+        label: `${tl.staff_id} - ${tl.name} (Group: ${tl.group || "N/A"})`,
         code: tl.staff_id,
-        ...tl
+        ...tl,
     }))
 );
+
+const groupOptions = computed(() => {
+    const set = new Set(
+        allStaff.value
+            .map((s) => s.group)
+            .filter((g) => g && typeof g === "string" && g.trim() !== "")
+    );
+    return Array.from(set)
+        .sort()
+        .map((g) => ({ label: g, code: g }));
+});
+
+const filteredTeamLeaderOptions = computed(() => {
+    const selectedGroup = transferForm.value.new_group;
+    if (!selectedGroup) return teamLeaderOptions.value;
+    return teamLeaders.value
+        .filter((tl) => (tl.group || "") === selectedGroup)
+        .map((tl) => ({
+            label: `${tl.staff_id} - ${tl.name} (Group: ${tl.group || "N/A"})`,
+            code: tl.staff_id,
+            ...tl,
+        }));
+});
 
 // Methods
 const loadAllStaff = async () => {
     try {
         const response = await fetch(`${API_BASE}/staff-changes/all-staff`);
-        if (!response.ok) throw new Error('Failed to load staff');
+        if (!response.ok) throw new Error("Failed to load staff");
         allStaff.value = await response.json();
     } catch (e) {
         error.value = e.message;
@@ -465,7 +664,7 @@ const loadAllStaff = async () => {
 const loadTeamLeaders = async () => {
     try {
         const response = await fetch(`${API_BASE}/staff-changes/team-leaders`);
-        if (!response.ok) throw new Error('Failed to load team leaders');
+        if (!response.ok) throw new Error("Failed to load team leaders");
         teamLeaders.value = await response.json();
     } catch (e) {
         error.value = e.message;
@@ -479,7 +678,7 @@ const loadLogs = async () => {
             : `${API_BASE}/staff-changes/logs`;
 
         const response = await fetch(url);
-        if (!response.ok) throw new Error('Failed to load logs');
+        if (!response.ok) throw new Error("Failed to load logs");
         logs.value = await response.json();
     } catch (e) {
         error.value = e.message;
@@ -487,27 +686,47 @@ const loadLogs = async () => {
 };
 
 const submitTransferDivision = async () => {
-    error.value = '';
-    successMessage.value = '';
+    error.value = "";
+    successMessage.value = "";
     submitting.value = true;
 
     try {
-        const response = await fetch(`${API_BASE}/staff-changes/transfer-division`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(transferForm.value),
-        });
+        // Ensure backend-required department is set; derive from selected TL if available
+        if (
+            !transferForm.value.new_department &&
+            transferForm.value.new_team_leader_id
+        ) {
+            const tl = teamLeaders.value.find(
+                (t) => t.staff_id === transferForm.value.new_team_leader_id
+            );
+            transferForm.value.new_department = tl?.department || "";
+        }
+
+        const response = await fetch(
+            `${API_BASE}/staff-changes/transfer-division`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(transferForm.value),
+            }
+        );
 
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || 'Transfer failed');
+            throw new Error(data.error || "Transfer failed");
         }
 
         successMessage.value = data.message;
-        transferForm.value = { staff_id: '', new_department: '', new_team_leader_id: '', remarks: '' };
+        transferForm.value = {
+            staff_id: "",
+            new_group: "",
+            new_department: "",
+            new_team_leader_id: "",
+            remarks: "",
+        };
         await loadAllStaff();
         await loadLogs();
     } catch (e) {
@@ -517,16 +736,28 @@ const submitTransferDivision = async () => {
     }
 };
 
+const onTeamLeaderSelected = () => {
+    const tl = teamLeaders.value.find(
+        (t) => t.staff_id === transferForm.value.new_team_leader_id
+    );
+    if (tl) {
+        transferForm.value.new_department = tl.department || "";
+        if (!transferForm.value.new_group && tl.group) {
+            transferForm.value.new_group = tl.group;
+        }
+    }
+};
+
 const submitPromotion = async () => {
-    error.value = '';
-    successMessage.value = '';
+    error.value = "";
+    successMessage.value = "";
     submitting.value = true;
 
     try {
         const response = await fetch(`${API_BASE}/staff-changes/promote-tl`, {
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(promotionForm.value),
         });
@@ -534,11 +765,16 @@ const submitPromotion = async () => {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || 'Promotion failed');
+            throw new Error(data.error || "Promotion failed");
         }
 
         successMessage.value = data.message;
-        promotionForm.value = { staff_id: '', group: '', first_day_tl: '', remarks: '' };
+        promotionForm.value = {
+            staff_id: "",
+            group: "",
+            first_day_tl: "",
+            remarks: "",
+        };
         await loadAllStaff();
         await loadTeamLeaders();
         await loadLogs();
@@ -550,15 +786,15 @@ const submitPromotion = async () => {
 };
 
 const submitRankChange = async () => {
-    error.value = '';
-    successMessage.value = '';
+    error.value = "";
+    successMessage.value = "";
     submitting.value = true;
 
     try {
         const response = await fetch(`${API_BASE}/staff-changes/change-rank`, {
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(rankForm.value),
         });
@@ -566,12 +802,12 @@ const submitRankChange = async () => {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || 'Rank change failed');
+            throw new Error(data.error || "Rank change failed");
         }
 
         successMessage.value = data.message;
-        rankForm.value = { staff_id: '', new_rank: '', remarks: '' };
-        currentRank.value = '';
+        rankForm.value = { staff_id: "", new_rank: "", remarks: "" };
+        currentRank.value = "";
         await loadAllStaff();
         await loadLogs();
     } catch (e) {
@@ -582,28 +818,31 @@ const submitRankChange = async () => {
 };
 
 const submitWarningLetter = async () => {
-    error.value = '';
-    successMessage.value = '';
+    error.value = "";
+    successMessage.value = "";
     submitting.value = true;
 
     try {
-        const response = await fetch(`${API_BASE}/staff-changes/warning-letter`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(warningForm.value),
-        });
+        const response = await fetch(
+            `${API_BASE}/staff-changes/warning-letter`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(warningForm.value),
+            }
+        );
 
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || 'Warning letter update failed');
+            throw new Error(data.error || "Warning letter update failed");
         }
 
         successMessage.value = data.message;
-        warningForm.value = { staff_id: '', warning_letter: '', remarks: '' };
-        currentWarningLetter.value = '';
+        warningForm.value = { staff_id: "", warning_letter: "", remarks: "" };
+        currentWarningLetter.value = "";
         await loadAllStaff();
         await loadLogs();
     } catch (e) {
@@ -614,64 +853,74 @@ const submitWarningLetter = async () => {
 };
 
 const onStaffSelectForRank = () => {
-    const selected = allStaff.value.find(s => s.staff_id === rankForm.value.staff_id);
-    currentRank.value = selected?.rank || 'N/A';
+    const selected = allStaff.value.find(
+        (s) => s.staff_id === rankForm.value.staff_id
+    );
+    currentRank.value = selected?.rank || "N/A";
 };
 
 const onStaffSelectForWarning = () => {
-    const selected = allStaff.value.find(s => s.staff_id === warningForm.value.staff_id);
-    currentWarningLetter.value = selected?.warning_letter || 'None';
+    const selected = allStaff.value.find(
+        (s) => s.staff_id === warningForm.value.staff_id
+    );
+    currentWarningLetter.value = selected?.warning_letter || "None";
 };
 
 const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
+    return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
     });
 };
 
 const getChangeTypeLabel = (type) => {
     const labels = {
-        division_transfer: 'Division Transfer',
-        promotion: 'Promotion to TL',
-        rank_change: 'Rank Change',
-        warning_letter: 'Warning Letter',
+        division_transfer: "Division Transfer",
+        promotion: "Promotion to TL",
+        rank_change: "Rank Change",
+        warning_letter: "Warning Letter",
     };
     return labels[type] || type;
 };
 
 const getChangeTypeClass = (type) => {
     const classes = {
-        division_transfer: 'px-2 py-1 text-xs font-medium rounded-full bg-blue-900/30 text-blue-400 border border-blue-800/50',
-        promotion: 'px-2 py-1 text-xs font-medium rounded-full bg-green-900/30 text-green-400 border border-green-800/50',
-        rank_change: 'px-2 py-1 text-xs font-medium rounded-full bg-purple-900/30 text-purple-400 border border-purple-800/50',
-        warning_letter: 'px-2 py-1 text-xs font-medium rounded-full bg-red-900/30 text-red-400 border border-red-800/50',
+        division_transfer:
+            "px-2 py-1 text-xs font-medium rounded-full bg-blue-900/30 text-blue-400 border border-blue-800/50",
+        promotion:
+            "px-2 py-1 text-xs font-medium rounded-full bg-green-900/30 text-green-400 border border-green-800/50",
+        rank_change:
+            "px-2 py-1 text-xs font-medium rounded-full bg-purple-900/30 text-purple-400 border border-purple-800/50",
+        warning_letter:
+            "px-2 py-1 text-xs font-medium rounded-full bg-red-900/30 text-red-400 border border-red-800/50",
     };
-    return classes[type] || '';
+    return classes[type] || "";
 };
 
 const formatLogValue = (type, value) => {
-    if (!value) return 'N/A';
+    if (!value) return "N/A";
 
-    if (type === 'division_transfer') {
-        return `Dept: ${value.department || 'N/A'}, TL: ${value.team_leader_id || 'N/A'}`;
-    } else if (type === 'promotion') {
-        return `Role: ${value.role || 'N/A'}, Group: ${value.group || 'N/A'}`;
-    } else if (type === 'rank_change') {
-        return value.rank || 'N/A';
-    } else if (type === 'warning_letter') {
-        return value.warning_letter || 'N/A';
+    if (type === "division_transfer") {
+        return `Dept: ${value.department || "N/A"}, TL: ${
+            value.team_leader_id || "N/A"
+        }`;
+    } else if (type === "promotion") {
+        return `Role: ${value.role || "N/A"}, Group: ${value.group || "N/A"}`;
+    } else if (type === "rank_change") {
+        return value.rank || "N/A";
+    } else if (type === "warning_letter") {
+        return value.warning_letter || "N/A";
     }
 
     return JSON.stringify(value);
 };
 
 const goBack = () => {
-    window.location.href = '/admin/dashboard';
+    window.location.href = "/admin/dashboard";
 };
 
 onMounted(async () => {
