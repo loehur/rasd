@@ -141,6 +141,7 @@
                     Quick Actions
                 </h2>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <!-- Card 1: Staff Lists - Active -->
                     <button
                         @click="goToStaffList"
                         class="bg-gradient-to-br from-emerald-600/20 to-emerald-500/10 border border-emerald-500/40 hover:border-emerald-400/60 hover:from-emerald-600/30 hover:to-emerald-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
@@ -170,35 +171,7 @@
                         </div>
                     </button>
 
-                    <button
-                        @click="goToInactiveStaff"
-                        class="bg-gradient-to-br from-blue-600/20 to-blue-500/10 border border-blue-500/40 hover:border-blue-400/60 hover:from-blue-600/30 hover:to-blue-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
-                    >
-                        <div
-                            class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center"
-                        >
-                            <svg
-                                class="w-6 h-6 text-blue-300"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13M12 6.253C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13"
-                                />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm text-slate-300">Staff Lists</p>
-                            <p class="text-lg font-semibold text-blue-300">
-                                Inactive
-                            </p>
-                        </div>
-                    </button>
-
+                    <!-- Card 2: Team Leader - List -->
                     <button
                         @click="goToTeamLeaderList"
                         class="bg-gradient-to-br from-fuchsia-600/20 to-fuchsia-500/10 border border-fuchsia-500/40 hover:border-fuchsia-400/60 hover:from-fuchsia-600/30 hover:to-fuchsia-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
@@ -228,16 +201,16 @@
                         </div>
                     </button>
 
+                    <!-- Card 3: Staff Lists - Resign -->
                     <button
-                        v-if="user.role === 'super-admin'"
-                        @click="goToUsers"
-                        class="bg-gradient-to-br from-sky-600/20 to-sky-500/10 border border-sky-500/40 hover:border-sky-400/60 hover:from-sky-600/30 hover:to-sky-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
+                        @click="goToInactiveStaff"
+                        class="bg-gradient-to-br from-blue-600/20 to-blue-500/10 border border-blue-500/40 hover:border-blue-400/60 hover:from-blue-600/30 hover:to-blue-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
                     >
                         <div
-                            class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center"
+                            class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center"
                         >
                             <svg
-                                class="w-6 h-6 text-sky-300"
+                                class="w-6 h-6 text-blue-300"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -246,18 +219,19 @@
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                     stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13M12 6.253C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13"
                                 />
                             </svg>
                         </div>
                         <div>
-                            <p class="text-sm text-slate-300">System</p>
-                            <p class="text-lg font-semibold text-sky-300">
-                                Users
+                            <p class="text-sm text-slate-300">Staff Lists</p>
+                            <p class="text-lg font-semibold text-blue-300">
+                                Resign
                             </p>
                         </div>
                     </button>
 
+                    <!-- Card 4: Staff - Attendance -->
                     <button
                         @click="goToAttendance"
                         class="bg-gradient-to-br from-orange-600/20 to-orange-500/10 border border-orange-500/40 hover:border-orange-400/60 hover:from-orange-600/30 hover:to-orange-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
@@ -287,6 +261,7 @@
                         </div>
                     </button>
 
+                    <!-- Card 5: Staff - Changes -->
                     <button
                         @click="goToStaffChanges"
                         class="bg-gradient-to-br from-purple-600/20 to-purple-500/10 border border-purple-500/40 hover:border-purple-400/60 hover:from-purple-600/30 hover:to-purple-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
@@ -315,6 +290,8 @@
                             </p>
                         </div>
                     </button>
+
+                    <!-- Card 6: Reports - Performance -->
                     <a
                         href="https://excel.myportofolio98.xyz/"
                         target="_blank"

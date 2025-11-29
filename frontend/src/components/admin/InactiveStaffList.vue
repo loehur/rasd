@@ -27,10 +27,10 @@
                         <h1
                             class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-slate-100 via-slate-200 to-slate-300"
                         >
-                            Inactive Staff
+                            Resign Staff
                         </h1>
                         <p class="text-slate-400 mt-2">
-                            Staff members who are no longer active
+                            Staff members who have resigned
                         </p>
                     </div>
                 </div>
@@ -140,7 +140,7 @@
                     class="inline-block w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"
                 ></div>
                 <p class="text-slate-400 mt-4">
-                    Loading inactive staff data...
+                    Loading resign staff data...
                 </p>
             </div>
 
@@ -701,7 +701,7 @@ const exportResignations = async () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `inactive_staff_${filterMonth.value || "all"}.csv`;
+    a.download = `resign_staff_${filterMonth.value || "all"}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

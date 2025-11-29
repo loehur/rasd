@@ -29,10 +29,10 @@
                         <h1
                             class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-gray-600 via-slate-600 to-gray-700"
                         >
-                            Inactive Staff
+                            Resign Staff
                         </h1>
                         <p class="text-sm text-gray-600 mt-1">
-                            Staff members who are no longer active
+                            Staff members who have resigned
                         </p>
                     </div>
                 </div>
@@ -135,7 +135,7 @@
                 <div
                     class="inline-block w-12 h-12 border-4 border-gray-200 border-t-gray-600 rounded-full animate-spin"
                 ></div>
-                <p class="text-gray-600 mt-4">Loading inactive staff data...</p>
+                <p class="text-gray-600 mt-4">Loading resign staff data...</p>
             </div>
 
             <!-- Error State -->

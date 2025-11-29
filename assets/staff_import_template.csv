@@ -1,2 +1,2 @@
-staff_id,name,phone_number,email,position,department,group,area,work_location,hire_date,rank,device,team_leader_id,warning_letter,ojk_case,notes
-IDNA102706,Sisrina Ristiani,628123456789,sisrina.ristiani@company.com,Collection Executive,Rangga Rahmanda Putra,P-1,Jakarta,WFH,2025-02-04,S1,PC,IDNA200008,,,Recommended by Yogi
+group,area,work_location,staff_id,name,position,team_leader_id,department,hire_date,rank,device,warning_letter,phone_number,email,ojk_case,notes
+P-1,Jakarta,WFH,IDNA102706,Sisrina Ristiani,Collection Executive,IDNA200008,Rangga Rahmanda Putra,2025-02-04,S1,PC,,628123456789,sisrina.ristiani@company.com,,Recommended by Yogi

@@ -202,7 +202,7 @@
                             <p
                                 class="text-lg font-bold text-gray-900 group-hover:text-blue-700"
                             >
-                                Inactive
+                                Resign
                             </p>
                         </div>
                         <svg

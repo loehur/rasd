@@ -1,6 +1,6 @@
-staff_id,name,phone_number,email,position,department,group,area,work_location,hire_date,rank,device,team_leader_id,warning_letter,ojk_case,notes
-IDNA102706,Sisrina Ristiani,628123456789,sisrina.ristiani@company.com,Collection Executive,Rangga Rahmanda Putra,P-1,Jakarta,WFH,2025-02-04,S1,PC,IDNA200008,,,Recommended by Yogi
-IDNA102707,Budi Santoso,628234567890,budi.santoso@company.com,Collection Supervisor,Collection Department,P-1,Jakarta,Onsite,2024-11-15,C1,Laptop,IDNA200008,,,
-IDNA102708,Siti Aminah,628345678901,siti.aminah@company.com,Data Analyst,IT Department,P-2,Bandung,WFH,2024-08-20,S2,PC,,,
-IDNA102709,Andi Wijaya,628456789012,andi.wijaya@company.com,Marketing Executive,Marketing Department,P-1,Surabaya,Onsite,2025-01-10,S1,Laptop,IDNA200009,,,New hire
-IDNA200008,Asep Irpan,628567890123,asep.irpan@company.com,Team Leader,Collection Department,P-1,Jakarta,Onsite,2023-12-15,C2,PC,,,,DC TL
+group,area,work_location,staff_id,name,position,team_leader_id,department,hire_date,rank,device,warning_letter,phone_number,email,ojk_case,notes
+P-1,Jakarta,WFH,IDNA102706,Sisrina Ristiani,Collection Executive,IDNA200008,Rangga Rahmanda Putra,2025-02-04,S1,PC,,628123456789,sisrina.ristiani@company.com,,Recommended by Yogi
+P-1,Jakarta,Onsite,IDNA102707,Budi Santoso,Collection Supervisor,IDNA200008,Collection Department,2024-11-15,C1,Laptop,,628234567890,budi.santoso@company.com,,
+P-2,Bandung,WFH,IDNA102708,Siti Aminah,Data Analyst,,IT Department,2024-08-20,S2,PC,,628345678901,siti.aminah@company.com,,
+P-1,Surabaya,Onsite,IDNA102709,Andi Wijaya,Marketing Executive,IDNA200009,Marketing Department,2025-01-10,S1,Laptop,,628456789012,andi.wijaya@company.com,,New hire
+P-1,Jakarta,Onsite,IDNA200008,Asep Irpan,Team Leader,,Collection Department,2023-12-15,C2,PC,,628567890123,asep.irpan@company.com,,DC TL

@@ -257,7 +257,7 @@
                                         <span
                                             class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800"
                                         >
-                                            Inactive
+                                            Resign
                                         </span>
                                     </td>
                                 </tr>
@@ -834,7 +834,7 @@ const submitForm = async () => {
             );
             closeModal();
             fetchResignations(pagination.value.current_page);
-            fetchStaffList(); // Refresh staff list to update active/inactive status
+            fetchStaffList(); // Refresh staff list to update active/resign status
         } else {
             showToast(data.message || "Operation failed", "error");
         }
