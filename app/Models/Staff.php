@@ -49,7 +49,6 @@ class Staff extends Model
         'email',
         'position',
         'department',
-        'superior',
         'group',
         'area',
         'work_location',

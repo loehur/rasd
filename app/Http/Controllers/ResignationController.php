@@ -88,7 +88,13 @@ class ResignationController extends Controller
 
                 $resignation->staff_name = $staff ? $staff->name : 'Unknown';
                 $resignation->staff_position = $staff ? $staff->position : null;
-                $resignation->staff_superior = $staff ? $staff->superior : null;
+                $resignation->staff_superior = null;
+                if ($staff && !empty($staff->team_leader_id)) {
+                    $tl = DB::table('staff')
+                        ->where('staff_id', $staff->team_leader_id)
+                        ->first();
+                    $resignation->staff_superior = $tl ? $tl->name : null;
+                }
             }
 
             // Calculate pagination data
@@ -196,7 +202,7 @@ class ResignationController extends Controller
             }
 
             // Verify that this staff belongs to the team leader
-            if ($staff->superior !== $teamLeader->name) {
+            if ($staff->team_leader_id !== $teamLeader->staff_id) {
                 return response()->json([
                     'success' => false,
                     'message' => 'You can only process resignations for your own team members'

@@ -85,8 +85,8 @@ class AttendanceController extends Controller
                 ], 401);
             }
 
-            // Get staff under this team leader using the superior name
-            $staff = Staff::where('superior', $teamLeader->name)
+            // Get staff under this team leader using team_leader_id
+            $staff = Staff::where('team_leader_id', $teamLeader->staff_id)
                 ->orderBy('name')
                 ->get();
 

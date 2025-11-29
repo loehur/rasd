@@ -302,7 +302,7 @@
                                         {{ staff.position || "-" }}
                                     </td>
                                     <td class="px-3 py-2">
-                                        {{ staff.superior || "-" }}
+                                        {{ getSuperiorName(staff) }}
                                     </td>
                                     <td class="px-3 py-2">
                                         {{ staff.department || "-" }}
@@ -535,7 +535,7 @@
                                 Superior
                             </p>
                             <p class="text-sm text-slate-100">
-                                {{ selectedStaff.superior || "-" }}
+                                {{ getSuperiorName(selectedStaff) }}
                             </p>
                         </div>
                         <div>
@@ -735,7 +735,7 @@ const groupedByTeamLeader = computed(() => {
     const groups = {};
 
     filteredStaff.value.forEach((staff) => {
-        const teamLeader = staff.superior || "No Team Leader";
+        const teamLeader = getSuperiorName(staff) || "No Team Leader";
         if (!groups[teamLeader]) {
             groups[teamLeader] = [];
         }
@@ -754,6 +754,21 @@ const departments = computed(() => {
 const positions = computed(() => {
     return [...new Set(staffList.value.map((s) => s.position))].filter(Boolean);
 });
+
+// Build map of staff_id -> name and helper to resolve superior name
+const tlNameById = computed(() => {
+    const map = {};
+    staffList.value.forEach((s) => {
+        map[s.staff_id] = s.name;
+    });
+    return map;
+});
+
+const getSuperiorName = (staff) => {
+    const id = staff?.team_leader_id || "";
+    if (!id) return "-";
+    return tlNameById.value[id] || "-";
+};
 
 const totalOjkCases = computed(() => {
     return staffList.value.reduce(

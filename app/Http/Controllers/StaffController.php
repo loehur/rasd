@@ -138,7 +138,6 @@ class StaffController extends Controller
                     'email' => !empty($data['email']) ? $this->normalizeUtf8($data['email']) : null,
                     'position' => $this->normalizeUtf8($data['position'] ?? ''),
                     'department' => $this->normalizeUtf8($data['department'] ?? ''),
-                    'superior' => !empty($data['superior']) ? $this->normalizeUtf8($data['superior']) : null,
                     'group' => !empty($data['group']) ? $this->normalizeUtf8($data['group']) : null,
                     'area' => !empty($data['area']) ? $this->normalizeUtf8($data['area']) : null,
                     'work_location' => !empty($data['work_location']) ? $this->normalizeUtf8($data['work_location']) : null,
