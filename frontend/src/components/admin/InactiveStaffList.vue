@@ -36,7 +36,7 @@
                 </div>
             </div>
 
-            <!-- Year Filter -->
+            <!-- Month Filter -->
             <div
                 class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-xl p-4 mb-4"
             >
@@ -55,38 +55,38 @@
                         />
                     </svg>
                     <span class="text-sm font-medium text-slate-300"
-                        >Filter by Year:</span
+                        >Filter by Month:</span
                     >
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <button
-                        @click="filterYear = ''"
+                        @click="filterMonth = ''"
                         :class="[
                             'px-4 py-2 text-sm font-medium rounded-lg transition',
-                            filterYear === ''
+                            filterMonth === ''
                                 ? 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/50'
                                 : 'bg-slate-800/50 text-slate-400 border border-slate-700 hover:bg-slate-700/50 hover:text-slate-200',
                         ]"
                     >
-                        All Years
+                        All Months
                         <span class="ml-1 text-xs opacity-70"
                             >({{ resignations.length }})</span
                         >
                     </button>
                     <button
-                        v-for="year in availableYears"
-                        :key="year"
-                        @click="filterYear = year"
+                        v-for="month in availableMonths"
+                        :key="month"
+                        @click="filterMonth = month"
                         :class="[
                             'px-4 py-2 text-sm font-medium rounded-lg transition',
-                            filterYear === year
+                            filterMonth === month
                                 ? 'bg-blue-600/30 text-blue-300 border border-blue-500/50'
                                 : 'bg-slate-800/50 text-slate-400 border border-slate-700 hover:bg-slate-700/50 hover:text-slate-200',
                         ]"
                     >
-                        {{ year }}
+                        {{ formatMonthLabel(month) }}
                         <span class="ml-1 text-xs opacity-70"
-                            >({{ getYearCount(year) }})</span
+                            >({{ getMonthCount(month) }})</span
                         >
                     </button>
                 </div>
@@ -426,14 +426,18 @@ const loading = ref(false);
 const error = ref("");
 const errorDetail = ref("");
 const searchQuery = ref("");
-const filterYear = ref(new Date().getFullYear());
+const currentDate = new Date();
+const filterMonth = ref(`${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`);
 const reactivatingId = ref(null);
 
-const availableYears = computed(() => {
-    const years = resignations.value.map((r) =>
-        new Date(r.report_day).getFullYear()
-    );
-    return [...new Set(years)].sort((a, b) => b - a);
+const availableMonths = computed(() => {
+    const months = resignations.value.map((r) => {
+        const date = new Date(r.report_day);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        return `${year}-${month}`;
+    });
+    return [...new Set(months)].sort((a, b) => b.localeCompare(a));
 });
 
 const loadResignations = async () => {
@@ -512,10 +516,14 @@ const loadResignations = async () => {
 const filteredResignations = computed(() => {
     let result = resignations.value;
 
-    if (filterYear.value) {
-        result = result.filter(
-            (r) => new Date(r.report_day).getFullYear() === filterYear.value
-        );
+    if (filterMonth.value) {
+        result = result.filter((r) => {
+            const date = new Date(r.report_day);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const resignationMonth = `${year}-${month}`;
+            return resignationMonth === filterMonth.value;
+        });
     }
 
     if (searchQuery.value) {
@@ -531,10 +539,21 @@ const filteredResignations = computed(() => {
     return result;
 });
 
-const getYearCount = (year) => {
-    return resignations.value.filter(
-        (r) => new Date(r.report_day).getFullYear() === year
-    ).length;
+const getMonthCount = (month) => {
+    return resignations.value.filter((r) => {
+        const date = new Date(r.report_day);
+        const year = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const resignationMonth = `${year}-${m}`;
+        return resignationMonth === month;
+    }).length;
+};
+
+const formatMonthLabel = (month) => {
+    if (!month) return '';
+    const [year, m] = month.split('-');
+    const date = new Date(year, parseInt(m) - 1);
+    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 };
 
 const formatDate = (date) => {
@@ -551,7 +570,7 @@ const goBack = () => {
 };
 const resetFilters = () => {
     searchQuery.value = "";
-    filterYear.value = "";
+    filterMonth.value = "";
 };
 
 onMounted(() => {

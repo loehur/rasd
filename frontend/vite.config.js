@@ -176,6 +176,10 @@ export default defineConfig(({ command }) => {
                         __dirname,
                         "pages/admin/attendance.html"
                     ),
+                    staffChanges: resolve(
+                        __dirname,
+                        "pages/admin/staff-changes.html"
+                    ),
                 },
             },
         },

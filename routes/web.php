@@ -61,6 +61,10 @@ $router->get('/admin/users', function () {
     return file_get_contents(base_path('public/pages/admin/users.html'));
 });
 
+$router->get('/admin/staff-changes', function () {
+    return file_get_contents(base_path('public/pages/admin/staff-changes.html'));
+});
+
 $router->get('/admin', function () {
     return file_get_contents(base_path('public/pages/admin/login.html'));
 });
@@ -142,4 +146,14 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('resignations', 'ResignationController@store');
     $router->get('resignations/{id}', 'ResignationController@show');
     $router->post('resignations/reactivate', 'ResignationController@reactivate');
+
+    // Staff Change Management routes
+    $router->get('staff-changes/all-staff', 'StaffChangeController@getAllStaff');
+    $router->get('staff-changes/team-leaders', 'StaffChangeController@getTeamLeaders');
+    $router->post('staff-changes/transfer-division', 'StaffChangeController@transferDivision');
+    $router->post('staff-changes/promote-tl', 'StaffChangeController@promoteToTL');
+    $router->post('staff-changes/change-rank', 'StaffChangeController@changeRank');
+    $router->post('staff-changes/warning-letter', 'StaffChangeController@updateWarningLetter');
+    $router->get('staff-changes/logs[/{staffId}]', 'StaffChangeController@getStaffLogs');
+    $router->get('staff-changes/detail/{staffId}', 'StaffChangeController@getStaffDetail');
 });

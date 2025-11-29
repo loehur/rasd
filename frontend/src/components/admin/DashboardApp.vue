@@ -286,6 +286,35 @@
                             </p>
                         </div>
                     </button>
+
+                    <button
+                        @click="goToStaffChanges"
+                        class="bg-gradient-to-br from-purple-600/20 to-purple-500/10 border border-purple-500/40 hover:border-purple-400/60 hover:from-purple-600/30 hover:to-purple-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
+                    >
+                        <div
+                            class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center"
+                        >
+                            <svg
+                                class="w-6 h-6 text-purple-300"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                                />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-300">Staff</p>
+                            <p class="text-lg font-semibold text-purple-300">
+                                Changes
+                            </p>
+                        </div>
+                    </button>
                 </div>
             </div>
 
@@ -481,5 +510,9 @@ const goToUsers = () => {
 
 const goToAttendance = () => {
     window.location.href = "/admin/attendance";
+};
+
+const goToStaffChanges = () => {
+    window.location.href = "/admin/staff-changes";
 };
 </script>

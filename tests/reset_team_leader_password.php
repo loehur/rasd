@@ -30,8 +30,8 @@ echo "Employee ID: $employeeId\n";
 echo "New Password: $newPassword\n";
 echo str_repeat('=', 70) . "\n\n";
 
-// Query database
-$teamLeader = \App\Models\TeamLeader::where('employee_id', $employeeId)->first();
+// Query database - now using staff_id since TeamLeader uses staff table
+$teamLeader = \App\Models\TeamLeader::where('staff_id', $employeeId)->first();
 
 if (!$teamLeader) {
     echo "ERROR: Team leader not found!\n";

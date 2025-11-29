@@ -28,8 +28,8 @@ class TeamLeaderController extends Controller
         }
 
         try {
-            // Find team leader by employee_id
-            $teamLeader = TeamLeader::where('employee_id', $request->employee_id)->first();
+            // Find team leader by staff_id (staff_id is the same as employee_id)
+            $teamLeader = TeamLeader::where('staff_id', $request->employee_id)->first();
 
             if (!$teamLeader) {
                 return response()->json([
@@ -50,7 +50,7 @@ class TeamLeaderController extends Controller
             $isDefaultPassword = password_verify('tl1230', $teamLeader->password);
 
             // Generate token (simple token for now)
-            $token = base64_encode($teamLeader->employee_id . ':' . time());
+            $token = base64_encode($teamLeader->staff_id . ':' . time());
 
             return response()->json([
                 'success' => true,
@@ -104,7 +104,7 @@ class TeamLeaderController extends Controller
             }
 
             // Find team leader
-            $teamLeader = TeamLeader::where('employee_id', $employeeId)->first();
+            $teamLeader = TeamLeader::where('staff_id', $employeeId)->first();
 
             if (!$teamLeader) {
                 return response()->json([
@@ -228,7 +228,7 @@ class TeamLeaderController extends Controller
                     ];
 
                     // Check if team leader already exists
-                    $teamLeader = TeamLeader::where('employee_id', $data['employee_id'])->first();
+                    $teamLeader = TeamLeader::where('staff_id', $data['employee_id'])->first();
 
                     if ($teamLeader) {
                         // Update existing team leader (don't change password)
@@ -415,7 +415,7 @@ class TeamLeaderController extends Controller
             }
 
             // Find and update team leader
-            $teamLeader = TeamLeader::where('employee_id', $employeeId)->first();
+            $teamLeader = TeamLeader::where('staff_id', $employeeId)->first();
 
             if (!$teamLeader) {
                 return response()->json([
@@ -485,7 +485,7 @@ class TeamLeaderController extends Controller
             }
 
             // Find team leader
-            $teamLeader = TeamLeader::where('employee_id', $employeeId)->first();
+            $teamLeader = TeamLeader::where('staff_id', $employeeId)->first();
 
             if (!$teamLeader) {
                 return response()->json([
@@ -525,7 +525,7 @@ class TeamLeaderController extends Controller
     {
         try {
             // Find team leader by employee_id
-            $teamLeader = TeamLeader::where('employee_id', $employeeId)->first();
+            $teamLeader = TeamLeader::where('staff_id', $employeeId)->first();
 
             if (!$teamLeader) {
                 return response()->json([
@@ -557,7 +557,7 @@ class TeamLeaderController extends Controller
     public function show($employeeId)
     {
         try {
-            $teamLeader = TeamLeader::where('employee_id', $employeeId)->first();
+            $teamLeader = TeamLeader::where('staff_id', $employeeId)->first();
 
             if (!$teamLeader) {
                 return response()->json([
@@ -584,7 +584,7 @@ class TeamLeaderController extends Controller
     public function update(Request $request, $employeeId)
     {
         try {
-            $teamLeader = TeamLeader::where('employee_id', $employeeId)->first();
+            $teamLeader = TeamLeader::where('staff_id', $employeeId)->first();
 
             if (!$teamLeader) {
                 return response()->json([

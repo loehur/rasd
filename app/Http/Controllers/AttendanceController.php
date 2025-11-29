@@ -72,9 +72,10 @@ class AttendanceController extends Controller
                 ], 401);
             }
 
-            // Get team leader info
-            $teamLeader = DB::table('team_leaders')
-                ->where('employee_id', $employeeId)
+            // Get team leader info from staff table
+            $teamLeader = DB::table('staff')
+                ->where('role', 'tl')
+                ->where('staff_id', $employeeId)
                 ->first();
 
             if (!$teamLeader) {

@@ -170,11 +170,6 @@
                                 >
                                     Hire Date
                                 </th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider"
-                                >
-                                    Actions
-                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/50">
@@ -186,7 +181,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span
                                         class="text-sm font-mono text-blue-400"
-                                        >{{ tl.employee_id }}</span
+                                        >{{ tl.staff_id }}</span
                                     >
                                 </td>
                                 <td class="px-6 py-4">
@@ -232,54 +227,6 @@
                                         tl.hire_date
                                     }}</span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <button
-                                            @click="viewTeamLeader(tl)"
-                                            class="text-blue-400 hover:text-blue-300 transition"
-                                            title="View Details"
-                                        >
-                                            <svg
-                                                class="w-5 h-5"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                                ></path>
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                                ></path>
-                                            </svg>
-                                        </button>
-                                        <button
-                                            @click="editTeamLeader(tl)"
-                                            class="text-emerald-400 hover:text-emerald-300 transition"
-                                            title="Edit Team Leader"
-                                        >
-                                            <svg
-                                                class="w-5 h-5"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                                ></path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -308,7 +255,7 @@
                                     {{ tl.position }}
                                 </p>
                                 <p class="text-xs font-mono text-blue-400 mt-1">
-                                    {{ tl.employee_id }}
+                                    {{ tl.staff_id }}
                                 </p>
                             </div>
                             <div>
@@ -331,55 +278,6 @@
                                     {{ tl.area }}
                                 </p>
                             </div>
-                        </div>
-                        <!-- Action Buttons for Mobile -->
-                        <div
-                            class="flex gap-2 pt-3 border-t border-slate-800/50"
-                        >
-                            <button
-                                @click="viewTeamLeader(tl)"
-                                class="flex-1 px-3 py-2 bg-blue-600/20 text-blue-400 border border-blue-600/30 rounded-lg hover:bg-blue-600/30 transition flex items-center justify-center gap-2 text-sm"
-                            >
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                    ></path>
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                    ></path>
-                                </svg>
-                                View
-                            </button>
-                            <button
-                                @click="editTeamLeader(tl)"
-                                class="flex-1 px-3 py-2 bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 rounded-lg hover:bg-emerald-600/30 transition flex items-center justify-center gap-2 text-sm"
-                            >
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                    ></path>
-                                </svg>
-                                Edit
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -509,7 +407,7 @@
                                 Employee ID
                             </p>
                             <p class="text-sm text-slate-100 font-mono">
-                                {{ selectedTeamLeader.employee_id }}
+                                {{ selectedTeamLeader.staff_id }}
                             </p>
                         </div>
                         <div>
@@ -571,7 +469,7 @@ const filteredTeamLeaders = computed(() => {
     return teamLeaders.value.filter((tl) => {
         return (
             (tl.name || "").toLowerCase().includes(q) ||
-            (tl.employee_id || "").toLowerCase().includes(q) ||
+            (tl.staff_id || "").toLowerCase().includes(q) ||
             (tl.team || "").toLowerCase().includes(q)
         );
     });
@@ -649,9 +547,6 @@ const fetchTeamLeaders = async () => {
     }
 };
 
-const editTeamLeader = (teamLeader) => {
-    window.location.href = `/admin/team-leader/edit/${teamLeader.employee_id}`;
-};
 
 onMounted(fetchTeamLeaders);
 
