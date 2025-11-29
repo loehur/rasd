@@ -905,9 +905,9 @@ const formatLogValue = (type, value) => {
     if (!value) return "N/A";
 
     if (type === "division_transfer") {
-        return `Dept: ${value.department || "N/A"}, TL: ${
-            value.team_leader_id || "N/A"
-        }`;
+        return `Group: ${value.group || "N/A"}, Dept: ${
+            value.department || "N/A"
+        }, TL: ${value.team_leader_id || "N/A"}`;
     } else if (type === "promotion") {
         return `Role: ${value.role || "N/A"}, Group: ${value.group || "N/A"}`;
     } else if (type === "rank_change") {

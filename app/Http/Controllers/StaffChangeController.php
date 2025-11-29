@@ -50,7 +50,8 @@ class StaffChangeController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'staff_id' => 'required|string|exists:staff,staff_id',
-            'new_department' => 'required|string',
+            'new_group' => 'required|string',
+            'new_department' => 'nullable|string',
             'new_team_leader_id' => 'required|string|exists:staff,staff_id',
             'remarks' => 'nullable|string',
         ]);
@@ -77,15 +78,21 @@ class StaffChangeController extends Controller
             $oldValue = [
                 'department' => $staff->department,
                 'team_leader_id' => $staff->team_leader_id,
+                'group' => $staff->group,
             ];
 
             $newValue = [
                 'department' => $request->new_department,
                 'team_leader_id' => $request->new_team_leader_id,
+                'group' => $request->new_group,
             ];
 
             // Update staff
-            $staff->department = $request->new_department;
+            $staff->group = $request->new_group;
+            // Keep department change if provided (UI may auto-fill from TL)
+            if (!empty($request->new_department)) {
+                $staff->department = $request->new_department;
+            }
             $staff->team_leader_id = $request->new_team_leader_id;
             $staff->save();
 

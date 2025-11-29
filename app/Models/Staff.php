@@ -51,7 +51,6 @@ class Staff extends Model
         'department',
         'superior',
         'group',
-        'team_quantity',
         'area',
         'work_location',
         'hire_date',
@@ -84,7 +83,6 @@ class Staff extends Model
         'hire_date' => 'date:Y-m-d',
         'first_day_tl' => 'date:Y-m-d',
         'ojk_case' => 'integer',
-        'team_quantity' => 'integer',
     ];
 
     /**
