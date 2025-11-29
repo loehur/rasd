@@ -157,6 +157,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('staff-changes/promote-tl', 'StaffChangeController@promoteToTL');
     $router->post('staff-changes/change-rank', 'StaffChangeController@changeRank');
     $router->post('staff-changes/warning-letter', 'StaffChangeController@updateWarningLetter');
-    $router->get('staff-changes/logs[/{staffId}]', 'StaffChangeController@getStaffLogs');
+    $router->get('staff-changes/logs', 'StaffChangeController@getStaffLogs');
+    $router->get('staff-changes/logs/{staffId}', 'StaffChangeController@getStaffLogs');
     $router->get('staff-changes/detail/{staffId}', 'StaffChangeController@getStaffDetail');
 });
