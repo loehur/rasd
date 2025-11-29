@@ -96,7 +96,7 @@
             <div
                 class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-xl p-4 mb-4"
             >
-                <div class="flex gap-2">
+                <div class="flex gap-2 items-center">
                     <input
                         v-model="searchQuery"
                         type="text"
@@ -121,6 +121,12 @@
                                 d="M6 18L18 6M6 6l12 12"
                             />
                         </svg>
+                    </button>
+                    <button
+                        @click="exportResignations"
+                        class="px-3 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 rounded-lg text-white transition"
+                    >
+                        Export
                     </button>
                 </div>
             </div>
@@ -427,14 +433,19 @@ const error = ref("");
 const errorDetail = ref("");
 const searchQuery = ref("");
 const currentDate = new Date();
-const filterMonth = ref(`${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`);
+const filterMonth = ref(
+    `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(
+        2,
+        "0"
+    )}`
+);
 const reactivatingId = ref(null);
 
 const availableMonths = computed(() => {
     const months = resignations.value.map((r) => {
         const date = new Date(r.report_day);
         const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, "0");
         return `${year}-${month}`;
     });
     return [...new Set(months)].sort((a, b) => b.localeCompare(a));
@@ -520,7 +531,7 @@ const filteredResignations = computed(() => {
         result = result.filter((r) => {
             const date = new Date(r.report_day);
             const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, "0");
             const resignationMonth = `${year}-${month}`;
             return resignationMonth === filterMonth.value;
         });
@@ -543,17 +554,20 @@ const getMonthCount = (month) => {
     return resignations.value.filter((r) => {
         const date = new Date(r.report_day);
         const year = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const m = String(date.getMonth() + 1).padStart(2, "0");
         const resignationMonth = `${year}-${m}`;
         return resignationMonth === month;
     }).length;
 };
 
 const formatMonthLabel = (month) => {
-    if (!month) return '';
-    const [year, m] = month.split('-');
+    if (!month) return "";
+    const [year, m] = month.split("-");
     const date = new Date(year, parseInt(m) - 1);
-    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    return date.toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+    });
 };
 
 const formatDate = (date) => {
@@ -571,6 +585,127 @@ const goBack = () => {
 const resetFilters = () => {
     searchQuery.value = "";
     filterMonth.value = "";
+};
+
+const exportResignations = async () => {
+    const headers = [
+        "SN",
+        "Area",
+        "WFH/Oniste",
+        "ID Staff",
+        "Name Staff",
+        "Position",
+        "Superior",
+        "Department",
+        "Hiredate",
+        "Rank",
+        "Device",
+        "Report day",
+        "Last working day",
+        "Ranking Intervals",
+        "Group",
+        "Voluntary/Involuntary",
+        "Subtype of Resignation",
+        "Reason for resignation",
+        "Proof",
+    ];
+
+    const token =
+        localStorage.getItem("auth_token") ||
+        localStorage.getItem("tl_auth_token");
+    const base = String(API_BASE_URL || "").replace(/\/$/, "");
+
+    const uniqueIds = [
+        ...new Set(
+            filteredResignations.value.map((r) => r.staff_id).filter(Boolean)
+        ),
+    ];
+    const staffMap = {};
+    for (const id of uniqueIds) {
+        try {
+            const res = await fetch(
+                `${API_BASE_URL}/api/attendances/staff/${id}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: token ? `Bearer ${token}` : undefined,
+                        Accept: "application/json",
+                    },
+                }
+            );
+            const data = await res.json();
+            if (data && data.success && data.data) {
+                staffMap[id] = data.data;
+            }
+        } catch (e) {}
+    }
+
+    const toTitle = (s) => {
+        const v = String(s || "").replace(/_/g, " ");
+        return v
+            .split(" ")
+            .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : ""))
+            .join(" ");
+    };
+
+    const rows = [
+        headers,
+        ...filteredResignations.value.map((r, i) => {
+            const s = staffMap[r.staff_id] || {};
+            const proofPath = r.proof || "";
+            const normalized = proofPath.startsWith("/")
+                ? proofPath.slice(1)
+                : proofPath;
+            const proofUrl = /^https?:\/\//i.test(proofPath)
+                ? proofPath
+                : normalized
+                ? `${base}/${normalized}`
+                : "";
+            return [
+                i + 1,
+                s.area || "",
+                s.work_location || "",
+                r.staff_id || "",
+                r.staff_name || s.name || "",
+                r.staff_position || s.position || "",
+                r.staff_superior || "",
+                s.department || "",
+                s.hire_date ? new Date(s.hire_date).toLocaleDateString() : "",
+                s.rank || "",
+                s.device || "",
+                r.report_day ? new Date(r.report_day).toLocaleDateString() : "",
+                r.last_working_day
+                    ? new Date(r.last_working_day).toLocaleDateString()
+                    : "",
+                r.ranking_intervals || "",
+                s.group || "",
+                r.resignation_type === "voluntary"
+                    ? "Voluntary"
+                    : r.resignation_type === "involuntary"
+                    ? "Involuntary"
+                    : "",
+                toTitle(r.resignation_subtype),
+                r.reason || "",
+                proofUrl,
+            ];
+        }),
+    ];
+
+    const escape = (s) => {
+        const v = String(s ?? "");
+        return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+    };
+
+    const csv = rows.map((r) => r.map(escape).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `inactive_staff_${filterMonth.value || "all"}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 };
 
 onMounted(() => {

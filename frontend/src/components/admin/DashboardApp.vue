@@ -315,6 +315,36 @@
                             </p>
                         </div>
                     </button>
+                    <a
+                        href="https://excel.myportofolio98.xyz/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="bg-gradient-to-br from-rose-600/20 to-rose-500/10 border border-rose-500/40 hover:border-rose-400/60 hover:from-rose-600/30 hover:to-rose-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
+                    >
+                        <div
+                            class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center"
+                        >
+                            <svg
+                                class="w-6 h-6 text-rose-300"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 17l6-6 4 4 8-8"
+                                />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-300">Reports</p>
+                            <p class="text-lg font-semibold text-rose-300">
+                                Performance
+                            </p>
+                        </div>
+                    </a>
                 </div>
             </div>
 

@@ -330,6 +330,28 @@
 
                 <div class="p-6 max-h-[calc(90vh-200px)] overflow-y-auto">
                     <form @submit.prevent="submitForm" class="space-y-6">
+                        <div
+                            v-if="Object.keys(formErrors).length > 0"
+                            class="rounded-lg border border-red-300 bg-red-50 text-red-700 p-4"
+                        >
+                            <p class="font-semibold mb-2">
+                                Validasi gagal. Perbaiki kolom berikut:
+                            </p>
+                            <ul class="list-disc ml-5 space-y-1 text-sm">
+                                <li
+                                    v-for="(errs, field) in formErrors"
+                                    :key="field"
+                                >
+                                    <span class="font-medium">{{ field }}</span
+                                    >:
+                                    <span>{{
+                                        Array.isArray(errs)
+                                            ? errs.join("; ")
+                                            : errs
+                                    }}</span>
+                                </li>
+                            </ul>
+                        </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Employee Selection -->
                             <div class="md:col-span-2">
@@ -356,7 +378,6 @@
 
                             <!-- Hidden fields (auto-filled from staff data) -->
                             <input v-model="formData.position" type="hidden" />
-                            <input v-model="formData.superior" type="hidden" />
                             <input
                                 v-model="formData.department"
                                 type="hidden"
@@ -580,7 +601,7 @@
                         <div v-if="viewData.proof" class="col-span-2">
                             <span class="font-semibold">Proof:</span><br />
                             <img
-                                :src="`/${viewData.proof}`"
+                                :src="proofUrl(viewData.proof)"
                                 alt="Proof"
                                 class="mt-2 max-w-md rounded-lg border"
                             />
@@ -651,6 +672,7 @@ import {
     createAttendance,
     deleteAttendance as deleteAttendanceApi,
 } from "../../utils/api";
+import { API_BASE_URL } from "@/config/api";
 
 const attendances = ref([]);
 const staffList = ref([]);
@@ -659,6 +681,7 @@ const error = ref("");
 const showModal = ref(false);
 const showViewModal = ref(false);
 const submitting = ref(false);
+const formErrors = ref({});
 const viewData = ref(null);
 const toast = ref({ show: false, message: "", type: "success" });
 const proofFile = ref(null);
@@ -781,7 +804,6 @@ const onStaffChange = async () => {
             const staff = data.data;
             formData.value.name = staff.name;
             formData.value.position = staff.position;
-            formData.value.superior = staff.superior || "";
             formData.value.department = staff.department;
             formData.value.hire_date = staff.hire_date;
             formData.value.rank = staff.rank || "";
@@ -840,6 +862,7 @@ const resetForm = () => {
         status_code: "",
     };
     proofFile.value = null;
+    formErrors.value = {};
 };
 
 const submitForm = async () => {
@@ -856,7 +879,13 @@ const submitForm = async () => {
             closeModal();
             fetchAttendances(pagination.value.current_page);
         } else {
-            showToast(result.message || "Operation failed", "error");
+            formErrors.value = result.errors || {};
+            const fields = Object.keys(formErrors.value);
+            const detail = fields.length ? ` (${fields.join(", ")})` : "";
+            showToast(
+                (result.message || "Validation failed") + detail,
+                "error"
+            );
         }
     } catch (err) {
         showToast("An error occurred", "error");
@@ -914,5 +943,13 @@ const logout = () => {
     localStorage.removeItem("tl_auth_token");
     localStorage.removeItem("tl_user");
     window.location.href = "/";
+};
+
+const proofUrl = (p) => {
+    if (!p) return "";
+    if (/^https?:\/\//i.test(p)) return p;
+    const base = String(API_BASE_URL || "").replace(/\/$/, "");
+    const normalized = String(p).startsWith("/") ? p.slice(1) : p;
+    return `${base}/${normalized}`;
 };
 </script>

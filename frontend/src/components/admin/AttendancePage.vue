@@ -42,6 +42,12 @@
                                 @change="loadAttendances"
                                 class="px-3 py-2 bg-slate-800/50 border border-slate-700 rounded text-slate-100"
                             />
+                            <button
+                                @click="exportExcel"
+                                class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 rounded text-white"
+                            >
+                                Export
+                            </button>
                         </div>
                     </div>
 
@@ -138,6 +144,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { adminGetAttendancesByMonth, adminDeleteAttendance } from "@/utils/api";
+import { API_BASE_URL } from "@/config/api";
 
 const loading = ref(false);
 const attendances = ref([]);
@@ -197,6 +204,75 @@ const showToast = (message, type = "success") => {
 
 const goBack = () => {
     window.location.href = "/admin/dashboard";
+};
+
+const exportExcel = () => {
+    const headers = [
+        "SN",
+        "Status",
+        "WFH/Oniste",
+        "ID Staff",
+        "Name Staff",
+        "Position",
+        "Superior",
+        "Department",
+        "Hiredate",
+        "Rank",
+        "Device",
+        "Report  Date",
+        "Ranking Intervals",
+        "Group",
+        "Reason for resign",
+        "Proof",
+    ];
+
+    const rows = [
+        headers,
+        ...attendances.value.map((a, i) => {
+            const p = a.proof || "";
+            const base = String(API_BASE_URL || "").replace(/\/$/, "");
+            const normalized = p.startsWith("/") ? p.slice(1) : p;
+            const proofUrl = /^https?:\/\//i.test(p)
+                ? p
+                : normalized
+                ? `${base}/${normalized}`
+                : "";
+            return [
+                i + 1,
+                a.status_code || "",
+                a.work_status || "",
+                a.staff_id || "",
+                a.name || "",
+                a.position || "",
+                a.superior || "",
+                a.department || "",
+                a.hire_date ? new Date(a.hire_date).toLocaleDateString() : "",
+                a.rank || "",
+                a.device || "",
+                a.report_day ? new Date(a.report_day).toLocaleDateString() : "",
+                a.ranking_intervals || "",
+                a.group || "",
+                a.reason_for_resign || "",
+                proofUrl,
+            ];
+        }),
+    ];
+
+    const escape = (s) => {
+        const v = String(s ?? "");
+        return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+    };
+
+    const csv = rows.map((r) => r.map(escape).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `attendance_${filterMonth.value}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 };
 </script>
 script

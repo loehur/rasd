@@ -714,7 +714,7 @@
                         <div v-if="viewData.proof" class="col-span-2">
                             <span class="font-semibold">Proof:</span><br />
                             <img
-                                :src="`/${viewData.proof}`"
+                                :src="proofUrl(viewData.proof)"
                                 alt="Proof"
                                 class="mt-2 max-w-md rounded-lg border"
                             />
@@ -784,6 +784,7 @@ import {
     getStaffDetail,
     createAttendance,
 } from "../../utils/api";
+import { API_BASE_URL } from "@/config/api";
 
 const userName = ref("");
 const staffList = ref([]);
@@ -1068,5 +1069,13 @@ const logout = () => {
     localStorage.removeItem("tl_auth_token");
     localStorage.removeItem("tl_user");
     window.location.href = "/";
+};
+
+const proofUrl = (p) => {
+    if (!p) return "";
+    if (/^https?:\/\//i.test(p)) return p;
+    const base = String(API_BASE_URL || "").replace(/\/$/, "");
+    const normalized = String(p).startsWith("/") ? p.slice(1) : p;
+    return `${base}/${normalized}`;
 };
 </script>

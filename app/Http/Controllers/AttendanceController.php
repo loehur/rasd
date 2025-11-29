@@ -183,7 +183,7 @@ class AttendanceController extends Controller
             'staff_id' => 'required|exists:staff,staff_id',
             'name' => 'required|string',
             'position' => 'required|string',
-            'superior' => 'required|string',
+            'superior' => 'nullable|string',
             'department' => 'required|string',
             'device' => 'required|in:Mobile,PC',
             'hire_date' => 'required|date',

@@ -222,7 +222,7 @@ class ResignationController extends Controller
                 // Insert resignation log
                 DB::table('staff_resignation_log')->insert([
                     'staff_id' => $request->staff_id,
-                    'submitted_by' => $teamLeader->employee_id,
+                    'submitted_by' => $teamLeader->staff_id,
                     'resignation_type' => $request->resignation_type,
                     'resignation_subtype' => $request->resignation_subtype,
                     'last_working_day' => $request->last_working_day,
@@ -305,7 +305,7 @@ class ResignationController extends Controller
             // Get resignation
             $resignation = DB::table('staff_resignation_log')
                 ->where('id', $id)
-                ->where('submitted_by', $teamLeader->employee_id)
+                ->where('submitted_by', $teamLeader->staff_id)
                 ->first();
 
             if (!$resignation) {
