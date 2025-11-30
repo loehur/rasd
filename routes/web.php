@@ -65,6 +65,10 @@ $router->get('/admin/staff-changes', function () {
     return file_get_contents(base_path('public/pages/admin/staff-changes.html'));
 });
 
+$router->get('/admin/system', function () {
+    return file_get_contents(base_path('public/pages/admin/system.html'));
+});
+
 $router->get('/admin', function () {
     return file_get_contents(base_path('public/pages/admin/login.html'));
 });
@@ -110,6 +114,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('staff', 'StaffController@index');
     $router->post('staff/import', 'StaffController@import');
     $router->get('staff/template', 'StaffController@downloadTemplate');
+    $router->delete('staff/reset-all', 'StaffController@resetAll');
     $router->delete('staff/{staffId}', 'StaffController@destroy');
 
     // Team Leader routes

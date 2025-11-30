@@ -33,8 +33,8 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // Generate simple token (in production, use JWT or Laravel Sanctum)
-        $token = base64_encode(random_bytes(32));
+        // Generate simple token (format: user_id:timestamp, same as Team Leader)
+        $token = base64_encode($user->id . ':' . time());
 
         return response()->json([
             'success' => true,

@@ -180,6 +180,7 @@ export default defineConfig(({ command }) => {
                         __dirname,
                         "pages/admin/staff-changes.html"
                     ),
+                    system: resolve(__dirname, "pages/admin/system.html"),
                 },
             },
         },

@@ -275,4 +275,150 @@ class StaffController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to delete staff'], 500);
         }
     }
+
+    /**
+     * Reset all staff data (Super Admin only)
+     * WARNING: This will permanently delete ALL staff records
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function resetAll(Request $request)
+    {
+        // Verify super-admin role
+        $role = $request->header('X-Role') ?? ($request->input('role') ?? null);
+        if ($role !== 'super-admin') {
+            // Log unauthorized access attempt
+            \Illuminate\Support\Facades\Log::warning('[SECURITY] Unauthorized Reset Data Attempt', [
+                'role' => $role,
+                'ip' => $request->ip(),
+                'timestamp' => \now()->toDateTimeString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied. Super-admin only.'
+            ], 403);
+        }
+
+        // Validate password
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Password is required',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Get current user from token
+            $token = $request->header('Authorization');
+            if (!$token) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+            // Extract user ID from token (assuming base64 encoded "user_id:timestamp")
+            $token = str_replace('Bearer ', '', $token);
+            $decoded = base64_decode($token);
+            $parts = explode(':', $decoded);
+            $userId = $parts[0] ?? null;
+
+            // Log token debugging info
+            \Illuminate\Support\Facades\Log::debug('Reset Data Token Debug', [
+                'decoded' => $decoded,
+                'user_id' => $userId,
+                'parts_count' => count($parts)
+            ]);
+
+            if (!$userId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid session token. Please logout and login again.'
+                ], 401);
+            }
+
+            // Find user
+            $user = \App\Models\User::where('id', $userId)->first();
+            if (!$user) {
+                // Log the failed user lookup
+                \Illuminate\Support\Facades\Log::warning('Reset Data - User Not Found', [
+                    'user_id_from_token' => $userId,
+                    'decoded_token' => $decoded
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your session is invalid or expired. Please logout and login again to continue.'
+                ], 401);
+            }
+
+            // Verify password
+            if (!password_verify($request->password, $user->password)) {
+                // Log failed attempt
+                \Illuminate\Support\Facades\Log::warning('[SECURITY] Failed Reset Data Attempt - Invalid Password', [
+                    'admin_id' => $userId,
+                    'admin_name' => $user->name,
+                    'admin_email' => $user->email,
+                    'ip' => $request->ip(),
+                    'timestamp' => \now()->toDateTimeString()
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid password'
+                ], 401);
+            }
+
+            // Count records before deletion
+            $count = Staff::count();
+
+            // Delete all staff records
+            Staff::query()->delete();
+
+            // Prepare log details
+            $logDetails = [
+                'deleted_count' => $count,
+                'user_id' => $userId,
+                'user_name' => $user->name,
+                'user_email' => $user->email,
+                'user_phone' => $user->phone_number ?? 'N/A',
+                'user_role' => $user->role,
+                'timestamp' => \now()->toDateTimeString(),
+                'action' => 'DELETE ALL STAFF DATA',
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent')
+            ];
+
+            // Log the action to database
+            $this->logAction($request, 'system_reset_all_staff', $logDetails);
+
+            // Also log to Laravel log file for system audit
+            \Illuminate\Support\Facades\Log::warning('[CRITICAL] System Reset All Staff Data', [
+                'admin_id' => $userId,
+                'admin_name' => $user->name,
+                'admin_email' => $user->email,
+                'deleted_records' => $count,
+                'ip' => $request->ip(),
+                'timestamp' => \now()->toDateTimeString()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully deleted all staff data",
+                'deleted' => $count
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reset staff data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

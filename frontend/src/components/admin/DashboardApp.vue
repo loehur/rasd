@@ -172,6 +172,43 @@
                         </div>
                     </button>
 
+                    <!-- Card 1b: System - Reset Data -->
+                    <button
+                        v-if="user.role === 'super-admin'"
+                        @click="goToSystem"
+                        class="bg-gradient-to-br from-red-600/20 to-red-500/10 border border-red-500/40 hover:border-red-400/60 hover:from-red-600/30 hover:to-red-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
+                    >
+                        <div
+                            class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center"
+                        >
+                            <svg
+                                class="w-6 h-6 text-red-300"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                                />
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-300">System</p>
+                            <p class="text-lg font-semibold text-red-300">
+                                Settings
+                            </p>
+                        </div>
+                    </button>
+
                     <!-- Card 2: Staff Lists - Active -->
                     <button
                         @click="goToStaffList"
@@ -544,6 +581,10 @@ const goToTeamLeaderList = () => {
 
 const goToUsers = () => {
     window.location.href = "/admin/users";
+};
+
+const goToSystem = () => {
+    window.location.href = "/admin/system";
 };
 
 const goToAttendance = () => {
