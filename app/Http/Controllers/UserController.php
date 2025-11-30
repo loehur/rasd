@@ -75,9 +75,29 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
         }
 
+        // Get current user ID from token
+        $token = $request->header('Authorization');
+        $currentUserId = null;
+        if ($token) {
+            $token = str_replace('Bearer ', '', $token);
+            $decoded = base64_decode($token);
+            $parts = explode(':', $decoded);
+            $currentUserId = $parts[0] ?? null;
+        }
+
+        // Prevent resetting your own password through this endpoint
+        if ($currentUserId && $id == $currentUserId) {
+            return response()->json(['success' => false, 'message' => 'Cannot reset your own password. Use change password feature instead'], 403);
+        }
+
         $user = User::find($id);
         if (!$user) {
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
+        }
+
+        // Prevent resetting super-admin password
+        if ($user->role === 'super-admin') {
+            return response()->json(['success' => false, 'message' => 'Cannot reset super-admin password'], 403);
         }
 
         $user->password = 'Admin123!';
@@ -97,11 +117,27 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
         }
 
+        // Get current user ID from token
+        $token = $request->header('Authorization');
+        $currentUserId = null;
+        if ($token) {
+            $token = str_replace('Bearer ', '', $token);
+            $decoded = base64_decode($token);
+            $parts = explode(':', $decoded);
+            $currentUserId = $parts[0] ?? null;
+        }
+
+        // Prevent deleting yourself
+        if ($currentUserId && $id == $currentUserId) {
+            return response()->json(['success' => false, 'message' => 'Cannot delete your own account'], 403);
+        }
+
         $user = User::find($id);
         if (!$user) {
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
 
+        // Prevent deleting super-admin
         if ($user->role === 'super-admin') {
             return response()->json(['success' => false, 'message' => 'Cannot delete super-admin'], 403);
         }
