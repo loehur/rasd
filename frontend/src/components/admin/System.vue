@@ -276,6 +276,31 @@
                             </button>
                         </div>
 
+                        <!-- Success Message Banner -->
+                        <div
+                            v-if="successMessage"
+                            class="mb-4 p-4 bg-green-500/10 border border-green-500/40 rounded-lg"
+                        >
+                            <div class="flex items-start gap-3">
+                                <svg
+                                    class="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-green-300">{{ successMessage }}</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <p class="text-sm text-slate-300 mb-4">
                             Are you absolutely sure you want to delete
                             <strong class="text-red-400">all staff data</strong>?
@@ -364,6 +389,7 @@ const confirmText = ref("");
 const confirmPassword = ref("");
 const isResetting = ref(false);
 const errorMessage = ref("");
+const successMessage = ref("");
 
 const goBack = () => {
     window.location.href = "/admin/dashboard";
@@ -427,6 +453,7 @@ const showResetConfirmation = () => {
     confirmText.value = "";
     confirmPassword.value = "";
     errorMessage.value = "";
+    successMessage.value = "";
     showModal.value = true;
 };
 
@@ -436,6 +463,7 @@ const closeModal = () => {
         confirmText.value = "";
         confirmPassword.value = "";
         errorMessage.value = "";
+        successMessage.value = "";
     }
 };
 
@@ -467,15 +495,15 @@ const confirmReset = async () => {
         const data = await res.json();
 
         if (data.success) {
-            // Show success message and close modal
+            // Show success message in modal
             errorMessage.value = "";
-            closeModal();
-            loadStats(); // Reload stats
+            successMessage.value = `Success! Deleted ${data.deleted} staff records.`;
 
-            // Show success notification
+            // Close modal after 2 seconds
             setTimeout(() => {
-                alert(`Success! Deleted ${data.deleted} staff records.`);
-            }, 100);
+                closeModal();
+                loadStats(); // Reload stats
+            }, 2000);
         } else {
             // Show error in modal
             errorMessage.value = data.message || "Failed to reset data";

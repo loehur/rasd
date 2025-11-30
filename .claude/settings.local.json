@@ -22,7 +22,10 @@
       "Bash(chmod:*)",
       "Bash(netstat:*)",
       "Bash(findstr:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(net stop Apache2.4)",
+      "Bash(net start Apache2.4)",
+      "Bash(composer dump-autoload:*)"
     ],
     "deny": [],
     "ask": []

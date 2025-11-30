@@ -292,7 +292,7 @@ class StaffController extends Controller
             \Illuminate\Support\Facades\Log::warning('[SECURITY] Unauthorized Reset Data Attempt', [
                 'role' => $role,
                 'ip' => $request->ip(),
-                'timestamp' => \now()->toDateTimeString()
+                'timestamp' => date('Y-m-d H:i:s')
             ]);
 
             return response()->json([
@@ -367,7 +367,7 @@ class StaffController extends Controller
                     'admin_name' => $user->name,
                     'admin_email' => $user->email,
                     'ip' => $request->ip(),
-                    'timestamp' => \now()->toDateTimeString()
+                    'timestamp' => date('Y-m-d H:i:s')
                 ]);
 
                 return response()->json([
@@ -390,7 +390,7 @@ class StaffController extends Controller
                 'user_email' => $user->email,
                 'user_phone' => $user->phone_number ?? 'N/A',
                 'user_role' => $user->role,
-                'timestamp' => \now()->toDateTimeString(),
+                'timestamp' => date('Y-m-d H:i:s'),
                 'action' => 'DELETE ALL STAFF DATA',
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->header('User-Agent')
@@ -406,7 +406,7 @@ class StaffController extends Controller
                 'admin_email' => $user->email,
                 'deleted_records' => $count,
                 'ip' => $request->ip(),
-                'timestamp' => \now()->toDateTimeString()
+                'timestamp' => date('Y-m-d H:i:s')
             ]);
 
             return response()->json([
