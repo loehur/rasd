@@ -96,7 +96,7 @@
                                 </thead>
                                 <tbody>
                                     <tr
-                                        v-for="u in users"
+                                        v-for="u in filteredUsers"
                                         :key="u.id"
                                         class="border-b border-slate-800"
                                     >
@@ -145,7 +145,7 @@
                         <!-- Mobile list -->
                         <div class="md:hidden space-y-3">
                             <div
-                                v-for="u in users"
+                                v-for="u in filteredUsers"
                                 :key="u.id"
                                 class="p-4 bg-slate-800/50 border border-slate-700 rounded-xl"
                             >
@@ -210,7 +210,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { API_BASE_URL } from "../../config/api";
 
 const currentUser = ref({ role: "" });
@@ -218,6 +218,17 @@ const users = ref([]);
 const form = ref({ name: "", phone_number: "" });
 const creating = ref(false);
 const toast = ref({ show: false, message: "", type: "success" });
+
+// Filter users: exclude super-admin and current user
+const filteredUsers = computed(() => {
+    return users.value.filter(u => {
+        // Exclude super-admin role
+        if (u.role === 'super-admin') return false;
+        // Exclude current user
+        if (u.id === currentUser.value.id) return false;
+        return true;
+    });
+});
 
 onMounted(async () => {
     const userData = localStorage.getItem("user");
