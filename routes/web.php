@@ -125,6 +125,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('team-leaders', 'TeamLeaderController@index');
     $router->post('team-leaders/import', 'TeamLeaderController@import');
     $router->get('team-leaders/template', 'TeamLeaderController@downloadTemplate');
+    $router->post('team-leaders/resign', 'TeamLeaderController@resign');
     $router->get('team-leaders/{employeeId}', 'TeamLeaderController@show');
     $router->put('team-leaders/{employeeId}', 'TeamLeaderController@update');
     $router->post('team-leaders/{employeeId}/reset-password', 'TeamLeaderController@resetPassword');
@@ -150,11 +151,11 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // Resignation routes
     $router->get('resignations', 'ResignationController@index');
     $router->post('resignations', 'ResignationController@store');
-    $router->get('resignations/{id}', 'ResignationController@show');
-    $router->post('resignations/reactivate', 'ResignationController@reactivate');
-    $router->post('resignations/import', 'ResignationController@import');
     $router->get('resignations/template', 'ResignationController@downloadTemplate');
     $router->get('resignations/months', 'ResignationController@months');
+    $router->post('resignations/reactivate', 'ResignationController@reactivate');
+    $router->post('resignations/import', 'ResignationController@import');
+    $router->get('resignations/{id}', 'ResignationController@show');
 
     // Staff Change Management routes
     $router->get('staff-changes/all-staff', 'StaffChangeController@getAllStaff');

@@ -181,6 +181,10 @@ export default defineConfig(({ command }) => {
                         "pages/admin/staff-changes.html"
                     ),
                     system: resolve(__dirname, "pages/admin/system.html"),
+                    teamLeaderResign: resolve(
+                        __dirname,
+                        "pages/admin/team-leader-resign.html"
+                    ),
                 },
             },
         },

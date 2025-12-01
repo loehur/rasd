@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TeamLeader;
 use App\Models\Staff;
+use App\Models\StaffLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -136,7 +137,10 @@ class TeamLeaderController extends Controller
      */
     public function index()
     {
-        $teamLeaders = TeamLeader::orderBy('name')->get();
+        // Only show active team leaders
+        $teamLeaders = TeamLeader::where('staff_status', 'active')
+                                 ->orderBy('name')
+                                 ->get();
 
         return response()->json([
             'success' => true,
@@ -643,6 +647,143 @@ class TeamLeaderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to reset password: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Process team leader resignation and transfer staff
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function resign(Request $request)
+    {
+        try {
+            // Validate input
+            $validator = Validator::make($request->all(), [
+                'resigning_tl_id' => 'required|string',
+                'replacement_tl_id' => 'required|string|different:resigning_tl_id'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $resigningTLId = $request->resigning_tl_id;
+            $replacementTLId = $request->replacement_tl_id;
+
+            // Verify both team leaders exist
+            $resigningTL = TeamLeader::where('staff_id', $resigningTLId)->first();
+            $replacementTL = TeamLeader::where('staff_id', $replacementTLId)->first();
+
+            if (!$resigningTL) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Resigning team leader not found'
+                ], 404);
+            }
+
+            if (!$replacementTL) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Replacement team leader not found'
+                ], 404);
+            }
+
+            // Get all active staff under the resigning TL
+            $staffMembers = Staff::where('team_leader_id', $resigningTLId)
+                                ->where('staff_status', 'active')
+                                ->get();
+
+            $transferredCount = 0;
+
+            // Transfer each staff member to the replacement TL
+            foreach ($staffMembers as $staff) {
+                $oldTL = $staff->team_leader_id;
+                $staff->team_leader_id = $replacementTLId;
+                $staff->save();
+
+                // Log the transfer using StaffLog model
+                try {
+                    StaffLog::create([
+                        'staff_id' => $staff->staff_id,
+                        'change_type' => 'team_leader_transfer',
+                        'old_value' => [
+                            'team_leader_id' => $oldTL,
+                            'team_leader_name' => $resigningTL->name
+                        ],
+                        'new_value' => [
+                            'team_leader_id' => $replacementTLId,
+                            'team_leader_name' => $replacementTL->name
+                        ],
+                        'changed_by' => 'admin',
+                        'remarks' => 'Team Leader Resignation - Transfer from ' . $resigningTL->name . ' to ' . $replacementTL->name
+                    ]);
+                } catch (\Exception $logError) {
+                    // Log error but continue processing
+                    \Illuminate\Support\Facades\Log::warning('Failed to log staff transfer: ' . $logError->getMessage());
+                }
+
+                $transferredCount++;
+            }
+
+            // Update the resigning TL status to inactive/resign
+            $oldStatus = $resigningTL->staff_status;
+            $resigningTL->staff_status = 'resign';
+            $resigningTL->save();
+
+            // Log the TL status change using StaffLog model
+            try {
+                StaffLog::create([
+                    'staff_id' => $resigningTL->staff_id,
+                    'change_type' => 'status_change',
+                    'old_value' => [
+                        'staff_status' => $oldStatus,
+                        'role' => 'tl'
+                    ],
+                    'new_value' => [
+                        'staff_status' => 'resign',
+                        'role' => 'tl'
+                    ],
+                    'changed_by' => 'admin',
+                    'remarks' => 'Team Leader Resignation'
+                ]);
+            } catch (\Exception $logError) {
+                \Illuminate\Support\Facades\Log::warning('Failed to log TL status change: ' . $logError->getMessage());
+            }
+
+            $this->logAction($request, 'team_leader_resignation', [
+                'resigning_tl_id' => $resigningTLId,
+                'resigning_tl_name' => $resigningTL->name,
+                'replacement_tl_id' => $replacementTLId,
+                'replacement_tl_name' => $replacementTL->name,
+                'transferred_staff_count' => $transferredCount
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully transferred {$transferredCount} staff member(s) from {$resigningTL->name} to {$replacementTL->name}",
+                'transferred_count' => $transferredCount
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Team Leader Resignation Error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process resignation: ' . $e->getMessage(),
+                'error_details' => [
+                    'file' => basename($e->getFile()),
+                    'line' => $e->getLine()
+                ]
             ], 500);
         }
     }

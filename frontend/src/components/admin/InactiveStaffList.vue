@@ -584,7 +584,7 @@ const colValue = (col, r, i) => {
         case "Area":
             return r.area || "";
         case "WFH/Oniste":
-            return r.work_location || "";
+            return r.group || "";
         case "ID Staff":
             return r.staff_id || "";
         case "Name Staff":
@@ -857,7 +857,7 @@ const exportResignations = async () => {
             return [
                 i + 1,
                 s.area || "",
-                s.work_location || "",
+                s.group || "",
                 r.staff_id || "",
                 r.staff_name || s.name || "",
                 r.staff_position || s.position || "",

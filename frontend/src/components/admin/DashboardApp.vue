@@ -141,75 +141,7 @@
                     Quick Actions
                 </h2>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <!-- Card 1: System - Users -->
-                    <button
-                        v-if="user.role === 'super-admin'"
-                        @click="goToUsers"
-                        class="bg-gradient-to-br from-cyan-600/20 to-cyan-500/10 border border-cyan-500/40 hover:border-cyan-400/60 hover:from-cyan-600/30 hover:to-cyan-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
-                    >
-                        <div
-                            class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center"
-                        >
-                            <svg
-                                class="w-6 h-6 text-cyan-300"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                                />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm text-slate-300">System</p>
-                            <p class="text-lg font-semibold text-cyan-300">
-                                Users
-                            </p>
-                        </div>
-                    </button>
-
-                    <!-- Card 1b: System - Reset Data -->
-                    <button
-                        v-if="user.role === 'super-admin'"
-                        @click="goToSystem"
-                        class="bg-gradient-to-br from-red-600/20 to-red-500/10 border border-red-500/40 hover:border-red-400/60 hover:from-red-600/30 hover:to-red-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
-                    >
-                        <div
-                            class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center"
-                        >
-                            <svg
-                                class="w-6 h-6 text-red-300"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                                />
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm text-slate-300">System</p>
-                            <p class="text-lg font-semibold text-red-300">
-                                Settings
-                            </p>
-                        </div>
-                    </button>
-
-                    <!-- Card 2: Staff Lists - Active -->
+                    <!-- Card 1: Staff Lists - Active -->
                     <button
                         @click="goToStaffList"
                         class="bg-gradient-to-br from-emerald-600/20 to-emerald-500/10 border border-emerald-500/40 hover:border-emerald-400/60 hover:from-emerald-600/30 hover:to-emerald-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
@@ -265,6 +197,36 @@
                             <p class="text-sm text-slate-300">Team Leader</p>
                             <p class="text-lg font-semibold text-fuchsia-300">
                                 List
+                            </p>
+                        </div>
+                    </button>
+
+                    <!-- Card 3b: Team Leader - Resign -->
+                    <button
+                        @click="goToTeamLeaderResign"
+                        class="bg-gradient-to-br from-amber-600/20 to-amber-500/10 border border-amber-500/40 hover:border-amber-400/60 hover:from-amber-600/30 hover:to-amber-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
+                    >
+                        <div
+                            class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center"
+                        >
+                            <svg
+                                class="w-6 h-6 text-amber-300"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-300">Team Leader</p>
+                            <p class="text-lg font-semibold text-amber-300">
+                                Resign
                             </p>
                         </div>
                     </button>
@@ -359,7 +321,7 @@
                         </div>
                     </button>
 
-                    <!-- Card 7: Reports - Performance -->
+                    <!-- Card 6: Reports - Performance -->
                     <a
                         href="https://excel.myportofolio98.xyz/"
                         target="_blank"
@@ -390,6 +352,74 @@
                             </p>
                         </div>
                     </a>
+
+                    <!-- Card 7: System - Users -->
+                    <button
+                        v-if="user.role === 'super-admin'"
+                        @click="goToUsers"
+                        class="bg-gradient-to-br from-cyan-600/20 to-cyan-500/10 border border-cyan-500/40 hover:border-cyan-400/60 hover:from-cyan-600/30 hover:to-cyan-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
+                    >
+                        <div
+                            class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center"
+                        >
+                            <svg
+                                class="w-6 h-6 text-cyan-300"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                                />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-300">System</p>
+                            <p class="text-lg font-semibold text-cyan-300">
+                                Users
+                            </p>
+                        </div>
+                    </button>
+
+                    <!-- Card 8: System - Settings -->
+                    <button
+                        v-if="user.role === 'super-admin'"
+                        @click="goToSystem"
+                        class="bg-gradient-to-br from-red-600/20 to-red-500/10 border border-red-500/40 hover:border-red-400/60 hover:from-red-600/30 hover:to-red-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
+                    >
+                        <div
+                            class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center"
+                        >
+                            <svg
+                                class="w-6 h-6 text-red-300"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                                />
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-300">System</p>
+                            <p class="text-lg font-semibold text-red-300">
+                                Settings
+                            </p>
+                        </div>
+                    </button>
                 </div>
             </div>
 
@@ -577,6 +607,10 @@ const refreshPage = () => {
 };
 const goToTeamLeaderList = () => {
     window.location.href = "/admin/team-leader-list";
+};
+
+const goToTeamLeaderResign = () => {
+    window.location.href = "/admin/team-leader-resign";
 };
 
 const goToUsers = () => {
