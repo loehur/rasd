@@ -584,7 +584,7 @@ const colValue = (col, r, i) => {
         case "Area":
             return r.area || "";
         case "WFH/Oniste":
-            return r.group || "";
+            return r.area || "";
         case "ID Staff":
             return r.staff_id || "";
         case "Name Staff":
