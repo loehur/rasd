@@ -46,6 +46,10 @@ $router->get('/admin/team-leader-list', function () {
     return file_get_contents(base_path('public/pages/admin/team-leader-list.html'));
 });
 
+$router->get('/admin/team-leader-resign', function () {
+    return file_get_contents(base_path('public/pages/admin/team-leader-resign.html'));
+});
+
 $router->get('/admin/team-leader/edit/{employeeId}', function () {
     return file_get_contents(base_path('public/pages/admin/edit-team-leader.html'));
 });
