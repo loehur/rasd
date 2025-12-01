@@ -1,58 +1,7 @@
 <template>
     <div class="min-h-screen bg-slate-950 text-slate-100 p-6">
         <div class="max-w-7xl mx-auto">
-            <!-- Header -->
-            <div class="mb-8">
-                <button
-                    @click="goBack"
-                    class="mb-4 text-slate-400 hover:text-slate-200 flex items-center gap-2 transition"
-                >
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                        />
-                    </svg>
-                    Back to Dashboard
-                </button>
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h1
-                            class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-300"
-                        >
-                            Team Leader
-                        </h1>
-                    </div>
-                    <div class="flex gap-3">
-                        <button
-                            @click="goToImport"
-                            class="px-4 py-2 bg-blue-600/20 text-blue-400 border border-blue-600/30 rounded-lg hover:bg-blue-600/30 transition flex items-center gap-2"
-                        >
-                            <svg
-                                class="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                ></path>
-                            </svg>
-                            Import
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <AdminHeader title="Team Leader" subtitle="Admin Portal" />
 
             <!-- Search and Filter -->
             <div
@@ -424,8 +373,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { API_BASE_URL } from "@/config/api";
+import AdminHeader from "./AdminHeader.vue";
 
 const teamLeaders = ref([]);
 const loading = ref(false);

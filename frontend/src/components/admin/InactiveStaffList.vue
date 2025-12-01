@@ -1,40 +1,7 @@
 <template>
     <div class="min-h-screen bg-slate-950 text-slate-100 p-6">
         <div class="max-w-7xl mx-auto">
-            <!-- Header -->
-            <div class="mb-8">
-                <button
-                    @click="goBack"
-                    class="mb-4 text-slate-400 hover:text-slate-200 flex items-center gap-2 transition"
-                >
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                        />
-                    </svg>
-                    Back to Dashboard
-                </button>
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h1
-                            class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-slate-100 via-slate-200 to-slate-300"
-                        >
-                            Resign Staff
-                        </h1>
-                        <p class="text-slate-400 mt-2">
-                            Staff members who have resigned
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <AdminHeader title="Resign Staff" subtitle="Admin Portal" />
 
             <!-- Month Filter -->
             <div
@@ -395,6 +362,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { API_BASE_URL } from "@/config/api";
+import AdminHeader from "./AdminHeader.vue";
 
 const resignations = ref([]);
 const months = ref([]);
@@ -584,7 +552,7 @@ const colValue = (col, r, i) => {
         case "Area":
             return r.area || "";
         case "WFH/Oniste":
-            return r.area || "";
+            return r.work_location || "";
         case "ID Staff":
             return r.staff_id || "";
         case "Name Staff":

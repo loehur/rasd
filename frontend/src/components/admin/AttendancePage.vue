@@ -1,28 +1,8 @@
 <template>
     <div class="min-h-screen bg-slate-950 text-slate-100">
+        <AdminHeader title="Attendance Records" subtitle="Admin Portal" />
         <main class="px-3 sm:px-6 lg:px-8 py-4">
             <div class="max-w-6xl mx-auto space-y-6">
-                <div class="mb-4">
-                    <button
-                        @click="goBack"
-                        class="text-slate-400 hover:text-slate-200 flex items-center gap-2 transition"
-                    >
-                        <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                            />
-                        </svg>
-                        Back to Dashboard
-                    </button>
-                </div>
                 <div
                     class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl p-6"
                 >
@@ -143,6 +123,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import AdminHeader from "./AdminHeader.vue";
 import { adminGetAttendancesByMonth, adminDeleteAttendance } from "@/utils/api";
 import { API_BASE_URL } from "@/config/api";
 

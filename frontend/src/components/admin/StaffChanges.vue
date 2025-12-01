@@ -2,43 +2,10 @@
     <div
         class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
     >
-        <!-- Header -->
-        <div
-            class="bg-slate-900/50 border-b border-slate-800/50 backdrop-blur-sm sticky top-0 z-10"
-        >
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <div class="flex items-center gap-3">
-                        <button
-                            @click="goBack"
-                            class="p-2 rounded-lg hover:bg-slate-800/50 transition text-slate-400 hover:text-slate-300"
-                        >
-                            <svg
-                                class="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M15 19l-7-7 7-7"
-                                />
-                            </svg>
-                        </button>
-                        <div>
-                            <h1 class="text-xl font-bold text-slate-100">
-                                Staff Changes Management
-                            </h1>
-                            <p class="text-sm text-slate-400">
-                                Manage staff transfers, promotions, and updates
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <AdminHeader
+            title="Staff Changes Management"
+            subtitle="Manage staff transfers, promotions, and updates"
+        />
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Error/Success Messages -->
@@ -545,6 +512,7 @@ import { ref, computed, onMounted } from "vue";
 import { API_BASE_URL } from "@/config/api";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
+import AdminHeader from "./AdminHeader.vue";
 
 const API_BASE = `${API_BASE_URL}/api`;
 
@@ -917,10 +885,6 @@ const formatLogValue = (type, value) => {
     }
 
     return JSON.stringify(value);
-};
-
-const goBack = () => {
-    window.location.href = "/admin/dashboard";
 };
 
 onMounted(async () => {

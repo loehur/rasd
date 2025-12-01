@@ -76,6 +76,8 @@ class ResignationController extends Controller
                     'staff.rank',
                     'staff.hire_date',
                     'staff.area',
+                    'staff.work_location',
+                    'staff.device',
                     'tl.name as staff_superior'
                 );
 
