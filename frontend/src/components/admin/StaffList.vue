@@ -128,6 +128,25 @@
                             ></path>
                         </svg>
                     </button>
+                    <button
+                        @click="exportInsightsXlsx"
+                        class="p-2 bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 rounded-lg hover:bg-emerald-600/30 transition flex items-center justify-center"
+                        title="Export XLSX"
+                    >
+                        <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 4v16h16M12 12v6m0 0l-3-3m3 3l3-3M8 4h8"
+                            ></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
@@ -975,6 +994,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import * as XLSX from "xlsx";
 import { API_BASE_URL } from "@/config/api";
 import AdminHeader from "./AdminHeader.vue";
 import { adminGetAttendancesByMonth } from "@/utils/api";
@@ -1364,6 +1384,216 @@ const showInsight = async (mode) => {
             }
         }
     }
+};
+
+const ensureInsightsLoaded = async () => {
+    if (!attendancesMonth.value.length) {
+        try {
+            const data = await adminGetAttendancesByMonth(
+                currentMonth.value,
+                1000
+            );
+            attendancesMonth.value = data.success ? data.data || [] : [];
+        } catch (e) {
+            attendancesMonth.value = [];
+        }
+    }
+    if (!resignationsMonth.value.length) {
+        try {
+            const token = localStorage.getItem("auth_token");
+            const role = JSON.parse(localStorage.getItem("user") || "{}").role;
+            const params = new URLSearchParams();
+            params.set("month", currentMonth.value);
+            const res = await fetch(
+                `${API_BASE_URL}/api/resignations?${params.toString()}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                        "X-Role": role,
+                    },
+                }
+            );
+            const json = await res.json();
+            resignationsMonth.value =
+                json && json.success ? json.data || [] : [];
+        } catch (e) {
+            resignationsMonth.value = [];
+        }
+    }
+    if (!teamLeaders.value.length) {
+        try {
+            const token = localStorage.getItem("auth_token");
+            const res = await fetch(`${API_BASE_URL}/api/team-leaders`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = await res.json();
+            if (data && data.success && Array.isArray(data.data)) {
+                teamLeaders.value = data.data;
+            } else if (Array.isArray(data)) {
+                teamLeaders.value = data;
+            } else {
+                teamLeaders.value = [];
+            }
+        } catch (e) {
+            teamLeaders.value = [];
+        }
+    }
+};
+
+const exportInsightsXlsx = async () => {
+    await ensureInsightsLoaded();
+
+    const fmtDate = (d) => (d ? new Date(d).toLocaleDateString() : "-");
+
+    const tlHeaders = [
+        "Employee ID",
+        "Name",
+        "Position",
+        "Group",
+        "Department",
+        "Area",
+        "Hire Date",
+        "Team Qty",
+    ];
+    const tlRows = teamLeaders.value.map((tl) => [
+        tl.staff_id || "",
+        tl.name || "",
+        tl.position || "",
+        tl.group || "",
+        tl.department || "",
+        tl.area || "",
+        tl.hire_date ? fmtDate(tl.hire_date) : "",
+        teamQtyByTlId.value[tl.staff_id] || 0,
+    ]);
+    const tlSheet = XLSX.utils.aoa_to_sheet([tlHeaders, ...tlRows]);
+
+    const rHeaders = [
+        "Report Day",
+        "ID Staff",
+        "Name Staff",
+        "Position",
+        "Superior",
+        "Department",
+        "Hiredate",
+        "Rank",
+        "Device",
+        "WFH/Onsite",
+        "Group",
+        "Last Working Day",
+    ];
+    const rRows = resignationsMonth.value.map((r) => [
+        fmtDate(r.report_day || r.last_working_day),
+        r.staff_id || "",
+        r.staff_name || "",
+        r.staff_position || "",
+        r.staff_superior || "",
+        r.department || "",
+        r.hire_date ? fmtDate(r.hire_date) : "",
+        r.rank || "",
+        r.device || "",
+        r.work_location || "",
+        r.group || "",
+        r.last_working_day ? fmtDate(r.last_working_day) : "",
+    ]);
+    const rSheet = XLSX.utils.aoa_to_sheet([rHeaders, ...rRows]);
+
+    const aHeaders = [
+        "Employee",
+        "Position",
+        "Department",
+        "WFH/Onsite",
+        "Device",
+        "Report Day",
+        "Status",
+        "Staff ID",
+    ];
+    const aRows = attendancesMonth.value.map((a) => [
+        a.name || "",
+        a.position || "",
+        a.department || "",
+        a.work_status || "",
+        a.device || "",
+        fmtDate(a.report_day),
+        a.status_code || "",
+        a.staff_id || "",
+    ]);
+    const aSheet = XLSX.utils.aoa_to_sheet([aHeaders, ...aRows]);
+
+    const gHeaders = ["Team", "Team Quantity"];
+    const gRows = groupSummary.value.map((row) => [row.group, row.count]);
+    const gSheet = XLSX.utils.aoa_to_sheet([gHeaders, ...gRows]);
+
+    const alHeaders = ["Area-Location", "Team Quantity"];
+    const alRows = areaLocationSummary.value.map((row) => [
+        row.label,
+        row.count,
+    ]);
+    const alSheet = XLSX.utils.aoa_to_sheet([alHeaders, ...alRows]);
+
+    const gtHeaders = ["Group", "Quantity"];
+    const gtRows = [
+        ["All", activeStaffList.value.length],
+        ...availableGroups.map((g) => [g, getGroupCount(g)]),
+    ];
+    const gtSheet = XLSX.utils.aoa_to_sheet([gtHeaders, ...gtRows]);
+
+    const wb = XLSX.utils.book_new();
+
+    const staffHeaders = [
+        "SN",
+        "Area",
+        "WFH/Onsite",
+        "ID Staff",
+        "Name Staff",
+        "Position",
+        "Superior",
+        "Department",
+        "Hiredate",
+        "Rank",
+        "Device",
+        "WL",
+    ];
+    const buildStaffRows = (list) =>
+        list.map((s, i) => [
+            i + 1,
+            s.area || "-",
+            s.work_location || "-",
+            s.staff_id || "",
+            s.name || "",
+            s.position || "",
+            getSuperiorName(s),
+            s.department || "",
+            s.hire_date ? fmtDate(s.hire_date) : "",
+            s.rank || "",
+            s.device || "",
+            s.warning_letter ? "WL" : "-",
+        ]);
+
+    const allSheet = XLSX.utils.aoa_to_sheet([
+        staffHeaders,
+        ...buildStaffRows(activeStaffList.value),
+    ]);
+    XLSX.utils.book_append_sheet(wb, allSheet, "All");
+
+    availableGroups.forEach((g) => {
+        const rows = buildStaffRows(
+            activeStaffList.value.filter((s) => (s.group || "") === g)
+        );
+        const sheet = XLSX.utils.aoa_to_sheet([staffHeaders, ...rows]);
+        XLSX.utils.book_append_sheet(wb, sheet, g);
+    });
+
+    XLSX.utils.book_append_sheet(wb, tlSheet, "TL");
+    XLSX.utils.book_append_sheet(wb, rSheet, "Resignation");
+    XLSX.utils.book_append_sheet(wb, aSheet, "Attendance");
+    XLSX.utils.book_append_sheet(wb, gSheet, "Team Summary");
+    XLSX.utils.book_append_sheet(wb, alSheet, "Area-Location Summary");
+    XLSX.utils.book_append_sheet(wb, gtSheet, "Groups Tabs");
+
+    const fname = `staff_insights_${currentMonth.value}.xlsx`;
+    XLSX.writeFile(wb, fname);
 };
 
 const getSuperiorName = (staff) => {
