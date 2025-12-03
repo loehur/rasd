@@ -22,12 +22,12 @@
                         ></path>
                     </svg>
                     <span class="text-sm font-medium text-slate-300"
-                        >Filter by Group:</span
+                        >Filter</span
                     >
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <button
-                        @click="filterGroup = ''"
+                        @click="setGroupFilter('')"
                         :class="[
                             'px-4 py-2 text-sm font-medium rounded-lg transition',
                             filterGroup === ''
@@ -43,7 +43,7 @@
                     <button
                         v-for="group in availableGroups"
                         :key="group"
-                        @click="filterGroup = group"
+                        @click="setGroupFilter(group)"
                         :class="[
                             'px-4 py-2 text-sm font-medium rounded-lg transition',
                             filterGroup === group
@@ -57,23 +57,43 @@
                         >
                     </button>
                 </div>
-            </div>
-
-            <!-- Search and Filter -->
-            <div
-                class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-xl p-4 mb-4"
-            >
-                <div class="flex gap-2">
+                <div class="mt-3 flex flex-wrap gap-2">
+                    <button
+                        @click="showInsight('tl')"
+                        :class="insightBtnClass('tl')"
+                    >
+                        TL
+                    </button>
+                    <button
+                        @click="showInsight('resignation')"
+                        :class="insightBtnClass('resignation')"
+                    >
+                        Resignation
+                    </button>
+                    <button
+                        @click="showInsight('attendance')"
+                        :class="insightBtnClass('attendance')"
+                    >
+                        Attendance
+                    </button>
+                    <button
+                        @click="showInsight('summary')"
+                        :class="insightBtnClass('summary')"
+                    >
+                        Summary
+                    </button>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
                     <input
                         v-model="searchQuery"
                         type="text"
-                        placeholder="Search by name, staff ID, or phone..."
+                        placeholder="Search..."
                         class="flex-1 px-3 py-2 text-sm bg-slate-800/50 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
                     />
                     <button
-                        @click="resetFilters"
+                        @click="searchQuery = ''"
                         class="px-3 py-2 text-sm bg-slate-800/50 border border-slate-700 rounded-lg text-slate-400 hover:text-slate-200 hover:border-slate-600 transition flex items-center justify-center"
-                        title="Reset search"
+                        title="Clear search"
                     >
                         <svg
                             class="w-4 h-4"
@@ -89,8 +109,383 @@
                             ></path>
                         </svg>
                     </button>
+                    <button
+                        @click="goToImport"
+                        class="p-2 bg-blue-600/20 text-blue-400 border border-blue-600/30 rounded-lg hover:bg-blue-600/30 transition flex items-center justify-center"
+                        title="Import staff"
+                    >
+                        <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                            ></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
+
+            <div
+                v-if="insightMode"
+                class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-xl p-4 mb-4"
+            >
+                <div v-if="insightLoading" class="text-center py-6">
+                    <div
+                        class="inline-block w-10 h-10 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"
+                    ></div>
+                </div>
+                <div v-else>
+                    <div v-if="insightMode === 'tl'" class="overflow-x-auto">
+                        <table class="w-full text-xs">
+                            <thead class="bg-slate-800/50">
+                                <tr>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Employee ID
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Name
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Position
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Group
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Department
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Area
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Hire Date
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Team Qty
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/50">
+                                <tr
+                                    v-for="tl in filteredTeamLeadersInsight"
+                                    :key="tl.id"
+                                    class="hover:bg-slate-800/30 transition"
+                                >
+                                    <td class="px-3 py-2 whitespace-nowrap">
+                                        <span
+                                            class="text-sm font-mono text-blue-400"
+                                            >{{ tl.staff_id }}</span
+                                        >
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold text-[11px]"
+                                            >
+                                                {{ getInitials(tl.name) }}
+                                            </div>
+                                            <div>
+                                                <p
+                                                    class="text-xs font-semibold text-slate-100"
+                                                >
+                                                    {{ tl.name }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <span class="text-xs text-slate-300">{{
+                                            tl.position
+                                        }}</span>
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <span
+                                            class="px-2 py-1 text-[10px] font-medium rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                                            >{{ tl.group || "-" }}</span
+                                        >
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <span class="text-xs text-slate-400">{{
+                                            tl.department
+                                        }}</span>
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <span class="text-xs text-slate-400">{{
+                                            tl.area
+                                        }}</span>
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <span class="text-xs text-slate-400">{{
+                                            tl.hire_date
+                                        }}</span>
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <span
+                                            class="text-xs font-semibold text-emerald-300"
+                                            >{{
+                                                teamQtyByTlId[tl.staff_id] || 0
+                                            }}</span
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div
+                        v-else-if="insightMode === 'resignation'"
+                        class="overflow-x-auto"
+                    >
+                        <table class="min-w-full text-xs">
+                            <thead class="bg-slate-800/50">
+                                <tr>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Report Day
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        ID Staff
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Name Staff
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Position
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Superior
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Department
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Hiredate
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Rank
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Device
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        WFH/Oniste
+                                    </th>
+                                    <th
+                                        class="px-3 py-2 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                    >
+                                        Group
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="r in filteredResignationsInsight"
+                                    :key="r.id"
+                                    class="hover:bg-slate-800/30 transition border-t border-slate-800/50"
+                                >
+                                    <td class="px-3 py-2">
+                                        {{
+                                            formatDate(
+                                                r.report_day ||
+                                                    r.last_working_day
+                                            )
+                                        }}
+                                    </td>
+                                    <td
+                                        class="px-3 py-2 font-mono text-blue-400"
+                                    >
+                                        {{ r.staff_id }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ r.staff_name }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ r.staff_position || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ r.staff_superior || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ r.department || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{
+                                            r.hire_date
+                                                ? formatDate(r.hire_date)
+                                                : "-"
+                                        }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ r.rank || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ r.device || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ r.work_location || "-" }}
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        {{ r.group || "-" }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div
+                        v-else-if="insightMode === 'attendance'"
+                        class="overflow-x-auto"
+                    >
+                        <table class="min-w-full text-xs">
+                            <thead>
+                                <tr
+                                    class="text-left text-slate-300 border-b border-slate-800"
+                                >
+                                    <th class="py-2 px-3">Employee</th>
+                                    <th class="py-2 px-3">Position</th>
+                                    <th class="py-2 px-3">Department</th>
+                                    <th class="py-2 px-3">WFH/Onsite</th>
+                                    <th class="py-2 px-3">Device</th>
+                                    <th class="py-2 px-3">Report Day</th>
+                                    <th class="py-2 px-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="a in filteredAttendancesInsight"
+                                    :key="a.id"
+                                    class="border-b border-slate-800"
+                                >
+                                    <td class="py-2 px-3">
+                                        <div class="font-medium text-slate-100">
+                                            {{ a.name }}
+                                        </div>
+                                        <div class="text-xs text-slate-400">
+                                            {{ a.staff_id }}
+                                        </div>
+                                    </td>
+                                    <td class="py-2">{{ a.position }}</td>
+                                    <td class="py-2">{{ a.department }}</td>
+                                    <td class="py-2">
+                                        {{ a.work_status }}
+                                    </td>
+                                    <td class="py-2">{{ a.device }}</td>
+                                    <td class="py-2">
+                                        {{ formatDate(a.report_day) }}
+                                    </td>
+                                    <td class="py-2">
+                                        {{ a.status_code }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div
+                        v-else-if="insightMode === 'summary'"
+                        class="grid grid-cols-1 md:grid-cols-2 gap-4"
+                    >
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-xs">
+                                <thead>
+                                    <tr
+                                        class="text-left text-slate-300 border-b border-slate-800"
+                                    >
+                                        <th class="py-2 px-3">Team</th>
+                                        <th class="py-2 px-3">Team Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for="row in filteredGroupSummary"
+                                        :key="row.group"
+                                        class="border-b border-slate-800"
+                                    >
+                                        <td class="py-2 px-3">
+                                            {{ row.group }}
+                                        </td>
+                                        <td class="py-2 px-3">
+                                            {{ row.count }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-xs">
+                                <thead>
+                                    <tr
+                                        class="text-left text-slate-300 border-b border-slate-800"
+                                    >
+                                        <th class="py-2 px-3">Area-Location</th>
+                                        <th class="py-2 px-3">Team Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="py-2 px-3">Total</td>
+                                        <td class="py-2 px-3">
+                                            {{ activeStaffList.length }}
+                                        </td>
+                                    </tr>
+                                    <tr
+                                        v-for="row in filteredAreaLocationSummary"
+                                        :key="row.label"
+                                        class="border-b border-slate-800"
+                                    >
+                                        <td class="py-2 px-3">
+                                            {{ row.label }}
+                                        </td>
+                                        <td class="py-2 px-3">
+                                            {{ row.count }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search -->
 
             <!-- Loading State -->
             <div
@@ -132,7 +527,7 @@
 
             <!-- Staff Table -->
             <div
-                v-else-if="filteredStaff.length > 0"
+                v-else-if="!insightMode && filteredStaff.length > 0"
                 class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl overflow-hidden"
             >
                 <!-- Desktop Table View -->
@@ -372,7 +767,7 @@
 
             <!-- Empty State -->
             <div
-                v-else
+                v-else-if="!insightMode"
                 class="text-center py-12 bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl"
             >
                 <svg
@@ -582,6 +977,7 @@
 import { ref, computed, onMounted } from "vue";
 import { API_BASE_URL } from "@/config/api";
 import AdminHeader from "./AdminHeader.vue";
+import { adminGetAttendancesByMonth } from "@/utils/api";
 
 const staffList = ref([]);
 const currentUser = ref({ role: "" });
@@ -594,18 +990,28 @@ const filterGroup = ref(""); // Group filter
 const currentPage = ref(1);
 const itemsPerPage = ref(5);
 const selectedStaff = ref(null);
+const insightMode = ref("");
+const insightLoading = ref(false);
+const resignationsMonth = ref([]);
+const attendancesMonth = ref([]);
+const currentMonth = ref(
+    `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(
+        2,
+        "0"
+    )}`
+);
 
 // Available groups in order
 const availableGroups = [
-    "P-1",
-    "P",
-    "A1-1",
-    "A1-2",
-    "A1-3",
-    "A2",
-    "B1",
-    "B2",
     "M2",
+    "B2",
+    "B1",
+    "A2",
+    "A1-3",
+    "A1-2",
+    "A1-1",
+    "P",
+    "P-1",
 ];
 
 const loadStaff = async () => {
@@ -652,14 +1058,24 @@ const filteredStaff = computed(() => {
         result = result.filter((staff) => staff.group === filterGroup.value);
     }
 
-    // Search filter
+    // Search filter (global search across visible columns)
     if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase();
+        const q = (searchQuery.value || "").toLowerCase();
         result = result.filter(
             (staff) =>
-                staff.name.toLowerCase().includes(query) ||
-                staff.staff_id.toLowerCase().includes(query) ||
-                staff.phone_number.includes(query)
+                includesQ(staff.name, q) ||
+                includesQ(staff.staff_id, q) ||
+                includesQ(staff.phone_number, q) ||
+                includesQ(staff.area, q) ||
+                includesQ(staff.work_location, q) ||
+                includesQ(staff.position, q) ||
+                includesQ(getSuperiorName(staff), q) ||
+                includesQ(staff.department, q) ||
+                includesQ(staff.hire_date, q) ||
+                includesQ(staff.rank, q) ||
+                includesQ(staff.device, q) ||
+                ((staff.warning_letter || false) && includesQ("wl", q)) ||
+                ((staff.ojk_case || 0) > 0 && includesQ("ojk", q))
         );
     }
 
@@ -713,6 +1129,242 @@ const tlNameById = computed(() => {
     });
     return map;
 });
+
+const tlSummary = computed(() => {
+    const list = Object.entries(groupedByTeamLeader.value).map(
+        ([name, arr]) => ({ name, count: arr.length })
+    );
+    return list.sort((a, b) => b.count - a.count);
+});
+
+const groupSummary = computed(() => {
+    const map = {};
+    activeStaffList.value.forEach((s) => {
+        const g = s.group || "-";
+        map[g] = (map[g] || 0) + 1;
+    });
+    const ordered = [];
+    availableGroups.forEach((g) => {
+        if (map[g]) ordered.push({ group: g, count: map[g] });
+    });
+    Object.keys(map)
+        .filter((g) => !availableGroups.includes(g))
+        .sort()
+        .forEach((g) => ordered.push({ group: g, count: map[g] }));
+    return ordered;
+});
+
+const locationSummary = computed(() => {
+    const map = {};
+    activeStaffList.value.forEach((s) => {
+        const loc = s.work_location || "-";
+        map[loc] = (map[loc] || 0) + 1;
+    });
+    return Object.keys(map)
+        .sort()
+        .map((k) => ({ location: k, count: map[k] }));
+});
+
+// Summary by Area + Work Location (e.g., Depok-Onsite)
+const areaLocationSummary = computed(() => {
+    const map = {};
+    activeStaffList.value.forEach((s) => {
+        const area = s.area || "-";
+        const loc = s.work_location || "-";
+        const key = `${area}-${loc}`;
+        map[key] = (map[key] || 0) + 1;
+    });
+    return Object.keys(map)
+        .sort()
+        .map((k) => ({ label: k, count: map[k] }));
+});
+
+// Team leaders and team quantity mapping for TL insight
+const teamLeaders = ref([]);
+const teamQtyByTlId = computed(() => {
+    const map = {};
+    activeStaffList.value.forEach((s) => {
+        const tlId = s.team_leader_id;
+        if (tlId) {
+            map[tlId] = (map[tlId] || 0) + 1;
+        }
+    });
+    return map;
+});
+
+// Generic helper for case-insensitive includes
+const includesQ = (val, q) =>
+    String(val || "")
+        .toLowerCase()
+        .includes(q);
+
+// Filtered datasets for current insight tables
+const filteredTeamLeadersInsight = computed(() => {
+    const q = (searchQuery.value || "").toLowerCase();
+    const base = q
+        ? teamLeaders.value.filter(
+              (tl) =>
+                  includesQ(tl.name, q) ||
+                  includesQ(tl.staff_id, q) ||
+                  includesQ(tl.position, q) ||
+                  includesQ(tl.group, q) ||
+                  includesQ(tl.department, q) ||
+                  includesQ(tl.area, q) ||
+                  includesQ(tl.hire_date, q)
+          )
+        : teamLeaders.value.slice();
+    return base.sort((a, b) => {
+        const ai = availableGroups.indexOf(a.group || "");
+        const bi = availableGroups.indexOf(b.group || "");
+        const pa = ai === -1 ? 999 : ai;
+        const pb = bi === -1 ? 999 : bi;
+        if (pa !== pb) return pa - pb;
+        return String(a.group || "").localeCompare(String(b.group || ""));
+    });
+});
+
+const filteredResignationsInsight = computed(() => {
+    const q = (searchQuery.value || "").toLowerCase();
+    if (!q) return resignationsMonth.value;
+    return resignationsMonth.value.filter(
+        (r) =>
+            includesQ(r.staff_name, q) ||
+            includesQ(r.staff_id, q) ||
+            includesQ(r.staff_position, q) ||
+            includesQ(r.staff_superior, q) ||
+            includesQ(r.department, q) ||
+            includesQ(r.rank, q) ||
+            includesQ(r.device, q) ||
+            includesQ(r.work_location, q) ||
+            includesQ(r.group, q) ||
+            includesQ(r.hire_date, q) ||
+            includesQ(r.report_day, q) ||
+            includesQ(r.last_working_day, q)
+    );
+});
+
+const filteredAttendancesInsight = computed(() => {
+    const q = (searchQuery.value || "").toLowerCase();
+    if (!q) return attendancesMonth.value;
+    return attendancesMonth.value.filter(
+        (a) =>
+            includesQ(a.name, q) ||
+            includesQ(a.staff_id, q) ||
+            includesQ(a.position, q) ||
+            includesQ(a.department, q) ||
+            includesQ(a.work_status, q) ||
+            includesQ(a.device, q) ||
+            includesQ(a.status_code, q) ||
+            includesQ(a.report_day, q)
+    );
+});
+
+const filteredGroupSummary = computed(() => {
+    const q = (searchQuery.value || "").toLowerCase();
+    if (!q) return groupSummary.value;
+    return groupSummary.value.filter((row) => includesQ(row.group, q));
+});
+
+const filteredLocationSummary = computed(() => {
+    const q = (searchQuery.value || "").toLowerCase();
+    if (!q) return locationSummary.value;
+    return locationSummary.value.filter((row) => includesQ(row.location, q));
+});
+
+const filteredAreaLocationSummary = computed(() => {
+    const q = (searchQuery.value || "").toLowerCase();
+    if (!q) return areaLocationSummary.value;
+    return areaLocationSummary.value.filter((row) => includesQ(row.label, q));
+});
+
+const insightBtnClass = (mode) => {
+    const active = insightMode.value === mode;
+    return [
+        "px-4 py-2 text-sm font-medium rounded-lg transition",
+        active
+            ? "bg-blue-600/30 text-blue-300 border border-blue-500/50"
+            : "bg-slate-800/50 text-slate-400 border border-slate-700 hover:bg-slate-700/50 hover:text-slate-200",
+    ];
+};
+
+const formatDate = (d) => {
+    if (!d) return "-";
+    return new Date(d).toLocaleDateString();
+};
+
+const showInsight = async (mode) => {
+    insightMode.value = mode;
+    if (mode === "attendance") {
+        if (!attendancesMonth.value.length) {
+            insightLoading.value = true;
+            try {
+                const data = await adminGetAttendancesByMonth(
+                    currentMonth.value,
+                    1000
+                );
+                attendancesMonth.value = data.success ? data.data || [] : [];
+            } catch (e) {
+                attendancesMonth.value = [];
+            } finally {
+                insightLoading.value = false;
+            }
+        }
+    } else if (mode === "resignation") {
+        if (!resignationsMonth.value.length) {
+            insightLoading.value = true;
+            try {
+                const token = localStorage.getItem("auth_token");
+                const role = JSON.parse(
+                    localStorage.getItem("user") || "{}"
+                ).role;
+                const params = new URLSearchParams();
+                params.set("month", currentMonth.value);
+                const res = await fetch(
+                    `${API_BASE_URL}/api/resignations?${params.toString()}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                            "X-Role": role,
+                        },
+                    }
+                );
+                const json = await res.json();
+                resignationsMonth.value =
+                    json && json.success ? json.data || [] : [];
+            } catch (e) {
+                resignationsMonth.value = [];
+            } finally {
+                insightLoading.value = false;
+            }
+        }
+    } else if (mode === "tl") {
+        if (!teamLeaders.value.length) {
+            insightLoading.value = true;
+            try {
+                const token = localStorage.getItem("auth_token");
+                const res = await fetch(`${API_BASE_URL}/api/team-leaders`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                const data = await res.json();
+                if (data && data.success && Array.isArray(data.data)) {
+                    teamLeaders.value = data.data;
+                } else if (Array.isArray(data)) {
+                    teamLeaders.value = data;
+                } else {
+                    teamLeaders.value = [];
+                }
+            } catch (e) {
+                teamLeaders.value = [];
+            } finally {
+                insightLoading.value = false;
+            }
+        }
+    }
+};
 
 const getSuperiorName = (staff) => {
     const id = staff?.team_leader_id || "";
@@ -785,6 +1437,12 @@ const resetFilters = () => {
     filterDepartment.value = "";
     filterPosition.value = "";
     filterGroup.value = "";
+    currentPage.value = 1;
+};
+
+const setGroupFilter = (group) => {
+    filterGroup.value = group;
+    insightMode.value = null;
     currentPage.value = 1;
 };
 
