@@ -360,11 +360,17 @@ const loadStaffCount = async () => {
 
         const data = await res.json();
 
-        if (data.success && Array.isArray(data.data)) {
-            staffCount.value = data.data.filter(s => s.status === 'active').length;
-        } else {
-            staffCount.value = 0;
-        }
+        const list = data && data.success && Array.isArray(data.data)
+            ? data.data
+            : Array.isArray(data)
+            ? data
+            : [];
+        staffCount.value = list.filter(
+            (s) =>
+                (String(s.staff_status || 'active').toLowerCase() === 'active') &&
+                (String(s.role || '').toLowerCase() !== 'tl') &&
+                (String(s.team_leader_id || '') === String(resigningTL.value || ''))
+        ).length;
     } catch (e) {
         console.error("Staff count error:", e);
         staffCount.value = 0;
