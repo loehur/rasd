@@ -1523,21 +1523,28 @@ const exportInsightsXlsx = async () => {
 
     const gHeaders = ["Team", "Team Quantity"];
     const gRows = groupSummary.value.map((row) => [row.group, row.count]);
-    const gSheet = XLSX.utils.aoa_to_sheet([gHeaders, ...gRows]);
 
     const alHeaders = ["Area-Location", "Team Quantity"];
     const alRows = areaLocationSummary.value.map((row) => [
         row.label,
         row.count,
     ]);
-    const alSheet = XLSX.utils.aoa_to_sheet([alHeaders, ...alRows]);
 
     const gtHeaders = ["Group", "Quantity"];
     const gtRows = [
         ["All", activeStaffList.value.length],
         ...availableGroups.map((g) => [g, getGroupCount(g)]),
     ];
-    const gtSheet = XLSX.utils.aoa_to_sheet([gtHeaders, ...gtRows]);
+
+    const summarySheet = XLSX.utils.aoa_to_sheet([]);
+    const add = (aoa, c) =>
+        XLSX.utils.sheet_add_aoa(summarySheet, aoa, { origin: { r: 0, c } });
+    let c = 0;
+    add([["Team Summary"], gHeaders, ...gRows], c);
+    c += gHeaders.length + 1;
+    add([["Area-Location Summary"], alHeaders, ...alRows], c);
+    c += alHeaders.length + 1;
+    add([["Groups Tabs"], gtHeaders, ...gtRows], c);
 
     const wb = XLSX.utils.book_new();
 
@@ -1588,9 +1595,7 @@ const exportInsightsXlsx = async () => {
     XLSX.utils.book_append_sheet(wb, tlSheet, "TL");
     XLSX.utils.book_append_sheet(wb, rSheet, "Resignation");
     XLSX.utils.book_append_sheet(wb, aSheet, "Attendance");
-    XLSX.utils.book_append_sheet(wb, gSheet, "Team Summary");
-    XLSX.utils.book_append_sheet(wb, alSheet, "Area-Location Summary");
-    XLSX.utils.book_append_sheet(wb, gtSheet, "Groups Tabs");
+    XLSX.utils.book_append_sheet(wb, summarySheet, "Summary");
 
     const fname = `staff_insights_${currentMonth.value}.xlsx`;
     XLSX.writeFile(wb, fname);
