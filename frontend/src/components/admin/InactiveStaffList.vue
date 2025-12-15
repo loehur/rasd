@@ -516,7 +516,7 @@ const filteredResignations = computed(() => {
 const columnsOrdered = [
     "SN",
     "Area",
-    "WFH/Oniste",
+    "WFH/Onsite",
     "ID Staff",
     "Name Staff",
     "Position",
@@ -551,7 +551,7 @@ const colValue = (col, r, i) => {
             return i + 1;
         case "Area":
             return r.area || "";
-        case "WFH/Oniste":
+        case "WFH/Onsite":
             return r.work_location || "";
         case "ID Staff":
             return r.staff_id || "";
@@ -593,6 +593,8 @@ const colValue = (col, r, i) => {
             return toTitle(r.resignation_subtype);
         case "Reason for resignation":
             return r.reason || "";
+        case "Proof":
+            return proofUrl(r.proof || "");
         default:
             return "";
     }
@@ -749,127 +751,12 @@ const formatFileSize = (bytes) => {
 };
 
 const exportResignations = async () => {
-    const headers = [
-        "SN",
-        "Area",
-        "WFH/Onsite",
-        "ID Staff",
-        "Name Staff",
-        "Position",
-        "Superior",
-        "Department",
-        "Hiredate",
-        "Rank",
-        "Device",
-        "Report day",
-        "Last working day",
-        "Ranking Intervals",
-        "Group",
-        "Voluntary/Involuntary",
-        "Subtype of Resignation",
-        "Reason for resignation",
-        "Proof",
-    ];
-
-    const token =
-        localStorage.getItem("auth_token") ||
-        localStorage.getItem("tl_auth_token");
-    const base = String(API_BASE_URL || "").replace(/\/$/, "");
-
-    const uniqueIds = [
-        ...new Set(
-            filteredResignations.value.map((r) => r.staff_id).filter(Boolean)
-        ),
-    ];
-    const staffMap = {};
-    for (const id of uniqueIds) {
-        try {
-            const res = await fetch(
-                `${API_BASE_URL}/api/attendances/staff/${id}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: token ? `Bearer ${token}` : undefined,
-                        Accept: "application/json",
-                    },
-                }
-            );
-            const data = await res.json();
-            if (data && data.success && data.data) {
-                staffMap[id] = data.data;
-            }
-        } catch (e) {}
-    }
-
-    const toTitle = (s) => {
-        const v = String(s || "").replace(/_/g, " ");
-        return v
-            .split(" ")
-            .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : ""))
-            .join(" ");
-    };
-
+    const headers = columnsOrdered;
     const rows = [
         headers,
-        ...filteredResignations.value.map((r, i) => {
-            const s = staffMap[r.staff_id] || {};
-            const groupCodes = new Set([
-                "M2",
-                "B2",
-                "B1",
-                "A2",
-                "A1-3",
-                "A1-2",
-                "A1-1",
-                "P",
-                "P-1",
-            ]);
-            const rawWorkMode =
-                r.work_status ||
-                s.work_status ||
-                r.work_location ||
-                s.work_location ||
-                "";
-            const workMode = groupCodes.has(String(rawWorkMode).toUpperCase())
-                ? ""
-                : rawWorkMode;
-            const proofPath = r.proof || "";
-            const normalized = proofPath.startsWith("/")
-                ? proofPath.slice(1)
-                : proofPath;
-            const proofUrl = /^https?:\/\//i.test(proofPath)
-                ? proofPath
-                : normalized
-                ? `${base}/${normalized}`
-                : "";
-            return [
-                i + 1,
-                s.area || "",
-                workMode,
-                r.staff_id || "",
-                r.staff_name || s.name || "",
-                r.staff_position || s.position || "",
-                r.staff_superior || "",
-                s.department || "",
-                s.hire_date ? new Date(s.hire_date).toLocaleDateString() : "",
-                s.rank || "",
-                s.device || "",
-                r.report_day ? new Date(r.report_day).toLocaleDateString() : "",
-                r.last_working_day
-                    ? new Date(r.last_working_day).toLocaleDateString()
-                    : "",
-                r.ranking_intervals || "",
-                s.group || "",
-                r.resignation_type === "voluntary"
-                    ? "Voluntary"
-                    : r.resignation_type === "involuntary"
-                    ? "Involuntary"
-                    : "",
-                toTitle(r.resignation_subtype),
-                r.reason || "",
-                proofUrl,
-            ];
-        }),
+        ...filteredResignations.value.map((r, i) =>
+            headers.map((h) => colValue(h, r, i))
+        ),
     ];
 
     const escape = (s) => {
