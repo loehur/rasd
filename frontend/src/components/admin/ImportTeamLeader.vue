@@ -2,7 +2,6 @@
     <div class="min-h-screen bg-slate-950 text-slate-100">
         <AdminHeader title="Import Team Leader Data" subtitle="Admin Portal" />
         <div class="max-w-4xl mx-auto p-6">
-
             <!-- Upload Section -->
             <div
                 class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl p-6 mb-6"
@@ -218,7 +217,11 @@
                                     : 'text-red-300',
                             ]"
                         >
-                            {{ resultSuccess ? "Import Successful!" : "Import Failed" }}
+                            {{
+                                resultSuccess
+                                    ? "Import Successful!"
+                                    : "Import Failed"
+                            }}
                         </p>
                     </div>
                     <button

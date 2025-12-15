@@ -752,7 +752,7 @@ const exportResignations = async () => {
     const headers = [
         "SN",
         "Area",
-        "WFH/Oniste",
+        "WFH/Onsite",
         "ID Staff",
         "Name Staff",
         "Position",
@@ -825,7 +825,11 @@ const exportResignations = async () => {
             return [
                 i + 1,
                 s.area || "",
-                s.group || "",
+                r.work_location ||
+                    s.work_location ||
+                    r.work_status ||
+                    s.work_status ||
+                    "",
                 r.staff_id || "",
                 r.staff_name || s.name || "",
                 r.staff_position || s.position || "",
