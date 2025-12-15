@@ -545,14 +545,38 @@ const toTitle = (s) => {
         .join(" ");
 };
 
+const normalizeWorkMode = (v) => {
+    const s = String(v || "")
+        .trim()
+        .toUpperCase();
+    if (!s) return "";
+    const groupCodes = new Set([
+        "M2",
+        "B2",
+        "B1",
+        "A2",
+        "A1-3",
+        "A1-2",
+        "A1-1",
+        "P",
+        "P-1",
+    ]);
+    if (groupCodes.has(s)) return "";
+    if (s === "WFO" || s === "ONSITE") return "Onsite";
+    if (s === "WFH") return "WFH";
+    return v || "";
+};
+
 const colValue = (col, r, i) => {
     switch (col) {
         case "SN":
             return i + 1;
         case "Area":
             return r.area || "";
+        case "WFH/Oniste":
+            return normalizeWorkMode(r.work_status || r.work_location);
         case "WFH/Onsite":
-            return r.work_location || "";
+            return normalizeWorkMode(r.work_status || r.work_location);
         case "ID Staff":
             return r.staff_id || "";
         case "Name Staff":
