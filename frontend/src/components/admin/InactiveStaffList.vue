@@ -813,6 +813,26 @@ const exportResignations = async () => {
         headers,
         ...filteredResignations.value.map((r, i) => {
             const s = staffMap[r.staff_id] || {};
+            const groupCodes = new Set([
+                "M2",
+                "B2",
+                "B1",
+                "A2",
+                "A1-3",
+                "A1-2",
+                "A1-1",
+                "P",
+                "P-1",
+            ]);
+            const rawWorkMode =
+                r.work_status ||
+                s.work_status ||
+                r.work_location ||
+                s.work_location ||
+                "";
+            const workMode = groupCodes.has(String(rawWorkMode).toUpperCase())
+                ? ""
+                : rawWorkMode;
             const proofPath = r.proof || "";
             const normalized = proofPath.startsWith("/")
                 ? proofPath.slice(1)
@@ -825,11 +845,7 @@ const exportResignations = async () => {
             return [
                 i + 1,
                 s.area || "",
-                r.work_location ||
-                    s.work_location ||
-                    r.work_status ||
-                    s.work_status ||
-                    "",
+                workMode,
                 r.staff_id || "",
                 r.staff_name || s.name || "",
                 r.staff_position || s.position || "",
