@@ -629,9 +629,9 @@ class TeamLeaderController extends Controller
                 ], 404);
             }
 
-            // Reset password to default
+            // Reset password to default - pass plain text, model mutator will hash it
             $defaultPassword = TeamLeader::getDefaultPassword();
-            $teamLeader->password = password_hash($defaultPassword, PASSWORD_DEFAULT);
+            $teamLeader->password = $defaultPassword;
             $teamLeader->save();
 
             $this->logAction($request, 'team_leader_password_reset', [
