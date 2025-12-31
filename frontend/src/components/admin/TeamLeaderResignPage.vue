@@ -81,20 +81,103 @@
 
             <!-- Recent Resignations Section -->
             <div
-                v-if="recentResignations.length > 0"
                 class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl overflow-hidden mb-6"
             >
                 <div class="p-6 border-b border-slate-800/80">
                     <h2 class="text-xl font-bold text-slate-100 mb-2">
-                        Recent Resignations
+                        Sudah Input (Resignations History)
                     </h2>
                     <p class="text-sm text-slate-400">
-                        Recent team leader resignations that can be reverted
+                        Team leader resignations that can be reverted
                     </p>
                 </div>
 
                 <div class="p-6">
-                    <div class="space-y-3">
+                    <!-- Date Filter -->
+                    <div class="mb-6 bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+                        <div class="flex flex-col sm:flex-row gap-4 items-end">
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-slate-300 mb-2">
+                                    Start Date
+                                </label>
+                                <input
+                                    type="date"
+                                    v-model="filterStartDate"
+                                    @change="onDateFilterChange"
+                                    class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-amber-500 transition"
+                                />
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-slate-300 mb-2">
+                                    End Date
+                                </label>
+                                <input
+                                    type="date"
+                                    v-model="filterEndDate"
+                                    @change="onDateFilterChange"
+                                    :max="maxEndDate"
+                                    class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-amber-500 transition"
+                                />
+                            </div>
+                            <button
+                                @click="resetDateFilter"
+                                class="px-4 py-2 bg-slate-700 text-slate-300 border border-slate-600 rounded-lg hover:bg-slate-600 transition text-sm"
+                            >
+                                Reset
+                            </button>
+                        </div>
+                        <p v-if="dateRangeError" class="text-xs text-red-400 mt-2">
+                            {{ dateRangeError }}
+                        </p>
+                        <p v-else class="text-xs text-slate-500 mt-2">
+                            Maksimal rentang filter adalah 1 minggu (7 hari)
+                        </p>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div v-if="loadingResignations" class="text-center py-8">
+                        <svg
+                            class="w-8 h-8 animate-spin text-amber-500 mx-auto"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle
+                                class="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                stroke-width="4"
+                            ></circle>
+                            <path
+                                class="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                        </svg>
+                        <p class="text-sm text-slate-400 mt-2">Loading...</p>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div v-else-if="recentResignations.length === 0" class="text-center py-8">
+                        <svg
+                            class="w-12 h-12 text-slate-600 mx-auto mb-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                        </svg>
+                        <p class="text-sm text-slate-400">Tidak ada data resignasi pada periode yang dipilih</p>
+                    </div>
+
+                    <!-- Resignations List -->
+                    <div v-else class="space-y-3">
                         <div
                             v-for="resignation in recentResignations"
                             :key="resignation.id"
@@ -410,6 +493,32 @@ const successMessage = ref("");
 const recentResignations = ref([]);
 const reverting = ref(false);
 const revertingResignationId = ref(null);
+const loadingResignations = ref(false);
+const dateRangeError = ref("");
+
+// Initialize date filter with default 1 week ago
+const getDefaultDateRange = () => {
+    const today = new Date();
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(today.getDate() - 7);
+    
+    return {
+        start: oneWeekAgo.toISOString().split('T')[0],
+        end: today.toISOString().split('T')[0]
+    };
+};
+
+const defaultDates = getDefaultDateRange();
+const filterStartDate = ref(defaultDates.start);
+const filterEndDate = ref(defaultDates.end);
+
+const maxEndDate = computed(() => {
+    if (!filterStartDate.value) return '';
+    const start = new Date(filterStartDate.value);
+    const maxEnd = new Date(start);
+    maxEnd.setDate(start.getDate() + 7);
+    return maxEnd.toISOString().split('T')[0];
+});
 
 const goBack = () => {
     window.location.href = "/admin/dashboard";
@@ -558,13 +667,68 @@ const submitResignation = async () => {
     }
 };
 
+const validateDateRange = () => {
+    if (!filterStartDate.value || !filterEndDate.value) {
+        dateRangeError.value = "";
+        return true;
+    }
+
+    const start = new Date(filterStartDate.value);
+    const end = new Date(filterEndDate.value);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays > 7) {
+        dateRangeError.value = "Rentang tanggal maksimal 1 minggu (7 hari)";
+        return false;
+    }
+
+    if (start > end) {
+        dateRangeError.value = "Tanggal mulai harus sebelum atau sama dengan tanggal akhir";
+        return false;
+    }
+
+    dateRangeError.value = "";
+    return true;
+};
+
+const onDateFilterChange = () => {
+    if (validateDateRange()) {
+        loadRecentResignations();
+    }
+};
+
+const resetDateFilter = () => {
+    const defaultDates = getDefaultDateRange();
+    filterStartDate.value = defaultDates.start;
+    filterEndDate.value = defaultDates.end;
+    dateRangeError.value = "";
+    loadRecentResignations();
+};
+
 const loadRecentResignations = async () => {
+    if (!validateDateRange()) {
+        return;
+    }
+
+    loadingResignations.value = true;
+    
     try {
         const token = localStorage.getItem("auth_token");
         const userData = localStorage.getItem("user");
         const parsedUser = userData ? JSON.parse(userData) : {};
 
-        const res = await fetch(`${API_BASE_URL}/api/team-leaders/resignations/recent?limit=10`, {
+        // Build query params
+        const params = new URLSearchParams();
+        params.append('limit', '100');
+        if (filterStartDate.value) {
+            params.append('start_date', filterStartDate.value);
+        }
+        if (filterEndDate.value) {
+            params.append('end_date', filterEndDate.value);
+        }
+
+        const res = await fetch(`${API_BASE_URL}/api/team-leaders/resignations/recent?${params.toString()}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -577,9 +741,14 @@ const loadRecentResignations = async () => {
 
         if (data.success && Array.isArray(data.data)) {
             recentResignations.value = data.data;
+        } else {
+            recentResignations.value = [];
         }
     } catch (e) {
         console.error("Load recent resignations error:", e);
+        recentResignations.value = [];
+    } finally {
+        loadingResignations.value = false;
     }
 };
 
@@ -648,6 +817,22 @@ watch(resigningTL, () => {
     }
 });
 
+watch(filterStartDate, (newStartDate) => {
+    if (newStartDate && filterEndDate.value) {
+        const start = new Date(newStartDate);
+        const end = new Date(filterEndDate.value);
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        // If end date is more than 7 days from start, adjust it
+        if (diffDays > 7) {
+            const newEnd = new Date(start);
+            newEnd.setDate(start.getDate() + 7);
+            filterEndDate.value = newEnd.toISOString().split('T')[0];
+        }
+    }
+});
+
 onMounted(() => {
     // Check if user is logged in and is admin
     const authToken = localStorage.getItem("auth_token");
@@ -667,6 +852,7 @@ onMounted(() => {
 
     user.value = parsedUser;
     loadTeamLeaders();
+    // Load recent resignations will use default date range (1 week ago)
     loadRecentResignations();
 });
 </script>

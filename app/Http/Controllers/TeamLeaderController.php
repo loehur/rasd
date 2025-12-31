@@ -798,12 +798,26 @@ class TeamLeaderController extends Controller
     public function getRecentResignations(Request $request)
     {
         try {
-            $limit = $request->input('limit', 20);
+            $limit = $request->input('limit', 100);
+
+            // Get date filters
+            $startDate = $request->input('start_date');
+            $endDate = $request->input('end_date');
+
+            // Build query for status_change logs
+            $query = StaffLog::where('change_type', 'status_change')
+                ->where('remarks', 'Team Leader Resignation');
+
+            // Apply date filters if provided
+            if ($startDate) {
+                $query->whereDate('created_at', '>=', $startDate);
+            }
+            if ($endDate) {
+                $query->whereDate('created_at', '<=', $endDate);
+            }
 
             // Get all status_change logs for TL resignations
-            $statusChangeLogs = StaffLog::where('change_type', 'status_change')
-                ->where('remarks', 'Team Leader Resignation')
-                ->orderBy('created_at', 'desc')
+            $statusChangeLogs = $query->orderBy('created_at', 'desc')
                 ->limit($limit)
                 ->get();
 
