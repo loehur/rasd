@@ -79,6 +79,113 @@
                 </div>
             </div>
 
+            <!-- Recent Resignations Section -->
+            <div
+                v-if="recentResignations.length > 0"
+                class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl overflow-hidden mb-6"
+            >
+                <div class="p-6 border-b border-slate-800/80">
+                    <h2 class="text-xl font-bold text-slate-100 mb-2">
+                        Recent Resignations
+                    </h2>
+                    <p class="text-sm text-slate-400">
+                        Recent team leader resignations that can be reverted
+                    </p>
+                </div>
+
+                <div class="p-6">
+                    <div class="space-y-3">
+                        <div
+                            v-for="resignation in recentResignations"
+                            :key="resignation.id"
+                            class="bg-slate-800/50 border border-slate-700 rounded-lg p-4"
+                        >
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <svg
+                                            class="w-5 h-5 text-red-400"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                            />
+                                        </svg>
+                                        <span class="text-sm font-semibold text-slate-200">
+                                            {{ formatName(resignation.resigning_tl_name) }} → {{ formatName(resignation.replacement_tl_name) || 'N/A' }}
+                                        </span>
+                                    </div>
+                                    <div class="text-xs text-slate-400 space-y-1">
+                                        <p>
+                                            <span class="text-slate-500">Resigning TL:</span>
+                                            {{ formatName(resignation.resigning_tl_name) }} ({{ resignation.resigning_tl_id }})
+                                        </p>
+                                        <p>
+                                            <span class="text-slate-500">Replacement TL:</span>
+                                            {{ formatName(resignation.replacement_tl_name) || 'N/A' }} ({{ resignation.replacement_tl_id || 'N/A' }})
+                                        </p>
+                                        <p>
+                                            <span class="text-slate-500">Transferred:</span>
+                                            {{ resignation.transferred_count }} staff member(s)
+                                        </p>
+                                        <p>
+                                            <span class="text-slate-500">Date:</span>
+                                            {{ formatDateTime(resignation.created_at) }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    @click="revertResignation(resignation)"
+                                    :disabled="reverting"
+                                    class="px-4 py-2 bg-red-600/80 hover:bg-red-600 text-white text-sm rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    <svg
+                                        v-if="reverting && revertingResignationId === resignation.resigning_tl_id"
+                                        class="w-4 h-4 animate-spin"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            class="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            stroke-width="4"
+                                        ></circle>
+                                        <path
+                                            class="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                    <svg
+                                        v-else
+                                        class="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                                        />
+                                    </svg>
+                                    Revert
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Form Section -->
             <div
                 class="bg-slate-900/70 backdrop-blur border border-slate-800/80 rounded-2xl overflow-hidden"
@@ -300,6 +407,9 @@ const loading = ref(false);
 const submitting = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
+const recentResignations = ref([]);
+const reverting = ref(false);
+const revertingResignationId = ref(null);
 
 const goBack = () => {
     window.location.href = "/admin/dashboard";
@@ -430,8 +540,13 @@ const submitResignation = async () => {
 
         if (data.success) {
             successMessage.value = data.message || `Successfully transferred ${data.transferred_count || 0} staff members`;
-            // Reload the team leaders list to reflect changes
+            // Reset form
+            resigningTL.value = "";
+            replacementTL.value = "";
+            staffCount.value = null;
+            // Reload the team leaders list and recent resignations
             loadTeamLeaders();
+            loadRecentResignations();
         } else {
             errorMessage.value = data.message || "Failed to process resignation";
         }
@@ -441,6 +556,89 @@ const submitResignation = async () => {
     } finally {
         submitting.value = false;
     }
+};
+
+const loadRecentResignations = async () => {
+    try {
+        const token = localStorage.getItem("auth_token");
+        const userData = localStorage.getItem("user");
+        const parsedUser = userData ? JSON.parse(userData) : {};
+
+        const res = await fetch(`${API_BASE_URL}/api/team-leaders/resignations/recent?limit=10`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                "X-Role": parsedUser.role || "admin"
+            }
+        });
+
+        const data = await res.json();
+
+        if (data.success && Array.isArray(data.data)) {
+            recentResignations.value = data.data;
+        }
+    } catch (e) {
+        console.error("Load recent resignations error:", e);
+    }
+};
+
+const revertResignation = async (resignation) => {
+    if (!confirm(`Are you sure you want to revert this resignation?\n\nThis will:\n- Transfer ${resignation.transferred_count} staff member(s) back to ${resignation.resigning_tl_name}\n- Restore ${resignation.resigning_tl_name}'s status to active`)) {
+        return;
+    }
+
+    reverting.value = true;
+    revertingResignationId.value = resignation.resigning_tl_id;
+    errorMessage.value = "";
+    successMessage.value = "";
+
+    try {
+        const token = localStorage.getItem("auth_token");
+        const userData = localStorage.getItem("user");
+        const parsedUser = userData ? JSON.parse(userData) : {};
+
+        const res = await fetch(`${API_BASE_URL}/api/team-leaders/resignations/revert`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                "X-Role": parsedUser.role || "admin"
+            },
+            body: JSON.stringify({
+                resigning_tl_id: resignation.resigning_tl_id
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            successMessage.value = data.message || "Successfully reverted resignation";
+            // Reload data
+            loadTeamLeaders();
+            loadRecentResignations();
+        } else {
+            errorMessage.value = data.message || "Failed to revert resignation";
+        }
+    } catch (e) {
+        console.error("Revert error:", e);
+        errorMessage.value = "Connection error. Please try again.";
+    } finally {
+        reverting.value = false;
+        revertingResignationId.value = null;
+    }
+};
+
+const formatDateTime = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
 };
 
 watch(resigningTL, () => {
@@ -469,5 +667,6 @@ onMounted(() => {
 
     user.value = parsedUser;
     loadTeamLeaders();
+    loadRecentResignations();
 });
 </script>

@@ -130,6 +130,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('team-leaders/import', 'TeamLeaderController@import');
     $router->get('team-leaders/template', 'TeamLeaderController@downloadTemplate');
     $router->post('team-leaders/resign', 'TeamLeaderController@resign');
+    $router->get('team-leaders/resignations/recent', 'TeamLeaderController@getRecentResignations');
+    $router->post('team-leaders/resignations/revert', 'TeamLeaderController@revertResignation');
     $router->get('team-leaders/{employeeId}', 'TeamLeaderController@show');
     $router->put('team-leaders/{employeeId}', 'TeamLeaderController@update');
     $router->post('team-leaders/{employeeId}/reset-password', 'TeamLeaderController@resetPassword');

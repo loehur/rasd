@@ -7,6 +7,7 @@ use App\Models\Staff;
 use App\Models\StaffLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class TeamLeaderController extends Controller
 {
@@ -784,6 +785,259 @@ class TeamLeaderController extends Controller
                     'file' => basename($e->getFile()),
                     'line' => $e->getLine()
                 ]
+            ], 500);
+        }
+    }
+
+    /**
+     * Get recent team leader resignations
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getRecentResignations(Request $request)
+    {
+        try {
+            $limit = $request->input('limit', 20);
+
+            // Get all status_change logs for TL resignations
+            $statusChangeLogs = StaffLog::where('change_type', 'status_change')
+                ->where('remarks', 'Team Leader Resignation')
+                ->orderBy('created_at', 'desc')
+                ->limit($limit)
+                ->get();
+
+            $resignations = [];
+
+            foreach ($statusChangeLogs as $statusLog) {
+                $resigningTLId = $statusLog->staff_id;
+                $resigningTL = TeamLeader::where('staff_id', $resigningTLId)->first();
+
+                if (!$resigningTL) {
+                    continue;
+                }
+
+                // Get all team_leader_transfer logs for this resignation
+                // They should have remarks containing the resigning TL name
+                $statusLogTime = $statusLog->created_at;
+                $timeStart = $statusLogTime->copy()->subMinutes(5)->format('Y-m-d H:i:s');
+                $timeEnd = $statusLogTime->copy()->addMinutes(5)->format('Y-m-d H:i:s');
+                
+                // Get transfer logs within the time window
+                $allTransferLogs = StaffLog::where('change_type', 'team_leader_transfer')
+                    ->where('remarks', 'like', '%Team Leader Resignation%')
+                    ->whereBetween('created_at', [$timeStart, $timeEnd])
+                    ->get();
+                
+                // Filter by matching old_value.team_leader_id
+                $transferLogs = $allTransferLogs->filter(function($log) use ($resigningTLId) {
+                    $oldValue = $log->old_value;
+                    return is_array($oldValue) && isset($oldValue['team_leader_id']) && $oldValue['team_leader_id'] === $resigningTLId;
+                });
+
+                // Get replacement TL ID from first transfer log
+                $replacementTLId = null;
+                $replacementTLName = null;
+                $transferredCount = 0;
+
+                if ($transferLogs->count() > 0) {
+                    $firstTransfer = $transferLogs->first();
+                    $newValue = $firstTransfer->new_value;
+                    if (is_array($newValue) && isset($newValue['team_leader_id'])) {
+                        $replacementTLId = $newValue['team_leader_id'];
+                        $replacementTL = TeamLeader::where('staff_id', $replacementTLId)->first();
+                        if ($replacementTL) {
+                            $replacementTLName = $replacementTL->name;
+                        }
+                    }
+                    $transferredCount = $transferLogs->count();
+                }
+
+                $resignations[] = [
+                    'id' => $statusLog->id,
+                    'resigning_tl_id' => $resigningTLId,
+                    'resigning_tl_name' => $resigningTL->name,
+                    'replacement_tl_id' => $replacementTLId,
+                    'replacement_tl_name' => $replacementTLName,
+                    'transferred_count' => $transferredCount,
+                    'created_at' => $statusLog->created_at->format('Y-m-d H:i:s'),
+                    'status_log_id' => $statusLog->id
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $resignations
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Get Recent Resignations Error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to get recent resignations: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Revert a team leader resignation
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function revertResignation(Request $request)
+    {
+        try {
+            // Validate input
+            $validator = Validator::make($request->all(), [
+                'resigning_tl_id' => 'required|string'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $resigningTLId = $request->resigning_tl_id;
+
+            // Verify the resigning TL exists
+            $resigningTL = TeamLeader::where('staff_id', $resigningTLId)->first();
+            if (!$resigningTL) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Resigning team leader not found'
+                ], 404);
+            }
+
+            // Start transaction
+            DB::beginTransaction();
+
+            try {
+                // Find the status_change log for this TL resignation
+                $statusLog = StaffLog::where('change_type', 'status_change')
+                    ->where('staff_id', $resigningTLId)
+                    ->where('remarks', 'Team Leader Resignation')
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+
+                if (!$statusLog) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Resignation record not found'
+                    ], 404);
+                }
+
+                // Get old status from the log
+                $oldStatus = $statusLog->old_value['staff_status'] ?? 'active';
+
+                // Find all team_leader_transfer logs for this resignation
+                $statusLogTime = $statusLog->created_at;
+                $timeStart = $statusLogTime->copy()->subMinutes(5)->format('Y-m-d H:i:s');
+                $timeEnd = $statusLogTime->copy()->addMinutes(5)->format('Y-m-d H:i:s');
+                
+                // Get transfer logs within the time window
+                $allTransferLogs = StaffLog::where('change_type', 'team_leader_transfer')
+                    ->where('remarks', 'like', '%Team Leader Resignation%')
+                    ->whereBetween('created_at', [$timeStart, $timeEnd])
+                    ->get();
+                
+                // Filter by matching old_value.team_leader_id
+                $transferLogs = $allTransferLogs->filter(function($log) use ($resigningTLId) {
+                    $oldValue = $log->old_value;
+                    return is_array($oldValue) && isset($oldValue['team_leader_id']) && $oldValue['team_leader_id'] === $resigningTLId;
+                });
+
+                $revertedCount = 0;
+
+                // Revert each staff member's team_leader_id
+                foreach ($transferLogs as $transferLog) {
+                    $staffId = $transferLog->staff_id;
+                    $oldValue = $transferLog->old_value;
+                    $oldTLId = $oldValue['team_leader_id'] ?? null;
+
+                    if ($oldTLId) {
+                        $staff = Staff::where('staff_id', $staffId)->first();
+                        if ($staff) {
+                            // Revert to old TL
+                            $staff->team_leader_id = $oldTLId;
+                            $staff->save();
+
+                            // Log the revert
+                            StaffLog::create([
+                                'staff_id' => $staffId,
+                                'change_type' => 'team_leader_transfer',
+                                'old_value' => [
+                                    'team_leader_id' => $transferLog->new_value['team_leader_id'] ?? null,
+                                    'team_leader_name' => $transferLog->new_value['team_leader_name'] ?? null
+                                ],
+                                'new_value' => [
+                                    'team_leader_id' => $oldTLId,
+                                    'team_leader_name' => $oldValue['team_leader_name'] ?? null
+                                ],
+                                'changed_by' => 'admin',
+                                'remarks' => 'Revert Team Leader Resignation - Reverted back to ' . ($oldValue['team_leader_name'] ?? $oldTLId)
+                            ]);
+
+                            $revertedCount++;
+                        }
+                    }
+                }
+
+                // Revert the TL status
+                $resigningTL->staff_status = $oldStatus;
+                $resigningTL->save();
+
+                // Log the status revert
+                StaffLog::create([
+                    'staff_id' => $resigningTLId,
+                    'change_type' => 'status_change',
+                    'old_value' => [
+                        'staff_status' => 'resign',
+                        'role' => 'tl'
+                    ],
+                    'new_value' => [
+                        'staff_status' => $oldStatus,
+                        'role' => 'tl'
+                    ],
+                    'changed_by' => 'admin',
+                    'remarks' => 'Revert Team Leader Resignation'
+                ]);
+
+                DB::commit();
+
+                $this->logAction($request, 'team_leader_resignation_revert', [
+                    'resigning_tl_id' => $resigningTLId,
+                    'resigning_tl_name' => $resigningTL->name,
+                    'reverted_staff_count' => $revertedCount
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => "Successfully reverted resignation. {$revertedCount} staff member(s) transferred back to {$resigningTL->name}",
+                    'reverted_count' => $revertedCount
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Revert Resignation Error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to revert resignation: ' . $e->getMessage()
             ], 500);
         }
     }
