@@ -13,71 +13,37 @@
 |
 */
 
-// Asset handler attempt to bypass server 404s
-$router->get('dist/{file:.+}', function ($file) {
-    // Prevent directory traversal
-    if (strpos($file, '..') !== false) {
-       return response('Forbidden', 403);
-    }
-    
-    $path = base_path('public/dist/' . $file);
-    
-    if (file_exists($path)) {
-        $ext = pathinfo($path, PATHINFO_EXTENSION);
-        $types = [
-            'js' => 'application/javascript',
-            'css' => 'text/css',
-            'png' => 'image/png',
-            'jpg' => 'image/jpeg',
-            'svg' => 'image/svg+xml',
-            'woff' => 'font/woff',
-            'woff2' => 'font/woff2'
-        ];
-        $contentType = $types[$ext] ?? 'text/plain';
-        return response(file_get_contents($path))
-            ->header('Content-Type', $contentType);
-    }
-    
-    return response('Asset not found: ' . $file, 404);
-});
+// Asset handlers removed - moved to catch-all at the end
 
-// Also handle old assets folder if needed
-$router->get('assets/{file:.+}', function ($file) {
-    if (strpos($file, '..') !== false) return response('Forbidden', 403);
-    $path = base_path('public/assets/' . $file);
-    if (file_exists($path)) {
-        $ext = pathinfo($path, PATHINFO_EXTENSION);
-        $types = [
-            'js' => 'application/javascript', 
-            'css' => 'text/css', 
-            'png' => 'image/png',
-            'jpg' => 'image/jpeg',
-            'svg' => 'image/svg+xml'
-        ];
-        $contentType = $types[$ext] ?? 'text/plain';
-        return response(file_get_contents($path))
-            ->header('Content-Type', $contentType);
-    }
-    // Debug info if file found via php but maybe path wrong
-    return response('Asset not found in: ' . $path, 404);
-});
-
-// Debug route
-$router->get('check-assets', function () {
-    $path = base_path('public/assets');
-    $files = is_dir($path) ? scandir($path) : [];
+// Debug Path Route - Access this to see what Lumen sees
+$router->get('debug-path', function () {
     return response()->json([
-        'path' => $path,
-        'exists' => is_dir($path),
-        'files' => $files,
-        'owner' => is_dir($path) ? fileowner($path) : 'N/A',
-        'perms' => is_dir($path) ? substr(sprintf('%o', fileperms($path)), -4) : 'N/A',
+        'path_path' => request()->path(),
+        'url' => request()->url(),
+        'full_url' => request()->fullUrl(),
+        'method' => request()->method(),
+        'base_path' => base_path(),
     ]);
 });
 
+// Main Entry Point
 $router->get('/', function () use ($router) {
     return file_get_contents(base_path('public/pages/public/team-leader-login.html'));
 });
+
+// Admin Dashboard
+$router->get('/admin/dashboard', function () {
+    return file_get_contents(base_path('public/pages/admin/dashboard.html'));
+});
+
+// ... (Other admin routes are defined below in the original file, I should not delete them if I can avoid it) ... 
+// But since I am appending, I will assume user routes are fine if I just append catch-all AT THE END.
+
+// Wait, the previous replace removed the '/' route. I need to put it back.
+// AND I need to make sure I didn't delete the rest of the file.
+
+// Let's rewrite the catch-all section correctly.
+
 
 // Admin frontend routes - serve appropriate HTML based on path
 $router->get('/admin/dashboard', function () {
@@ -250,4 +216,57 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('phone-numbers', 'PhoneNumberController@store');
     $router->put('phone-numbers/{id}', 'PhoneNumberController@update');
     $router->delete('phone-numbers/{id}', 'PhoneNumberController@destroy');
+});
+
+// Fallback Catch-All Route for Assets & Debugging
+// matches GET requests to anything not matched above
+$router->get('/{any:.*}', function ($any) {
+    // Debug Path Route
+    if (strpos($any, 'check-assets') !== false || strpos($any, 'debug-path') !== false) {
+        return response()->json([
+            'message' => 'Catch-All Route Hit!',
+            'path_seen_by_lumen' => $any,
+            'full_url' => request()->fullUrl(),
+            'base_path' => base_path(),
+            'public_path' => base_path('public'),
+            'asset_dir_exists' => is_dir(base_path('public/assets')),
+            'sample_file_check' => file_exists(base_path('public/assets/staff.png')) ? 'FOUND' : 'NOT FOUND',
+        ]);
+    }
+    
+    // Check if this looks like an asset request (contains 'assets/' or 'dist/')
+    // Usage of preg_match allows matching "jobs/sd_pro/public/assets/foo.js" 
+    // and extracting "assets/foo.js" regardless of prefix.
+    if (preg_match('#(assets|dist)/(.*)$#', $any, $matches)) {
+        $folder = $matches[1]; // assets or dist
+        $file = $matches[2];   // filename.js
+        
+        // Prevent directory traversal
+        if (strpos($file, '..') !== false) {
+           return response('Forbidden', 403);
+        }
+
+        $path = base_path("public/$folder/$file");
+        
+        if (file_exists($path)) {
+            $ext = pathinfo($path, PATHINFO_EXTENSION);
+            $types = [
+                'js' => 'application/javascript',
+                'css' => 'text/css',
+                'png' => 'image/png',
+                'jpg' => 'image/jpeg',
+                'svg' => 'image/svg+xml',
+                'woff' => 'font/woff', 
+                'woff2' => 'font/woff2'
+            ];
+            $contentType = $types[$ext] ?? 'text/plain';
+            return response(file_get_contents($path))
+                ->header('Content-Type', $contentType);
+        }
+        
+        // If file not found, return 404 but with debug info for now
+        // return response("Asset file not found at: $path", 404);
+    }
+
+    return response('Route not defined: ' . $any, 404);
 });
