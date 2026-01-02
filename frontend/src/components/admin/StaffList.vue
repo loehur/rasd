@@ -986,6 +986,19 @@
                             </p>
                         </div>
                     </div>
+                    
+                    <!-- ADMIN ACTIONS -->
+                    <div class="mt-6 pt-4 border-t border-slate-800 flex justify-end">
+                        <button
+                            @click="resetStaffPassword(selectedStaff.staff_id)"
+                            class="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/20 transition text-sm font-medium flex items-center gap-2"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                            </svg>
+                            Reset Password to Default
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1059,6 +1072,32 @@ const loadStaff = async () => {
         console.error("Load error:", err);
     } finally {
         loading.value = false;
+    }
+};
+
+const resetStaffPassword = async (staffId) => {
+    if (!confirm("Are you sure you want to reset this staff's password to the default 'staff1230'?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/staff/${staffId}/reset-password`, {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            alert("Password Reset Successfully!\n\nNew Password: staff1230");
+        } else {
+            alert("Failed to reset password: " + (data.message || "Unknown error"));
+        }
+    } catch (err) {
+        console.error(err);
+        alert("An error occurred while communicating with the server.");
     }
 };
 
