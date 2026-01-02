@@ -147,7 +147,15 @@ $router->get('/team-leader/phone-numbers', function () {
 });
 
 // API Routes
-$router->group(['prefix' => 'api'], function () use ($router) {
+// Detect if we are running in a subfolder and adjust prefix accordingly
+$apiPrefix = 'api';
+$requestPath = request()->path();
+// If the path starts with 'jobs/sd_pro/api' (or any other subfolder variant), use that as prefix
+if (preg_match('#^(.*)/api(/|$)#', $requestPath, $matches)) {
+    $apiPrefix = $matches[1] . '/api';
+}
+
+$router->group(['prefix' => $apiPrefix], function () use ($router) {
     $router->post('login', 'AuthController@login');
 
     // Staff routes
