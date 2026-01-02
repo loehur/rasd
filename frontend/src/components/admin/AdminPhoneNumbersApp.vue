@@ -27,7 +27,9 @@
                 <div class="px-6 py-4 border-b border-slate-800/80">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-bold text-slate-100">Phone Numbers List</h2>
-                        <div class="text-sm text-slate-500">Showing last 20 entries</div>
+                        <div class="text-sm text-slate-500">
+                            Showing {{ pagination.total > 0 ? ((pagination.current_page - 1) * pagination.per_page) + 1 : 0 }} - {{ Math.min(pagination.current_page * pagination.per_page, pagination.total) }} of {{ pagination.total }} entries
+                        </div>
                     </div>
                     
                     <!-- Search Input -->
@@ -116,8 +118,17 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-400">
                                     {{ item.phone_number }}
                                 </td>
-                                <td class="px-6 py-4 text-sm text-slate-400">
-                                    {{ item.remarks || '-' }}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
+                                    <div v-if="item.remarks" class="relative group">
+                                        <svg class="w-5 h-5 text-amber-400 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <div class="absolute z-50 invisible group-hover:visible bg-slate-800 border border-slate-600 text-slate-200 text-xs rounded-lg py-2 px-3 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 max-w-xs shadow-xl">
+                                            {{ item.remarks }}
+                                            <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-slate-600"></div>
+                                        </div>
+                                    </div>
+                                    <span v-else class="text-slate-500">-</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                                     {{ formatDate(item.created_at) }}
@@ -146,6 +157,29 @@
                 <!-- Empty State -->
                 <div v-else class="p-8 text-center text-slate-500">
                     No phone numbers found.
+                </div>
+
+                <!-- Pagination Controls -->
+                <div v-if="phoneNumbers.length > 0" class="px-6 py-4 border-t border-slate-800/80 flex items-center justify-between">
+                    <div class="text-sm text-slate-400">
+                        Page {{ pagination.current_page }} of {{ pagination.total_pages }}
+                    </div>
+                    <div class="flex gap-2">
+                        <button
+                            @click="goToPage(pagination.current_page - 1)"
+                            :disabled="!pagination.has_prev || loading"
+                            class="px-4 py-2 bg-slate-700 text-slate-200 font-medium rounded-lg hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        >
+                            ← Previous
+                        </button>
+                        <button
+                            @click="goToPage(pagination.current_page + 1)"
+                            :disabled="!pagination.has_next || loading"
+                            class="px-4 py-2 bg-slate-700 text-slate-200 font-medium rounded-lg hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        >
+                            Next →
+                        </button>
+                    </div>
                 </div>
             </div>
         </main>
@@ -249,6 +283,14 @@ const editData = ref({
     remarks: ''
 });
 const isSuperAdmin = ref(false);
+const pagination = ref({
+    current_page: 1,
+    per_page: 20,
+    total: 0,
+    total_pages: 0,
+    has_prev: false,
+    has_next: false
+});
 
 onMounted(() => {
     // Check if user is super-admin
@@ -256,27 +298,29 @@ onMounted(() => {
     if (userData) {
         try {
             const parsed = JSON.parse(userData);
-            isSuperAdmin.value = parsed.role === 'super-admin';
+            isSuperAdmin.value = ['super-admin', 'admin'].includes(parsed.role);
         } catch {}
     }
 
     fetchPhoneNumbers();
 });
 
-const fetchPhoneNumbers = async () => {
+const fetchPhoneNumbers = async (page = 1) => {
     loading.value = true;
     error.value = '';
     
     try {
         const token = localStorage.getItem('auth_token');
         
-        // Build URL with search parameter
-        let url = `${API_BASE_URL}/api/phone-numbers`;
+        // Build URL with search and pagination parameters
+        const params = new URLSearchParams();
+        params.append('page', page);
+        params.append('per_page', 20);
         if (searchQuery.value && searchQuery.value.length >= 8) {
-            url += `?search=${encodeURIComponent(searchQuery.value)}`;
+            params.append('search', searchQuery.value);
         }
         
-        const response = await fetch(url, {
+        const response = await fetch(`${API_BASE_URL}/api/phone-numbers?${params.toString()}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
@@ -287,6 +331,9 @@ const fetchPhoneNumbers = async () => {
         
         if (data.success) {
             phoneNumbers.value = data.data;
+            if (data.pagination) {
+                pagination.value = data.pagination;
+            }
         } else {
             error.value = data.message || 'Failed to fetch phone numbers';
         }
@@ -295,6 +342,12 @@ const fetchPhoneNumbers = async () => {
         console.error('Error:', err);
     } finally {
         loading.value = false;
+    }
+};
+
+const goToPage = (page) => {
+    if (page >= 1 && page <= pagination.value.total_pages) {
+        fetchPhoneNumbers(page);
     }
 };
 

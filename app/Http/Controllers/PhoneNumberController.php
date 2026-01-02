@@ -84,16 +84,36 @@ class PhoneNumberController extends Controller
                 $query->where('phone_number', 'LIKE', '%' . $search . '%');
             }
 
-            // Order by latest and limit to 20 records
+            // Pagination parameters
+            $page = (int) $request->input('page', 1);
+            $perPage = (int) $request->input('per_page', 20);
+            
+            // Get total count before pagination
+            $total = $query->count();
+            
+            // Calculate offset and get paginated data
+            $offset = ($page - 1) * $perPage;
             $phoneNumbers = $query->orderBy('created_at', 'desc')
-                ->limit(20)
+                ->skip($offset)
+                ->take($perPage)
                 ->get();
+            
+            // Calculate pagination info
+            $totalPages = ceil($total / $perPage);
 
             return response()->json([
                 'success' => true,
                 'data' => $phoneNumbers,
                 'user_role' => $user->role ?? 'admin',
-                'search' => $search
+                'search' => $search,
+                'pagination' => [
+                    'current_page' => $page,
+                    'per_page' => $perPage,
+                    'total' => $total,
+                    'total_pages' => $totalPages,
+                    'has_prev' => $page > 1,
+                    'has_next' => $page < $totalPages
+                ]
             ]);
 
         } catch (\Exception $e) {
@@ -177,13 +197,16 @@ class PhoneNumberController extends Controller
                 }
             }
 
+            // Sanitize phone number - only keep digits
+            $cleanPhoneNumber = preg_replace('/[^0-9]/', '', $request->phone_number);
+
             // Create phone number entry
             $phoneNumber = PhoneNumber::create([
                 'staff_id' => $user->staff_id,
                 'employee_name' => $user->name,
                 'team_leader_name' => $teamLeaderName,
                 'team_leader_id' => $teamLeaderId,
-                'phone_number' => $request->phone_number,
+                'phone_number' => $cleanPhoneNumber,
                 'remarks' => $request->remarks,
             ]);
 
@@ -245,10 +268,13 @@ class PhoneNumberController extends Controller
             $user = Staff::where('staff_id', $employeeId)->first();
             if (!$user) {
                 $user = \App\Models\User::find($employeeId);
+                if ($user) {
+                    $user->role = $user->role ?? 'admin';
+                }
             }
 
             // Admin can edit any, Staff can only edit their own
-            if ($user && $user->role !== 'admin' && $phoneNumber->staff_id !== $employeeId) {
+            if ($user && !in_array($user->role, ['admin', 'super-admin']) && $phoneNumber->staff_id !== $employeeId) {
                 return response()->json([
                     'success' => false,
                     'message' => 'You can only edit your own phone numbers'
@@ -269,9 +295,12 @@ class PhoneNumberController extends Controller
                 ], 422);
             }
 
+            // Sanitize phone number - only keep digits
+            $cleanPhoneNumber = preg_replace('/[^0-9]/', '', $request->phone_number);
+
             // Update phone number
             $phoneNumber->update([
-                'phone_number' => $request->phone_number,
+                'phone_number' => $cleanPhoneNumber,
                 'remarks' => $request->remarks,
             ]);
 
@@ -332,10 +361,13 @@ class PhoneNumberController extends Controller
             $user = Staff::where('staff_id', $employeeId)->first();
             if (!$user) {
                 $user = \App\Models\User::find($employeeId);
+                if ($user) {
+                    $user->role = $user->role ?? 'admin';
+                }
             }
 
             // Admin can delete any, Staff can only delete their own
-            if ($user && $user->role !== 'admin' && $phoneNumber->staff_id !== $employeeId) {
+            if ($user && !in_array($user->role, ['admin', 'super-admin']) && $phoneNumber->staff_id !== $employeeId) {
                 return response()->json([
                     'success' => false,
                     'message' => 'You can only delete your own phone numbers'
