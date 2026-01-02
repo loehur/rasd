@@ -103,7 +103,6 @@ export default defineConfig(({ command }) => {
         resolve: { alias: { "@": resolve(__dirname, "src") } },
         build: {
             outDir: "../public",
-            assetsDir: "dist", // Change asset folder to 'dist' to bypass 'assets' folder issues
             emptyOutDir: false,
             rollupOptions: {
                 input: {
