@@ -14,7 +14,7 @@
 */
 
 // Asset handler attempt to bypass server 404s
-$router->get('/dist/{file:.+}', function ($file) {
+$router->get('dist/{file:.+}', function ($file) {
     // Prevent directory traversal
     if (strpos($file, '..') !== false) {
        return response('Forbidden', 403);
@@ -42,7 +42,7 @@ $router->get('/dist/{file:.+}', function ($file) {
 });
 
 // Also handle old assets folder if needed
-$router->get('/assets/{file:.+}', function ($file) {
+$router->get('assets/{file:.+}', function ($file) {
     if (strpos($file, '..') !== false) return response('Forbidden', 403);
     $path = base_path('public/assets/' . $file);
     if (file_exists($path)) {
@@ -58,7 +58,21 @@ $router->get('/assets/{file:.+}', function ($file) {
         return response(file_get_contents($path))
             ->header('Content-Type', $contentType);
     }
-    return response('Asset not found', 404);
+    // Debug info if file found via php but maybe path wrong
+    return response('Asset not found in: ' . $path, 404);
+});
+
+// Debug route
+$router->get('check-assets', function () {
+    $path = base_path('public/assets');
+    $files = is_dir($path) ? scandir($path) : [];
+    return response()->json([
+        'path' => $path,
+        'exists' => is_dir($path),
+        'files' => $files,
+        'owner' => is_dir($path) ? fileowner($path) : 'N/A',
+        'perms' => is_dir($path) ? substr(sprintf('%o', fileperms($path)), -4) : 'N/A',
+    ]);
 });
 
 $router->get('/', function () use ($router) {
