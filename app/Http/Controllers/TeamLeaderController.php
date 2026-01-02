@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 class TeamLeaderController extends Controller
 {
     /**
-     * Team Leader login
+     * Team Leader and Staff login
      */
     public function login(Request $request)
     {
@@ -30,43 +30,82 @@ class TeamLeaderController extends Controller
         }
 
         try {
-            // Find team leader by staff_id (staff_id is the same as employee_id)
+            // First, try to find team leader by staff_id (staff_id is the same as employee_id)
             $teamLeader = TeamLeader::where('staff_id', $request->employee_id)->first();
 
-            if (!$teamLeader) {
+            if ($teamLeader) {
+                // Verify password for team leader
+                if (!password_verify($request->password, $teamLeader->password)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid employee ID or password'
+                    ], 401);
+                }
+
+                // Check if using default password (tl1230)
+                $isDefaultPassword = password_verify('tl1230', $teamLeader->password);
+
+                // Generate token (simple token for now)
+                $token = base64_encode($teamLeader->staff_id . ':' . time());
+
                 return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid employee ID or password'
-                ], 401);
+                    'success' => true,
+                    'message' => 'Login successful',
+                    'token' => $token,
+                    'is_default_password' => $isDefaultPassword,
+                    'user' => [
+                        'employee_id' => $teamLeader->staff_id,
+                        'name' => $teamLeader->name,
+                        'position' => $teamLeader->position,
+                        'group' => $teamLeader->group,
+                        'department' => $teamLeader->department,
+                        'role' => 'team_leader',
+                    ]
+                ]);
             }
 
-            // Verify password
-            if (!password_verify($request->password, $teamLeader->password)) {
+            // If not found as team leader, try to find as staff in staff table with role='staff'
+            $staffUser = Staff::where('staff_id', $request->employee_id)
+                ->where('role', 'staff')
+                ->first();
+
+            if ($staffUser) {
+                // Verify password for staff
+                if (!password_verify($request->password, $staffUser->password)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid employee ID or password'
+                    ], 401);
+                }
+
+                // Check if using default password (staff1230)
+                $isDefaultPassword = password_verify('staff1230', $staffUser->password);
+
+                // Generate token
+                $token = base64_encode($staffUser->staff_id . ':staff:' . time());
+
                 return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid employee ID or password'
-                ], 401);
+                    'success' => true,
+                    'message' => 'Login successful',
+                    'token' => $token,
+                    'is_default_password' => $isDefaultPassword,
+                    'user' => [
+                        'employee_id' => $staffUser->staff_id,
+                        'name' => $staffUser->name,
+                        'position' => $staffUser->position,
+                        'group' => $staffUser->group,
+                        'department' => $staffUser->department,
+                        'role' => 'staff',
+                    ]
+                ]);
             }
 
-            // Check if using default password (tl1230)
-            $isDefaultPassword = password_verify('tl1230', $teamLeader->password);
-
-            // Generate token (simple token for now)
-            $token = base64_encode($teamLeader->staff_id . ':' . time());
-
+            // Neither team leader nor staff found
             return response()->json([
-                'success' => true,
-                'message' => 'Login successful',
-                'token' => $token,
-                'is_default_password' => $isDefaultPassword,
-                'user' => [
-                    'employee_id' => $teamLeader->staff_id,
-                    'name' => $teamLeader->name,
-                    'position' => $teamLeader->position,
-                    'group' => $teamLeader->group,
-                    'department' => $teamLeader->department,
-                ]
-            ]);
+                'success' => false,
+                'message' => 'Invalid employee ID or password'
+            ], 401);
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

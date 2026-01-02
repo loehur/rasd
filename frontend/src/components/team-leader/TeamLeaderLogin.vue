@@ -238,14 +238,15 @@ const handleLogin = async () => {
             localStorage.setItem("tl_auth_token", data.token);
             localStorage.setItem("tl_user", JSON.stringify(data.user));
 
-            // Store default password flag
-            if (data.is_default_password) {
+            // Store default password flag and redirect based on role
+            // Only force password change for Team Leaders, not for Staff
+            if (data.is_default_password && data.user.role === 'team_leader') {
                 localStorage.setItem("tl_must_change_password", "true");
-                // Redirect to change password page
+                // Redirect to change password page (Team Leader only)
                 window.location.href = "/team-leader/change-password";
             } else {
                 localStorage.removeItem("tl_must_change_password");
-                // Redirect to Team Leader dashboard
+                // Redirect to dashboard (both Team Leader and Staff)
                 window.location.href = "/team-leader/dashboard";
             }
         } else {

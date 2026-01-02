@@ -78,6 +78,7 @@ export default defineConfig(({ command }) => {
     return {
         root: ".",
         publicDir: "public",
+        base: "/jobs/sd_pro/public/", // Use absolute path for subdirectory deployment
         plugins: [
             vue(),
             {
@@ -139,6 +140,10 @@ export default defineConfig(({ command }) => {
                         __dirname,
                         "pages/team-leader/resignation.html"
                     ),
+                    teamLeaderPhoneNumbers: resolve(
+                        __dirname,
+                        "pages/team-leader/phone-numbers.html"
+                    ),
                     // Admin pages
                     adminLogin: resolve(__dirname, "pages/admin/login.html"),
                     dashboard: resolve(__dirname, "pages/admin/dashboard.html"),
@@ -181,6 +186,7 @@ export default defineConfig(({ command }) => {
                         "pages/admin/staff-changes.html"
                     ),
                     system: resolve(__dirname, "pages/admin/system.html"),
+                    adminPhoneNumbers: resolve(__dirname, "pages/admin/phone-numbers.html"),
                     teamLeaderResign: resolve(
                         __dirname,
                         "pages/admin/team-leader-resign.html"

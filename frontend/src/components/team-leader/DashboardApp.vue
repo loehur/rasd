@@ -119,8 +119,8 @@
 
         <!-- Main Content -->
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <!-- Quick Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Quick Stats - Hidden for staff -->
+            <div v-if="userRole !== 'staff'" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <a
                     href="/team-leader/staff-list"
                     class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-emerald-300 transition-all cursor-pointer group"
@@ -375,6 +375,89 @@
                     </div>
                 </a>
             </div>
+
+            <!-- Menu for staff users - Phone Numbers -->
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <a
+                    href="/team-leader/phone-numbers"
+                    class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-lg hover:border-green-300 transition-all cursor-pointer group"
+                >
+                    <div class="flex items-center">
+                        <div
+                            class="p-3 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors"
+                        >
+                            <svg
+                                class="w-8 h-8 text-green-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                                ></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <p
+                                class="text-sm font-medium text-gray-600 group-hover:text-green-600"
+                            >
+                                Phone Numbers
+                            </p>
+                            <p
+                                class="text-lg font-bold text-gray-900 group-hover:text-green-700"
+                            >
+                                Manage Contacts
+                            </p>
+                        </div>
+                        <svg
+                            class="w-6 h-6 text-gray-400 group-hover:text-green-600 transition-colors"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 5l7 7-7 7"
+                            ></path>
+                        </svg>
+                    </div>
+                </a>
+
+                <!-- Placeholder for future staff features -->
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 opacity-50">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-gray-100">
+                            <svg
+                                class="w-8 h-8 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                ></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <p class="text-sm font-medium text-gray-400">
+                                More Features
+                            </p>
+                            <p class="text-lg font-bold text-gray-400">
+                                Coming Soon
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 
             <!-- Attendance section moved to dedicated page /team-leader/attendance -->
         </main>
@@ -840,6 +923,7 @@ import {
 import { API_BASE_URL } from "@/config/api";
 
 const userName = ref("");
+const userRole = ref("");
 const staffList = ref([]);
 const attendances = ref([]);
 const loading = ref(true);
@@ -932,6 +1016,9 @@ onMounted(() => {
     const user = JSON.parse(localStorage.getItem("tl_user") || "{}");
     const full = (user && user.name ? user.name : "Team Leader").trim();
     userName.value = full.split(/\s+/)[0];
+    
+    // Set user role
+    userRole.value = user.role || "team_leader";
 
     fetchStaffList();
     fetchAttendances();

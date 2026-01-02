@@ -73,6 +73,10 @@ $router->get('/admin/system', function () {
     return file_get_contents(base_path('public/pages/admin/system.html'));
 });
 
+$router->get('/admin/phone-numbers', function () {
+    return file_get_contents(base_path('public/pages/admin/phone-numbers.html'));
+});
+
 $router->get('/admin', function () {
     return file_get_contents(base_path('public/pages/admin/login.html'));
 });
@@ -108,6 +112,10 @@ $router->get('/team-leader/inactive-staff', function () {
 
 $router->get('/team-leader/resignation', function () {
     return file_get_contents(base_path('public/pages/team-leader/resignation.html'));
+});
+
+$router->get('/team-leader/phone-numbers', function () {
+    return file_get_contents(base_path('public/pages/team-leader/phone-numbers.html'));
 });
 
 // API Routes
@@ -173,4 +181,10 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('staff-changes/logs', 'StaffChangeController@getStaffLogs');
     $router->get('staff-changes/logs/{staffId}', 'StaffChangeController@getStaffLogs');
     $router->get('staff-changes/detail/{staffId}', 'StaffChangeController@getStaffDetail');
+    
+    // Phone Number Management routes
+    $router->get('phone-numbers', 'PhoneNumberController@index');
+    $router->post('phone-numbers', 'PhoneNumberController@store');
+    $router->put('phone-numbers/{id}', 'PhoneNumberController@update');
+    $router->delete('phone-numbers/{id}', 'PhoneNumberController@destroy');
 });
