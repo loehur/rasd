@@ -277,6 +277,40 @@ class StaffController extends Controller
     }
 
     /**
+     * Reset staff password to default (staff1230) - Admin only
+     */
+    public function resetPassword($staffId)
+    {
+        try {
+            $staff = Staff::where('staff_id', $staffId)
+                ->where('role', 'staff')
+                ->first();
+
+            if (!$staff) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Staff not found'
+                ], 404);
+            }
+
+            // Reset password to default
+            $defaultPassword = password_hash('staff1230', PASSWORD_BCRYPT);
+            $staff->update(['password' => $defaultPassword]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset successfully to staff1230'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reset password: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Reset all staff data (Super Admin only)
      * WARNING: This will permanently delete ALL staff records
      *
