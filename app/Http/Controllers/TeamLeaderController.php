@@ -845,7 +845,8 @@ class TeamLeaderController extends Controller
 
             // Build query for status_change logs
             $query = StaffLog::where('change_type', 'status_change')
-                ->where('remarks', 'Team Leader Resignation');
+                ->where('remarks', 'Team Leader Resignation')
+                ->where('created_at', '>=', \Carbon\Carbon::now()->subHours(24));
 
             // Apply date filters if provided
             if ($startDate) {

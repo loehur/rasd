@@ -97,7 +97,7 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                                     Date Added
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                <th v-if="isSuperAdmin" class="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                                     Actions
                                 </th>
                             </tr>
@@ -122,7 +122,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                                     {{ formatDate(item.created_at) }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <td v-if="isSuperAdmin" class="px-6 py-4 whitespace-nowrap text-sm">
                                     <div class="flex gap-2">
                                         <button
                                             @click="editPhoneNumber(item)"
@@ -248,8 +248,18 @@ const editData = ref({
     phone_number: '',
     remarks: ''
 });
+const isSuperAdmin = ref(false);
 
 onMounted(() => {
+    // Check if user is super-admin
+    const userData = localStorage.getItem('user');
+    if (userData) {
+        try {
+            const parsed = JSON.parse(userData);
+            isSuperAdmin.value = parsed.role === 'super-admin';
+        } catch {}
+    }
+
     fetchPhoneNumbers();
 });
 
