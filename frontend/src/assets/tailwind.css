@@ -1,4 +1,9 @@
-/* FILE: src/assets/tailwind.css */
+/* FILE: src/assets/tailwind.css - v2 */
+/* Force rebuild hash change */
+.force-rebuild-v3 {
+    content: 'v3';
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

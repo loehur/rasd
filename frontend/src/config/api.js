@@ -15,9 +15,10 @@ const isDevelopment =
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1";
 
-export const API_BASE_URL = isDevelopment
-    ? API_CONFIG.development
-    : API_CONFIG.production;
+// Fixed API Base URL logic - v2
+export const API_BASE_URL = import.meta.env.MODE === 'production'
+    ? '/jobs/sd_pro' // Production URL
+    : 'http://localhost:8000'; // Development URL
 
 // API Endpoints
 export const API_ENDPOINTS = {
