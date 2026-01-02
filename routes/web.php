@@ -241,55 +241,46 @@ $router->group(['prefix' => $apiPrefix], function () use ($router) {
     $router->delete('phone-numbers/{id}', 'PhoneNumberController@destroy');
 });
 
-// Fallback Catch-All Route for Assets & Debugging
-// matches GET requests to anything not matched above
-$router->get('/{any:.*}', function ($any) {
-    // Debug Path Route
-    if (strpos($any, 'check-assets') !== false || strpos($any, 'debug-path') !== false) {
-        return response()->json([
-            'message' => 'Catch-All Route Hit!',
-            'path_seen_by_lumen' => $any,
-            'full_url' => request()->fullUrl(),
-            'base_path' => base_path(),
-            'public_path' => base_path('public'),
-            'asset_dir_exists' => is_dir(base_path('public/assets')),
-            'sample_file_check' => file_exists(base_path('public/assets/staff.png')) ? 'FOUND' : 'NOT FOUND',
-        ]);
-    }
+// Debug Route Top
+$router->get('test-path', function () {
+    return response()->json([
+        'path' => request()->path(),
+        'url' => request()->url(),
+    ]);
+});
+
+// Assets handler logic (removed, handled by catch-all)
+
+// ... (Rest of code)
+
+// MODIFIED Catch-All at the end to support POST/PUT etc for debugging
+$router->group(['prefix' => ''], function ($router) {
+    $router->addRoute(['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], '/{any:.*}', function ($any) {
+        // Debug Path for failed API calls
+        if (strpos($any, 'login') !== false || strpos($any, 'api') !== false) {
+             return response()->json([
+                'STATUS' => 'FALLBACK_HIT_MEANS_ROUTE_MISMATCH',
+                'method' => request()->method(),
+                'path_seen_by_lumen' => $any,
+                'request_path_method' => request()->path(),
+                'calculated_prefix_logic_test' => preg_match('#^(.*/)?api(/|$)#', request()->path(), $m) ? ($m[1] . 'api') : 'NOMATCH',
+                'full_url' => request()->fullUrl(),
+            ], 404);
+        }
+        
+        // Asset Handler Logic (Same as before)
+        if (preg_match('#(assets|dist)/(.*)$#', $any, $matches)) {
+            $folder = $matches[1];
+            $file = $matches[2];
+            if (strpos($file, '..') !== false) return response('Forbidden', 403);
+            $path = base_path("public/$folder/$file");
+            if (file_exists($path)) {
+                $ext = pathinfo($path, PATHINFO_EXTENSION);
+                $types = ['js' => 'application/javascript', 'css' => 'text/css', 'png' => 'image/png', 'jpg' => 'image/jpeg', 'svg' => 'image/svg+xml'];
+                return response(file_get_contents($path))->header('Content-Type', $types[$ext] ?? 'text/plain');
+            }
+        }
     
-    // Check if this looks like an asset request (contains 'assets/' or 'dist/')
-    // Usage of preg_match allows matching "jobs/sd_pro/public/assets/foo.js" 
-    // and extracting "assets/foo.js" regardless of prefix.
-    if (preg_match('#(assets|dist)/(.*)$#', $any, $matches)) {
-        $folder = $matches[1]; // assets or dist
-        $file = $matches[2];   // filename.js
-        
-        // Prevent directory traversal
-        if (strpos($file, '..') !== false) {
-           return response('Forbidden', 403);
-        }
-
-        $path = base_path("public/$folder/$file");
-        
-        if (file_exists($path)) {
-            $ext = pathinfo($path, PATHINFO_EXTENSION);
-            $types = [
-                'js' => 'application/javascript',
-                'css' => 'text/css',
-                'png' => 'image/png',
-                'jpg' => 'image/jpeg',
-                'svg' => 'image/svg+xml',
-                'woff' => 'font/woff', 
-                'woff2' => 'font/woff2'
-            ];
-            $contentType = $types[$ext] ?? 'text/plain';
-            return response(file_get_contents($path))
-                ->header('Content-Type', $contentType);
-        }
-        
-        // If file not found, return 404 but with debug info for now
-        // return response("Asset file not found at: $path", 404);
-    }
-
-    return response('Route not defined: ' . $any, 404);
+        return response('Route not defined: ' . $any, 404);
+    });
 });
