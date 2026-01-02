@@ -118,24 +118,9 @@ $router->get('/team-leader/phone-numbers', function () {
     return file_get_contents(base_path('public/pages/team-leader/phone-numbers.html'));
 });
 
-// --- 3. API ROUTES (WITH DYNAMIC PREFIX) ---
-
-// Detect if we are running in a subfolder and adjust prefix accordingly
-$apiPrefix = 'api';
-$requestPath = request()->path();
-// Regex to capture optional prefix folder before 'api'
-if (preg_match('#^(.*/)?api(/|$)#', $requestPath, $matches)) {
-    $prefixPath = $matches[1] ?? '';
-    $prefixPath = rtrim($prefixPath, '/');
-    if (!empty($prefixPath)) {
-        $apiPrefix = $prefixPath . '/api';
-    } else {
-        $apiPrefix = 'api';
-    }
-}
-$apiPrefix = ltrim($apiPrefix, '/'); // Ensure clean prefix
-
-$router->group(['prefix' => $apiPrefix], function () use ($router) {
+// --- 3. API ROUTES (ROBUST MATCHING) ---
+// Define API routes in a closure to reuse
+$apiRoutes = function () use ($router) {
     $router->post('login', 'AuthController@login');
 
     // Staff routes
@@ -205,7 +190,24 @@ $router->group(['prefix' => $apiPrefix], function () use ($router) {
     $router->post('phone-numbers', 'PhoneNumberController@store');
     $router->put('phone-numbers/{id}', 'PhoneNumberController@update');
     $router->delete('phone-numbers/{id}', 'PhoneNumberController@destroy');
-});
+};
+
+// Register routes for 'api' prefix (Standard)
+$router->group(['prefix' => 'api'], $apiRoutes);
+
+// Register routes for detected subfolder prefix (Subfolder Support)
+// This covers cases where 'request()->path()' includes the full subfolder structure
+$requestPath = request()->path();
+if (preg_match('#^(.*/)?api(/|$)#', $requestPath, $matches)) {
+    $calculatedPrefix = $matches[1] . 'api';
+    $calculatedPrefix = trim($calculatedPrefix, '/');
+    if ($calculatedPrefix !== 'api') {
+        $router->group(['prefix' => $calculatedPrefix], $apiRoutes);
+    }
+}
+// Also hardcode the known subfolder just in case regex fails mysteriously
+$testPrefix = 'jobs/sd_pro/api';
+$router->group(['prefix' => $testPrefix], $apiRoutes);
 
 
 // --- 4. CATCH-ALL ROUTE (ASSETS FALLBACK & DEBUGGING) ---
