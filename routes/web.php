@@ -13,162 +13,127 @@
 |
 */
 
-// Asset handlers removed - moved to catch-all at the end
-
-// Debug Path Route - Access this to see what Lumen sees
-$router->get('debug-path', function () {
+// --- 1. DEBUG ROUTES ---
+$router->get('test-path', function () {
     return response()->json([
-        'path_path' => request()->path(),
+        'path' => request()->path(),
         'url' => request()->url(),
-        'full_url' => request()->fullUrl(),
-        'method' => request()->method(),
-        'base_path' => base_path(),
+        'method' => request()->method()
     ]);
 });
 
+$router->get('check-assets', function () {
+    $path = base_path('public/assets');
+    $files = is_dir($path) ? scandir($path) : [];
+    return response()->json([
+        'path' => $path,
+        'exists' => is_dir($path),
+        'files' => $files,
+        'public_path' => base_path('public'),
+    ]);
+});
+
+// --- 2. PAGE ROUTES (SERVE HTML) ---
 // Main Entry Point
 $router->get('/', function () use ($router) {
     return file_get_contents(base_path('public/pages/public/team-leader-login.html'));
 });
 
-// Admin Dashboard
+// Admin Pages
+$router->get('/admin', function () {
+    return file_get_contents(base_path('public/pages/admin/login.html'));
+});
 $router->get('/admin/dashboard', function () {
     return file_get_contents(base_path('public/pages/admin/dashboard.html'));
 });
-
-// ... (Other admin routes are defined below in the original file, I should not delete them if I can avoid it) ... 
-// But since I am appending, I will assume user routes are fine if I just append catch-all AT THE END.
-
-// Wait, the previous replace removed the '/' route. I need to put it back.
-// AND I need to make sure I didn't delete the rest of the file.
-
-// Let's rewrite the catch-all section correctly.
-
-
-// Admin frontend routes - serve appropriate HTML based on path
-$router->get('/admin/dashboard', function () {
-    return file_get_contents(base_path('public/pages/admin/dashboard.html'));
-});
-
 $router->get('/admin/staff-list', function () {
     return file_get_contents(base_path('public/pages/admin/staff-list.html'));
 });
-
 $router->get('/admin/inactive-staff', function () {
     return file_get_contents(base_path('public/pages/admin/inactive-staff.html'));
 });
-
 $router->get('/admin/import-staff', function () {
     return file_get_contents(base_path('public/pages/admin/import-staff.html'));
 });
-
 $router->get('/admin/import-team-leader', function () {
     return file_get_contents(base_path('public/pages/admin/import-team-leader.html'));
 });
-
 $router->get('/admin/account', function () {
     return file_get_contents(base_path('public/pages/admin/account.html'));
 });
-
 $router->get('/admin/team-leader-list', function () {
     return file_get_contents(base_path('public/pages/admin/team-leader-list.html'));
 });
-
 $router->get('/admin/team-leader-resign', function () {
     return file_get_contents(base_path('public/pages/admin/team-leader-resign.html'));
 });
-
 $router->get('/admin/team-leader/edit/{employeeId}', function () {
     return file_get_contents(base_path('public/pages/admin/edit-team-leader.html'));
 });
-
 $router->get('/admin/change-password', function () {
     return file_get_contents(base_path('public/pages/admin/change-password.html'));
 });
 $router->get('/admin/attendance', function () {
     return file_get_contents(base_path('public/pages/admin/attendance.html'));
 });
-
 $router->get('/admin/users', function () {
     return file_get_contents(base_path('public/pages/admin/users.html'));
 });
-
 $router->get('/admin/staff-changes', function () {
     return file_get_contents(base_path('public/pages/admin/staff-changes.html'));
 });
-
 $router->get('/admin/system', function () {
     return file_get_contents(base_path('public/pages/admin/system.html'));
 });
-
 $router->get('/admin/phone-numbers', function () {
     return file_get_contents(base_path('public/pages/admin/phone-numbers.html'));
 });
 
-$router->get('/admin', function () {
-    return file_get_contents(base_path('public/pages/admin/login.html'));
-});
-
-// Team Leader public routes
+// Team Leader Pages
 $router->get('/team-leader/login', function () {
     return file_get_contents(base_path('public/pages/public/team-leader-login.html'));
 });
-
 $router->get('/team-leader/dashboard', function () {
     return file_get_contents(base_path('public/pages/team-leader/dashboard.html'));
 });
-
 $router->get('/team-leader/attendance', function () {
     return file_get_contents(base_path('public/pages/team-leader/attendance.html'));
 });
-
 $router->get('/team-leader/account', function () {
     return file_get_contents(base_path('public/pages/team-leader/account.html'));
 });
-
 $router->get('/team-leader/change-password', function () {
     return file_get_contents(base_path('public/pages/team-leader/change-password.html'));
 });
-
 $router->get('/team-leader/staff-list', function () {
     return file_get_contents(base_path('public/pages/team-leader/staff-list.html'));
 });
-
 $router->get('/team-leader/inactive-staff', function () {
     return file_get_contents(base_path('public/pages/team-leader/inactive-staff.html'));
 });
-
 $router->get('/team-leader/resignation', function () {
     return file_get_contents(base_path('public/pages/team-leader/resignation.html'));
 });
-
 $router->get('/team-leader/phone-numbers', function () {
     return file_get_contents(base_path('public/pages/team-leader/phone-numbers.html'));
 });
 
-// API Routes
+// --- 3. API ROUTES (WITH DYNAMIC PREFIX) ---
+
 // Detect if we are running in a subfolder and adjust prefix accordingly
 $apiPrefix = 'api';
 $requestPath = request()->path();
-
-// Regex explanation:
-// ^(.*/)?  -> Optional leading path ending with slash (Group 1)
-// api      -> Literal 'api'
-// (/|$)    -> Followed by slash or end of string
+// Regex to capture optional prefix folder before 'api'
 if (preg_match('#^(.*/)?api(/|$)#', $requestPath, $matches)) {
-    $prefixPath = $matches[1] ?? ''; // e.g. 'jobs/sd_pro/' or ''
-    // Trim trailing slash from prefix path to strictly format 'path/api'
+    $prefixPath = $matches[1] ?? '';
     $prefixPath = rtrim($prefixPath, '/');
-    
     if (!empty($prefixPath)) {
         $apiPrefix = $prefixPath . '/api';
     } else {
         $apiPrefix = 'api';
     }
 }
-
-// Ensure no leading slash issues in Lumen
-$apiPrefix = ltrim($apiPrefix, '/');
+$apiPrefix = ltrim($apiPrefix, '/'); // Ensure clean prefix
 
 $router->group(['prefix' => $apiPrefix], function () use ($router) {
     $router->post('login', 'AuthController@login');
@@ -208,6 +173,7 @@ $router->group(['prefix' => $apiPrefix], function () use ($router) {
     $router->get('attendances/{id}', 'AttendanceController@show');
     $router->put('attendances/{id}', 'AttendanceController@update');
     $router->delete('attendances/{id}', 'AttendanceController@destroy');
+    
     // Users management routes
     $router->get('users', 'UserController@index');
     $router->post('users', 'UserController@store');
@@ -241,46 +207,59 @@ $router->group(['prefix' => $apiPrefix], function () use ($router) {
     $router->delete('phone-numbers/{id}', 'PhoneNumberController@destroy');
 });
 
-// Debug Route Top
-$router->get('test-path', function () {
-    return response()->json([
-        'path' => request()->path(),
-        'url' => request()->url(),
-    ]);
-});
 
-// Assets handler logic (removed, handled by catch-all)
+// --- 4. CATCH-ALL ROUTE (ASSETS FALLBACK & DEBUGGING) ---
+// This must be the LAST route definition.
+// It accepts ALL methods (GET, POST, etc) to catch everything.
 
-// ... (Rest of code)
-
-// MODIFIED Catch-All at the end to support POST/PUT etc for debugging
 $router->group(['prefix' => ''], function ($router) {
     $router->addRoute(['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], '/{any:.*}', function ($any) {
-        // Debug Path for failed API calls
+        
+        // A. Asset Handling Logic
+        // Checks if URL contains 'assets/' or 'dist/'
+        if (preg_match('#(assets|dist)/(.*)$#', $any, $matches)) {
+            $folder = $matches[1];
+            $file = $matches[2];
+            
+            // Security check
+            if (strpos($file, '..') !== false) {
+                 return response('Forbidden', 403);
+            }
+
+            $path = base_path("public/$folder/$file");
+            if (file_exists($path)) {
+                $ext = pathinfo($path, PATHINFO_EXTENSION);
+                $types = [
+                    'js' => 'application/javascript', 
+                    'css' => 'text/css', 
+                    'png' => 'image/png', 
+                    'jpg' => 'image/jpeg', 
+                    'svg' => 'image/svg+xml',
+                    'woff' => 'font/woff',
+                    'woff2' => 'font/woff2'
+                ];
+                $contentType = $types[$ext] ?? 'text/plain';
+                return response(file_get_contents($path))
+                    ->header('Content-Type', $contentType);
+            }
+            // If asset not found, don't return 404 yet, let it fall through or return specific asset 404
+             return response("Asset file not found at: $path", 404);
+        }
+
+        // B. Debug Logic for API/Login failures
+        // If we reached here with an API request, it means the API route didn't match.
         if (strpos($any, 'login') !== false || strpos($any, 'api') !== false) {
              return response()->json([
                 'STATUS' => 'FALLBACK_HIT_MEANS_ROUTE_MISMATCH',
                 'method' => request()->method(),
                 'path_seen_by_lumen' => $any,
-                'request_path_method' => request()->path(),
-                'calculated_prefix_logic_test' => preg_match('#^(.*/)?api(/|$)#', request()->path(), $m) ? ($m[1] . 'api') : 'NOMATCH',
+                'request_path' => request()->path(),
                 'full_url' => request()->fullUrl(),
+                'calculated_prefix_test' => preg_match('#^(.*/)?api(/|$)#', request()->path(), $m) ? ($m[1] . 'api') : 'NOMATCH',
             ], 404);
         }
-        
-        // Asset Handler Logic (Same as before)
-        if (preg_match('#(assets|dist)/(.*)$#', $any, $matches)) {
-            $folder = $matches[1];
-            $file = $matches[2];
-            if (strpos($file, '..') !== false) return response('Forbidden', 403);
-            $path = base_path("public/$folder/$file");
-            if (file_exists($path)) {
-                $ext = pathinfo($path, PATHINFO_EXTENSION);
-                $types = ['js' => 'application/javascript', 'css' => 'text/css', 'png' => 'image/png', 'jpg' => 'image/jpeg', 'svg' => 'image/svg+xml'];
-                return response(file_get_contents($path))->header('Content-Type', $types[$ext] ?? 'text/plain');
-            }
-        }
-    
+
+        // C. Generic 404
         return response('Route not defined: ' . $any, 404);
     });
 });
