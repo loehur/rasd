@@ -13,6 +13,54 @@
 |
 */
 
+// Asset handler attempt to bypass server 404s
+$router->get('/dist/{file:.+}', function ($file) {
+    // Prevent directory traversal
+    if (strpos($file, '..') !== false) {
+       return response('Forbidden', 403);
+    }
+    
+    $path = base_path('public/dist/' . $file);
+    
+    if (file_exists($path)) {
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
+        $types = [
+            'js' => 'application/javascript',
+            'css' => 'text/css',
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'svg' => 'image/svg+xml',
+            'woff' => 'font/woff',
+            'woff2' => 'font/woff2'
+        ];
+        $contentType = $types[$ext] ?? 'text/plain';
+        return response(file_get_contents($path))
+            ->header('Content-Type', $contentType);
+    }
+    
+    return response('Asset not found: ' . $file, 404);
+});
+
+// Also handle old assets folder if needed
+$router->get('/assets/{file:.+}', function ($file) {
+    if (strpos($file, '..') !== false) return response('Forbidden', 403);
+    $path = base_path('public/assets/' . $file);
+    if (file_exists($path)) {
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
+        $types = [
+            'js' => 'application/javascript', 
+            'css' => 'text/css', 
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'svg' => 'image/svg+xml'
+        ];
+        $contentType = $types[$ext] ?? 'text/plain';
+        return response(file_get_contents($path))
+            ->header('Content-Type', $contentType);
+    }
+    return response('Asset not found', 404);
+});
+
 $router->get('/', function () use ($router) {
     return file_get_contents(base_path('public/pages/public/team-leader-login.html'));
 });
