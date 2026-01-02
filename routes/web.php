@@ -150,10 +150,25 @@ $router->get('/team-leader/phone-numbers', function () {
 // Detect if we are running in a subfolder and adjust prefix accordingly
 $apiPrefix = 'api';
 $requestPath = request()->path();
-// If the path starts with 'jobs/sd_pro/api' (or any other subfolder variant), use that as prefix
-if (preg_match('#^(.*)/api(/|$)#', $requestPath, $matches)) {
-    $apiPrefix = $matches[1] . '/api';
+
+// Regex explanation:
+// ^(.*/)?  -> Optional leading path ending with slash (Group 1)
+// api      -> Literal 'api'
+// (/|$)    -> Followed by slash or end of string
+if (preg_match('#^(.*/)?api(/|$)#', $requestPath, $matches)) {
+    $prefixPath = $matches[1] ?? ''; // e.g. 'jobs/sd_pro/' or ''
+    // Trim trailing slash from prefix path to strictly format 'path/api'
+    $prefixPath = rtrim($prefixPath, '/');
+    
+    if (!empty($prefixPath)) {
+        $apiPrefix = $prefixPath . '/api';
+    } else {
+        $apiPrefix = 'api';
+    }
 }
+
+// Ensure no leading slash issues in Lumen
+$apiPrefix = ltrim($apiPrefix, '/');
 
 $router->group(['prefix' => $apiPrefix], function () use ($router) {
     $router->post('login', 'AuthController@login');
