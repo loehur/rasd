@@ -614,6 +614,11 @@
                                 >
                                     WL
                                 </th>
+                                <th
+                                    class="px-3 py-2 text-center text-[11px] font-semibold text-slate-300 uppercase tracking-wider"
+                                >
+                                    Action
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -626,7 +631,7 @@
                                 <!-- Team Leader Header Row -->
                                 <tr class="bg-slate-800/70">
                                     <td
-                                        colspan="12"
+                                        colspan="13"
                                         class="px-3 py-3 text-left font-bold text-emerald-400 text-sm"
                                     >
                                         Team Leader: {{ teamLeader }} ({{
@@ -639,7 +644,8 @@
                                 <tr
                                     v-for="(staff, index) in staffGroup"
                                     :key="staff.id"
-                                    class="hover:bg-slate-800/30 transition border-t border-slate-800/50"
+                                    @click="selectedStaff = staff"
+                                    class="hover:bg-slate-800/30 transition border-t border-slate-800/50 cursor-pointer"
                                 >
                                     <td
                                         class="px-3 py-2 text-blue-300 font-semibold"
@@ -678,6 +684,17 @@
                                     </td>
                                     <td class="px-3 py-2">
                                         {{ staff.warning_letter ? "WL" : "-" }}
+                                    </td>
+                                    <td class="px-3 py-2 text-center" @click.stop>
+                                        <button
+                                            @click="resetStaffPassword(staff.staff_id)"
+                                            class="p-1.5 bg-red-500/10 text-red-400 border border-red-500/30 rounded hover:bg-red-500/20 transition"
+                                            title="Reset Password"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                            </svg>
+                                        </button>
                                     </td>
                                 </tr>
                             </template>
