@@ -321,6 +321,36 @@
                         </div>
                     </button>
 
+                    <!-- Card 7: Staff - Phone Numbers -->
+                    <button
+                        @click="goToPhoneNumbers"
+                        class="bg-gradient-to-br from-indigo-600/20 to-indigo-500/10 border border-indigo-500/40 hover:border-indigo-400/60 hover:from-indigo-600/30 hover:to-indigo-500/20 rounded-xl p-4 transition-all text-left flex items-center gap-3"
+                    >
+                        <div
+                            class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center"
+                        >
+                            <svg
+                                class="w-6 h-6 text-indigo-300"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                                />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-300">Staff</p>
+                            <p class="text-lg font-semibold text-indigo-300">
+                                Phone Numbers
+                            </p>
+                        </div>
+                    </button>
+
                     <!-- Card 6: Reports - Performance -->
                     <a
                         href="https://excel.myportofolio98.xyz/"
@@ -627,5 +657,9 @@ const goToAttendance = () => {
 
 const goToStaffChanges = () => {
     window.location.href = "/admin/staff-changes";
+};
+
+const goToPhoneNumbers = () => {
+    window.location.href = "/admin/phone-numbers";
 };
 </script>
