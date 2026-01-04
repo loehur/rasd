@@ -164,11 +164,11 @@ class PhoneNumberController extends Controller
                 ], 404);
             }
 
-            // Only staff can add phone numbers
-            if ($user->role !== 'staff') {
+            // Only staff and team leader can add phone numbers
+            if (!in_array($user->role, ['staff', 'tl'])) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Only staff members can add phone numbers'
+                    'message' => 'Only staff members and team leaders can add phone numbers'
                 ], 403);
             }
 
@@ -189,7 +189,14 @@ class PhoneNumberController extends Controller
             // Get team leader info
             $teamLeaderName = null;
             $teamLeaderId = null;
-            if ($user->team_leader_id) {
+            
+            // If user is TL, use their own info as team leader
+            if ($user->role === 'tl') {
+                $teamLeaderName = $user->name;
+                $teamLeaderId = $user->staff_id;
+            }
+            // If user is staff, get their team leader info
+            elseif ($user->team_leader_id) {
                 $teamLeader = Staff::where('staff_id', $user->team_leader_id)->first();
                 if ($teamLeader) {
                     $teamLeaderName = $teamLeader->name;
