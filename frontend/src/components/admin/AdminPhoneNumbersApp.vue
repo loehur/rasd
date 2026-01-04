@@ -119,13 +119,13 @@
                                     {{ item.phone_number }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
-                                    <div v-if="item.remarks" class="relative group">
-                                        <svg class="w-5 h-5 text-amber-400 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        <div class="absolute z-50 invisible group-hover:visible bg-slate-800 border border-slate-600 text-slate-200 text-xs rounded-lg py-2 px-3 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 max-w-xs shadow-xl">
+                                    <div v-if="item.remarks" class="relative group cursor-help">
+                                        <span class="text-slate-300">
+                                            {{ item.remarks.length > 20 ? item.remarks.substring(0, 20) + '...' : item.remarks }}
+                                        </span>
+                                        <div v-if="item.remarks.length > 20" class="absolute z-50 invisible group-hover:visible bg-slate-800 border border-slate-600 text-slate-200 text-xs rounded-lg py-2 px-3 bottom-full left-0 mb-2 w-auto max-w-xs shadow-xl whitespace-normal">
                                             {{ item.remarks }}
-                                            <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-slate-600"></div>
+                                            <div class="absolute top-full left-4 transform border-4 border-transparent border-t-slate-600"></div>
                                         </div>
                                     </div>
                                     <span v-else class="text-slate-500">-</span>
