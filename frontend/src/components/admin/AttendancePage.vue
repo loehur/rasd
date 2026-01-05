@@ -211,7 +211,11 @@ const exportExcel = () => {
         headers,
         ...attendances.value.map((a, i) => {
             const p = a.proof || "";
-            const base = String(API_BASE_URL || "").replace(/\/$/, "");
+            // Use full domain URL for export (window.location.origin + API path + file path)
+            const origin = window.location.origin;
+            const apiPath = String(API_BASE_URL || "").replace(/\/$/, "");
+            // Build full base URL: if API_BASE_URL is relative, prepend origin
+            const base = /^https?:\/\//i.test(apiPath) ? apiPath : `${origin}${apiPath.startsWith('/') ? '' : '/'}${apiPath}`;
             const normalized = p.startsWith("/") ? p.slice(1) : p;
             const proofUrl = /^https?:\/\//i.test(p)
                 ? p

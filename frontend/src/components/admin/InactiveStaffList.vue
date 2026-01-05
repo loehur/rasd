@@ -803,7 +803,11 @@ const exportResignations = async () => {
 const proofUrl = (p) => {
     if (!p) return "";
     if (/^https?:\/\//i.test(p)) return p;
-    const base = String(API_BASE_URL || "").replace(/\/$/, "");
+    // Use full domain URL for export and display
+    const origin = window.location.origin;
+    const apiPath = String(API_BASE_URL || "").replace(/\/$/, "");
+    // Build full base URL: if API_BASE_URL is relative, prepend origin
+    const base = /^https?:\/\//i.test(apiPath) ? apiPath : `${origin}${apiPath.startsWith('/') ? '' : '/'}${apiPath}`;
     const normalized = String(p).startsWith("/") ? p.slice(1) : p;
     return `${base}/${normalized}`;
 };
