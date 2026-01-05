@@ -214,6 +214,18 @@
                         />
                     </div>
                     
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">
+                            Add Date <span class="text-rose-500">*</span>
+                        </label>
+                        <input 
+                            v-model="editData.add_date"
+                            type="datetime-local"
+                            required
+                            class="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-100 placeholder-slate-500"
+                        />
+                    </div>
+                    
                     <div class="flex gap-3 justify-end mt-6">
                         <button
                             type="button"
@@ -280,7 +292,8 @@ const showEditModal = ref(false);
 const editData = ref({
     id: null,
     phone_number: '',
-    remarks: ''
+    remarks: '',
+    add_date: ''
 });
 const isSuperAdmin = ref(false);
 const pagination = ref({
@@ -373,10 +386,23 @@ const clearSearch = () => {
 };
 
 const editPhoneNumber = (item) => {
+    // Format date for datetime-local input
+    let formattedDate = '';
+    if (item.created_at) {
+        const date = new Date(item.created_at);
+        // Format: YYYY-MM-DDTHH:mm
+        formattedDate = date.getFullYear() + '-' + 
+            String(date.getMonth() + 1).padStart(2, '0') + '-' +
+            String(date.getDate()).padStart(2, '0') + 'T' +
+            String(date.getHours()).padStart(2, '0') + ':' +
+            String(date.getMinutes()).padStart(2, '0');
+    }
+    
     editData.value = {
         id: item.id,
         phone_number: item.phone_number,
-        remarks: item.remarks
+        remarks: item.remarks,
+        add_date: formattedDate
     };
     showEditModal.value = true;
 };
@@ -405,7 +431,8 @@ const submitEdit = async () => {
             },
             body: JSON.stringify({
                 phone_number: editData.value.phone_number,
-                remarks: editData.value.remarks
+                remarks: editData.value.remarks,
+                add_date: editData.value.add_date
             })
         });
         
@@ -431,7 +458,8 @@ const closeEditModal = () => {
     editData.value = {
         id: null,
         phone_number: '',
-        remarks: ''
+        remarks: '',
+        add_date: ''
     };
 };
 

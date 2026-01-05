@@ -292,6 +292,7 @@ class PhoneNumberController extends Controller
             $validator = Validator::make($request->all(), [
                 'phone_number' => 'required|string|max:20',
                 'remarks' => 'required|string|max:500',
+                'add_date' => 'nullable|date',
             ]);
 
             if ($validator->fails()) {
@@ -305,11 +306,19 @@ class PhoneNumberController extends Controller
             // Sanitize phone number - only keep digits
             $cleanPhoneNumber = preg_replace('/[^0-9]/', '', $request->phone_number);
 
-            // Update phone number
-            $phoneNumber->update([
+            // Prepare update data
+            $updateData = [
                 'phone_number' => $cleanPhoneNumber,
                 'remarks' => $request->remarks,
-            ]);
+            ];
+
+            // If add_date is provided (admin editing the date)
+            if ($request->has('add_date') && $request->add_date) {
+                $updateData['created_at'] = $request->add_date;
+            }
+
+            // Update phone number
+            $phoneNumber->update($updateData);
 
             return response()->json([
                 'success' => true,
