@@ -1268,7 +1268,12 @@ const proofUrl = (p) => {
     // Use full domain URL for proper display
     const origin = window.location.origin;
     const apiPath = String(API_BASE_URL || "").replace(/\/$/, "");
-    const base = /^https?:\/\//i.test(apiPath) ? apiPath : `${origin}${apiPath.startsWith('/') ? '' : '/'}${apiPath}`;
+    // Build full base URL: if API_BASE_URL is relative or empty, prepend origin
+    const base = /^https?:\/\//i.test(apiPath) 
+        ? apiPath 
+        : apiPath 
+            ? `${origin}${apiPath.startsWith('/') ? '' : '/'}${apiPath}`
+            : origin;
     const normalized = String(p).startsWith("/") ? p.slice(1) : p;
     return `${base}/${normalized}`;
 };

@@ -17,7 +17,7 @@ const isDevelopment =
 
 // Fixed API Base URL logic - v2
 export const API_BASE_URL = import.meta.env.MODE === 'production'
-    ? '/jobs/sd_pro' // Production URL
+    ? '' // Production URL (root domain, no subdirectory)
     : 'http://localhost:8000'; // Development URL
 
 // API Endpoints
